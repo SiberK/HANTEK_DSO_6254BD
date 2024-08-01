@@ -1,0 +1,13 @@
+__history
+obj
+Code demo
+Debug
+DLL*
+DOC
+*.exe
+*.log
+*.map
+*.zip
+*.7z
+*.tds
+*.~*

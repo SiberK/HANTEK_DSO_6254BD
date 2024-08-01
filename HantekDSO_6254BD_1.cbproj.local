@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2024.07.30 20:40:52.212.cpp,C:\Users\siber\OneDrive\Documents\RAD Studio\Projects\Unit1.cpp=B:\HANTEK_DSO_6254BD\Main.cpp</Transaction>
+    <Transaction>2024.07.30 20:40:52.213.h,C:\Users\siber\OneDrive\Documents\RAD Studio\Projects\Unit1.h=B:\HANTEK_DSO_6254BD\Main.h</Transaction>
+    <Transaction>2024.07.30 20:40:52.213.dfm,C:\Users\siber\OneDrive\Documents\RAD Studio\Projects\Unit1.dfm=B:\HANTEK_DSO_6254BD\Main.dfm</Transaction>
+    <Transaction>2024.07.30 20:41:28.165.cbproj,C:\Users\siber\OneDrive\Documents\RAD Studio\Projects\Project1.cbproj=B:\HANTEK_DSO_6254BD\HantekDSO_6254BD_1.cbproj</Transaction>
+    <Transaction>2024.07.30 21:34:26.370.dll,B:\HANTEK_DSO_6254BD\DLL_X64\HTDisplayDll.dll=</Transaction>
+    <Transaction>2024.07.30 21:34:26.371.dll,B:\HANTEK_DSO_6254BD\DLL_X64\HTHardDll.dll=</Transaction>
+    <Transaction>2024.07.30 21:34:26.371.dll,B:\HANTEK_DSO_6254BD\DLL_X64\HTSoftDll.dll=</Transaction>
+    <Transaction>2024.07.30 21:34:26.371.dll,B:\HANTEK_DSO_6254BD\DLL_X64\MeasDll.dll=</Transaction>
+    <Transaction>2024.07.30 23:18:46.261.cpp,B:\HANTEK_DSO_6254BD\Unit1.cpp=B:\HANTEK_DSO_6254BD\Hard.cpp</Transaction>
+    <Transaction>2024.07.30 23:18:46.261.h,B:\HANTEK_DSO_6254BD\Unit1.h=B:\HANTEK_DSO_6254BD\Hard.h</Transaction>
+    <Transaction>2024.07.30 23:19:47.688.h,B:\HANTEK_DSO_6254BD\File1.h=B:\HANTEK_DSO_6254BD\StdAfx.h</Transaction>
+    <Transaction>2024.07.30 23:28:59.229.h,B:\HANTEK_DSO_6254BD\StdAfx.h=</Transaction>
+    <Transaction>2024.07.31 18:39:09.806.cpp,B:\HANTEK_DSO_6254BD\Unit1.cpp=B:\HANTEK_DSO_6254BD\DSO_frame.cpp</Transaction>
+    <Transaction>2024.07.31 18:39:09.806.h,B:\HANTEK_DSO_6254BD\Unit1.h=B:\HANTEK_DSO_6254BD\DSO_frame.h</Transaction>
+    <Transaction>2024.07.31 18:39:09.806.dfm,B:\HANTEK_DSO_6254BD\Unit1.dfm=B:\HANTEK_DSO_6254BD\DSO_frame.dfm</Transaction>
+  </Transactions>
+</BorlandProject>
