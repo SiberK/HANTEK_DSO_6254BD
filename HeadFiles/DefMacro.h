@@ -181,7 +181,7 @@
 #endif
 	#define SF_VERSION					_T("2.0.9");
 	#define VERTICAL_8BIT
-	#define MAX_TIMEDIV_NUM				36	//总时基档位个数		
+	#define MAX_TIMEDIV_NUM				36	//总时基档位个数
 	#define TIMEDIV_OFFSET				2	//时基偏移量
 	#define AUTOMOTIVE						//定义是否有汽车测量功能
 	#define FUN_DDS						1	//定义是否有DDS功能
@@ -199,7 +199,7 @@
 	#define CALI_10V 	120
 	#define CALI_FACTOR  0.6
 	//触发灵敏度
-	#define TRI_SEN_2MV		30	
+	#define TRI_SEN_2MV		30
 	#define TRI_SEN_5MV		14
 	#define TRI_SEN_10MV	8
 	#define TRI_SEN_20MV	5
@@ -236,11 +236,11 @@
 //定义垂直8bit精度
 	#define VERTICAL_8BIT
 //水平
-	#define MAX_TIMEDIV_NUM				35	//总时基档位个数		
+	#define MAX_TIMEDIV_NUM				35	//总时基档位个数
 	#define TIMEDIV_OFFSET				3	//时基偏移量
 	#define AUTOMOTIVE						//定义是否有汽车测量功能
 	#define FUN_DDS						1	//定义是否有DDS功能
-///////////////////////////////////////////////////////////////////////////////////////	
+///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -252,7 +252,7 @@
 //#define MINI_PX1374		//---> 德国
 
 //生产用软件宏
-//#define _DEBUG_SOFTWARE	
+//#define _DEBUG_SOFTWARE
 
 
 
@@ -262,10 +262,10 @@
 
 #ifdef MINI_DSO5080
 	#ifdef _DEBUG_SOFTWARE//生产使用版
-		#define	DEVICE_NAME					_T("8CH 生产专用 -- 2012-05-15-16")	//_T("DSO5080Beta -- 2012-04-27-10")//	
-		#define PROGRAM_TITLE				_T("8CH 生产专用 Ver1.0.8 -- 2012-05-15-16") //_T("DSO5080Beta Ver1.0.7 -- 2012-04-27-10")//	
+		#define	DEVICE_NAME					_T("8CH 生产专用 -- 2012-05-15-16")	//_T("DSO5080Beta -- 2012-04-27-10")//
+		#define PROGRAM_TITLE				_T("8CH 生产专用 Ver1.0.8 -- 2012-05-15-16") //_T("DSO5080Beta Ver1.0.7 -- 2012-04-27-10")//
 	#else//发布版
-		#define	DEVICE_NAME					_T("DSO5080")	//_T("DSO5080Beta -- 2012-04-27-10")//	
+		#define	DEVICE_NAME					_T("DSO5080")	//_T("DSO5080Beta -- 2012-04-27-10")//
 		#define PROGRAM_TITLE				_T("DSO5080 Ver1.0.8") //_T("DSO5080Beta Ver1.0.7 -- 2012-04-27-10")
 	#endif
 #elif defined(MINI_HAN1008)
@@ -287,9 +287,9 @@
 //定义垂直8bit精度
 	#define VERTICAL_12BIT
 //水平
-	#define MAX_TIMEDIV_NUM				41	//总时基档位个数		
+	#define MAX_TIMEDIV_NUM				41	//总时基档位个数
 	#define TIMEDIV_OFFSET				1	//时基偏移量
-	
+
 	#define AUTOMOTIVE	//定义是否有汽车测量功能
 
 #elif defined DSO2200G
@@ -299,9 +299,9 @@
 //定义垂直8bit精度
 	#define VERTICAL_8BIT
 //水平
-	#define MAX_TIMEDIV_NUM				35	//总时基档位个数		
+	#define MAX_TIMEDIV_NUM				35	//总时基档位个数
 	#define TIMEDIV_OFFSET				3	//时基偏移量
-	
+
 #else
 	#ifdef _LAUNCH
 		#ifdef HANASCOPE
@@ -325,7 +325,7 @@
 //定义垂直10bit精度
 	#define VERTICAL_8BIT
 //水平
-	#define MAX_TIMEDIV_NUM				35	//总时基档位个数		
+	#define MAX_TIMEDIV_NUM				35	//总时基档位个数
 	#define TIMEDIV_OFFSET				3	//时基偏移量
 
 #endif
@@ -335,16 +335,16 @@
 
 
 //Scan 模式是否有10K长度限制(也就是说SCAN模式只有在10K长度下才能使用)
-#define BUF_10K_LIMIT			
+#define BUF_10K_LIMIT
 
 //**********************************
 
-#define ROLL_STEP_32	32	//ROLL/SCAN读取一次数据的步进
+#define ROLL_STEP_32				32	//ROLL/SCAN读取一次数据的步进
 
 //Project
-#define DSO			0	//示波器
-#define DDS			1	//信号源
-#define LA			2	//逻辑分析仪
+#define DSO					0	//示波器
+#define DDS					1	//信号源
+#define LA					2	//逻辑分析仪
 
 
 #define MAX_USB_DEV_NUMBER			32						//PC最大设备连接数目
@@ -353,15 +353,15 @@
 #define MIN_DEMO_POS	MAX_USB_DEV_NUMBER	//模拟状态在设备列表中最小位置
 
 #define THREAD_TIMEOUT				0						//
-#define	PI							3.14159265358979323846
+#define	PI				      	3.14159265358979323846
 //Communication
-#define USB							0
-#define NET							1
-#define NET_LAN						2
-#define NET_WIFI					3
+#define USB				      	0
+#define NET				      	1
+#define NET_LAN				      	2
+#define NET_WIFI			      	3
 
-#define UDP							0
-#define TCP_IP						1
+#define UDP				      	0
+#define TCP_IP				      	1
 
 //频率单位定义
 #define FREQUENCY_UNIT_HZ			0
@@ -370,37 +370,37 @@
 #define MAX_FREQUENCY_UNIT			3
 
 #define MIN_SWEEPSTEPS_NUM			2	//最小扫描步骤数
-#define SWEEP_FREQUENCY_LINEAR		0	//线性扫频
-#define SWEEP_FREQUENCY_LOGARITHM	1	//对数扫频
-#define	MAX_SWEEP_FREQUENCY_TYPE	2	//最大扫频数目
+#define SWEEP_FREQUENCY_LINEAR			0	//线性扫频
+#define SWEEP_FREQUENCY_LOGARITHM		1	//对数扫频
+#define	MAX_SWEEP_FREQUENCY_TYPE		2	//最大扫频数目
 
 //#define CREATE_DEV_ID(nMode,nIndex)	(((nMode)<<4) | nIndex)//设备ID，高4位：传输协议，低4位：设备索引
 //水平***********************************************************/
 //#define BUF_ETS_LEN				500
-#define BUF_4K_LEN					0x1000
-#define BUF_3K_LEN					0x0C00//3072
-#define BUF_8K_LEN					0x2000
-#define BUF_16K_LEN					0x4000
-#define BUF_32K_LEN					0x8000
-#define BUF_64K_LEN					0x10000
-#define BUF_10K_LEN					10240  
-#define BUF_1M_LEN					1048576
-#define BUF_2M_LEN					2097152
-#define BUF_4M_LEN					4194304
-#define BUF_8M_LEN					8388608
-#define BUF_12M_LEN					12582912			
-#define BUF_16M_LEN					16252928
-#define BUF_40K_LEN					40960 //40960//32768
-#define BUF_72K_LEN					0x12000 
-#define BUF_INSERT_LEN 				BUF_72K_LEN	
+#define BUF_4K_LEN				0x1000
+#define BUF_3K_LEN				0x0C00//3072
+#define BUF_8K_LEN				0x2000
+#define BUF_16K_LEN				0x4000
+#define BUF_32K_LEN				0x8000
+#define BUF_64K_LEN				0x10000
+#define BUF_10K_LEN				10240
+#define BUF_1M_LEN				1048576
+#define BUF_2M_LEN				2097152
+#define BUF_4M_LEN				4194304
+#define BUF_8M_LEN				8388608
+#define BUF_12M_LEN				12582912
+#define BUF_16M_LEN				16252928
+#define BUF_40K_LEN				40960 //40960//32768
+#define BUF_72K_LEN				0x12000
+#define BUF_INSERT_LEN 				BUF_72K_LEN
 
 
 #ifndef MINISCOPE
-	#define DEF_READ_DATA_LEN			BUF_4K_LEN //BUF_10K_LEN		//默认读取的数据长度
-	#define DEF_DRAW_DATA_LEN			2500 //10000			
+	#define DEF_READ_DATA_LEN		BUF_4K_LEN //BUF_10K_LEN		//默认读取的数据长度
+	#define DEF_DRAW_DATA_LEN		2500 //10000
 #else
-	#define DEF_READ_DATA_LEN			BUF_4K_LEN		
-	#define DEF_DRAW_DATA_LEN			BUF_4K_LEN
+	#define DEF_READ_DATA_LEN		BUF_4K_LEN
+	#define DEF_DRAW_DATA_LEN		BUF_4K_LEN
 #endif
 
 #define MAX_INSERT_TIMEDIV			6	//200nS						//最大需要插值的时基  //modified by zhang from 9 to 5  200ns
@@ -411,11 +411,11 @@
 #define INSERT_MODE_SIN				2
 #define INSERT_MODE_STEP			0
 #define INSERT_MODE_LINEAR			1
-#define YT							0
-#define XY							1
-#define YT_NORMAL					0
-#define YT_SCAN						1
-#define YT_ROLL						2
+#define YT					0
+#define XY					1
+#define YT_NORMAL				0
+#define YT_SCAN					1
+#define YT_ROLL					2
 #define PEAK_START_TIMEDIV			5//13
 
 #ifndef MINISCOPE

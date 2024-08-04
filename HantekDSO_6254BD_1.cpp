@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 USEFORM("Main.cpp", Form1);
 USEFORM("DSO_frame.cpp", FrmDSO); /* TFrame: File Type */
+USEFORM("Chnl_frame.cpp", FrmChnl); /* TFrame: File Type */
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {

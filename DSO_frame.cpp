@@ -3,6 +3,7 @@
 #pragma hdrstop
 
 #include "DSO_frame.h"
+#include "ComWorL.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -51,105 +52,50 @@ void __fastcall TFrmDSO::Init(TObject* Sender)
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::Destroy(TObject* Sender){DestroyGL()	;}
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::CollectData(void)
-{short	nState = 0	;
- String Str		;
-
- if(m_Hard.m_nDeviceIndex == 0xFF){
-   if(!m_Hard.FindeDev()){
-     Application->MessageBox("No suitble device was found!","!!!",MB_OK);
-     return;
-   }
-   else{
-     Str.printf("verFPGA %lX",dsoGetFPGAVersion(m_Hard.m_nDeviceIndex));
-//     StatMsg[0] = Str	;
-   }
- }
-
-  if(m_bStartNew) {
-    WORD nStartControl=0;
-    nStartControl|=((m_Hard.m_nTriggerSweep==AUTO)?0x01:0);//add by zhang
-    nStartControl|=((m_Hard.m_nYTFormat== YT_ROLL)?0x02:0);//add by zhang
-    nStartControl|=m_Hard.m_bCollect?0:0x04;//add by zhang
-    dsoHTStartCollectData(m_Hard.m_nDeviceIndex,nStartControl);
-    m_Hard.m_stControl.nLastAddress = 0;  //扫描有效 Скан действителен
-    m_Hard.m_stControl.nAlreadyReadLen = 0;//扫描有效 Скан действителен
-//	dsoHTStartTrigger(m_Hard.m_nDeviceIndex);
-//		m_nAutoTriggerCnt = 0;
-    m_bStartNew = FALSE		;
-  }
-
-  nState = dsoHTGetState(m_Hard.m_nDeviceIndex);
-  if (YT_NORMAL == m_Hard.m_nYTFormat){
-    if (nState & 0x02){
-      m_Hard.ReadData()		;
-      m_bStartNew = TRUE	;
-    }
-    else{
-      m_bStartNew = FALSE	;
-    }
-  }
-  else if (m_Hard.m_nYTFormat == YT_SCAN)//扫描有效 Скан действителен
-  {
-    if(((nState >> 8) & 0x0F) >= 3)//预采集满 Предварительная коллекция заполнена)
-      m_Hard.ReadSCANData()	;
-    if(m_Hard.m_stControl.nAlreadyReadLen >= DEF_READ_DATA_LEN){
-      m_bStartNew = TRUE	;
-    }
-  }
+USHORT __fastcall TFrmDSO::CollectData(void)
+{
+ return m_Hard.CollectData()	;
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::DrawWave(HDC hdc,TRect Rect)
+void __fastcall TFrmDSO::DrawWaves(void)
 {
- for(int i=0;i<MAX_CH_NUM;i++)    //CH1/CH2/CH3/CH4
-   DrawWaveInYT(hdc,Rect,i)	;
+ for(int nCh=0;nCh<MAX_CH_NUM;nCh++)    //CH1/CH2/CH3/CH4
+   DrawWaveInYT(nCh)	;
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::DrawWaveInYT(HDC hdc,TRect Rect,USHORT nCH)
+void __fastcall TFrmDSO::DrawWaveInYT(USHORT nCH)
 {
-//  short*  pData        = m_Hard.m_pSrcData[nCH]		;//源数据 		   источник данных
-//  ULONG   nDisDataLen  = 2500				;//网格内要画的数据长度 Длина данных, отображаемых в сетке
-//  ULONG   nSrcDataLen  = BUF_4K_LEN			;//源数据的长度         Длина исходных данных
-//  USHORT  nDisLeverPos = m_Hard.m_nLeverPos[nCH]	;//零电平的显示位置     Положение отображения нулевого уровня
-//  ULONG   nCenterData  = BUF_4K_LEN / 2			;//
-//  COLORREF  clrRGB     = m_Hard.m_clrRGB[nCH]		;//颜色                 цвет
-//  USHORT  nHTriggerPos = m_Hard.m_stControl.nHTriggerPos;//水平触发点位置       Горизонтальное расположение триггерной точки
-//  USHORT  nYTFormat    = 0				;
-//  USHORT  nDisType     = 0				;//显示类型，点或线       Тип отображения, точка или линия
-//  double  dbVertical   = 1.0				;//
-//  double  dbHorizontal = 1.0				;
+ TParamsDrawWave params	;
+ params.clrRGB        = m_Hard.m_clrRGB[nCH]		;// the color of the line
+ params.nDisType      = 0				;// display type: Line or Dot
+ params.pSrcData      = m_Hard.RelayControl.bCHEnable[nCH] ?
+			  m_Hard.m_pSrcData[nCH] : 0	;// the source data for drawing
+ params.nSrcDataLen   = m_Hard.m_stControl.nBufferLen 	;// the source data length
+ params.nDisDataLen   = 512				;// the display data length for drawing
+ params.nCenterData   = params.nSrcDataLen / 2 		;// half of the source data
+ params.nDisLeverPos  = m_Hard.m_nLeverPos[nCH]		;// the display position(Zero Level)
+ params.dbHorizontal  = 1.0				;// the horizontal factor of zoom out/in
+ params.dbVertical    = 1.0				;// the vertical factor of zoom out/in
+ params.nYTFormat     = 0				;// Fomat: Normal or Scan
+ params.nScanLen      = params.nSrcDataLen		;// the scan data length, only invalidate in scan mode
 
-  TParamsDrawWave        params	;
-//  params.hDC	       = 			;// handle to dc
-//  params.Rect	       = 			;// the rect for drawing
-  params.clrRGB        = m_Hard.m_clrRGB[nCH]	;// the color of the line
-  params.nDisType      = 0			;// display type: Line or Dot
-  params.pSrcData      = m_Hard.m_pSrcData[nCH]	;// the source data for drawing
-  params.nSrcDataLen   = BUF_4K_LEN		;// the source data length
-  params.nDisDataLen   = 2500			;// the display data length for drawing
-  params.nCenterData   = BUF_4K_LEN / 2		;// half of the source data
-  params.nDisLeverPos  = m_Hard.m_nLeverPos[nCH];// the display position(Zero Level)
-  params.dbHorizontal  = 1.0			;// the horizontal factor of zoom out/in
-  params.dbVertical    = 1.0			;// the vertical factor of zoom out/in
-  params.nYTFormat     = 0			;// Fomat: Normal or Scan
-  params.nScanLen      = BUF_4K_LEN		;// the scan data length, only invalidate in scan mode
-
-  DrawWaveGL(nCH,&params)			;//
+ DrawWaveGL(nCH,&params)				;//
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::OnDraw(TObject *Sender)
-{
- HDC 	hdc  = GetDC(pView->Handle)	;
- TRect	Rect = pView->ClientRect	;
+{static bool  flGrid = false			;
+ int CliWdt = pView->ClientRect.Width()		;
+ int CliHgt = pView->ClientRect.Height()	;
 
- static bool  flGrid = false		;
- if(!flGrid){ flGrid = true		;
-   DrawGridGL(12,8,200,1)		;}
+ try{
+   if(!flGrid){ flGrid = true			;
+     DrawGridGL(12,8,200,1)			;}
 
- if(m_Hard.m_nDeviceIndex!=0xFF){
-   DrawWave(hdc,Rect)			;}
+   if(m_Hard.m_nDeviceIndex != 0xFF){
+     DrawWaves()				;}
 
- DrawSceneGL(Rect.Width(),Rect.Height());
+   DrawSceneGL(CliWdt,CliHgt)			;
+ }DEF_CATCH
 }
 //---------------------------------------------------------------------------
 
@@ -190,6 +136,8 @@ GLvoid  DrawWaveGL(USHORT nCH,TParamsDrawWave* prms)
 
  double stpX = 2.0 / prms->nDisDataLen	;
  double stpY = 1.0 / 255	;
+
+ if(!prms->pSrcData) return	;
 
  glNewList(lst,GL_COMPILE);{
    glLineWidth(1)		;

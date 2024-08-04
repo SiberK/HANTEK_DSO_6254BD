@@ -1,0 +1,9 @@
+{
+	"editor.tabSize": 8,
+	"C_Cpp.default.includePath": [
+		"c:\\program files (x86)\\codegear\\rad studio\\5.0\\include",
+		"c:\\program files (x86)\\codegear\\rad studio\\5.0\\include\\vcl",
+		"c:\\program files (x86)\\codegear\\rad studio\\5.0\\include\\dinkumware",
+		"L:\\RAD\\RX_2010\\Units\\include"
+			]
+}

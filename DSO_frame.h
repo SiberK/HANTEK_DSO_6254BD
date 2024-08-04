@@ -17,18 +17,22 @@ __published:	// IDE-managed Components
 	TScrollBox *pView;
 private:	// User declarations
 	CHard	m_Hard		;
-	BOOL 	m_bStartNew	;//是否启动新一次采集 Стоит ли начинать новую коллекцию
+	TRect	Rect		;
 
- void __fastcall DrawWave    (HDC hdc,TRect Rect)	    	;
- void __fastcall DrawWaveInYT(HDC hdc,TRect Rect,USHORT nCH)	;
+ void __fastcall DrawWaves   (void)    	;	
+ void __fastcall DrawWaveInYT(USHORT nCH)	;
 
 public:		// User declarations
 	__fastcall TFrmDSO(TComponent* Owner)	;
 
- void __fastcall Init(TObject* Sender)		;
- void __fastcall Destroy(TObject* Sender)	;
- void __fastcall CollectData (void)		;
- void __fastcall OnDraw(TObject *Sender)	;
+ void  __fastcall Init(TObject* Sender)		;
+ void  __fastcall SetChnlParams(TChnlParams* params)
+			{ m_Hard.SetChnlParams(params)	;}
+ void  __fastcall Destroy(TObject* Sender)	;
+ USHORT __fastcall CollectData (void)		;
+ void  __fastcall OnDraw(TObject *Sender)	;
+
+ uint16_t __fastcall GetDevIx(){ return m_Hard.m_nDeviceIndex	;}
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFrmDSO *FrmDSO;

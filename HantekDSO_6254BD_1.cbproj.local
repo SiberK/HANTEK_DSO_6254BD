@@ -16,5 +16,10 @@
     <Transaction>2024.07.31 18:39:09.806.cpp,B:\HANTEK_DSO_6254BD\Unit1.cpp=B:\HANTEK_DSO_6254BD\DSO_frame.cpp</Transaction>
     <Transaction>2024.07.31 18:39:09.806.h,B:\HANTEK_DSO_6254BD\Unit1.h=B:\HANTEK_DSO_6254BD\DSO_frame.h</Transaction>
     <Transaction>2024.07.31 18:39:09.806.dfm,B:\HANTEK_DSO_6254BD\Unit1.dfm=B:\HANTEK_DSO_6254BD\DSO_frame.dfm</Transaction>
+    <Transaction>2024.08.02 17:59:42.603.cpp,B:\HANTEK_DSO_6254BD\Unit1.cpp=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp</Transaction>
+    <Transaction>2024.08.02 17:59:42.603.h,B:\HANTEK_DSO_6254BD\Unit1.h=B:\HANTEK_DSO_6254BD\Chnl_frame.h</Transaction>
+    <Transaction>2024.08.02 17:59:42.603.dfm,B:\HANTEK_DSO_6254BD\Unit1.dfm=B:\HANTEK_DSO_6254BD\Chnl_frame.dfm</Transaction>
+    <Transaction>2024.08.03 12:32:47.240.cpp,B:\HANTEK_DSO_6254BD\ComWorM.cpp=B:\HANTEK_DSO_6254BD\ComWorL.cpp</Transaction>
+    <Transaction>2024.08.03 12:32:47.240.h,B:\HANTEK_DSO_6254BD\ComWorM.h=B:\HANTEK_DSO_6254BD\ComWorL.h</Transaction>
   </Transactions>
 </BorlandProject>
