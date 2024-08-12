@@ -1,5 +1,4 @@
 ﻿//---------------------------------------------------------------------------
-
 #ifndef MainH
 #define MainH
 //---------------------------------------------------------------------------
@@ -27,10 +26,6 @@ __published:	// IDE-managed Components
 	TPageControl *pcTool;
 	TTabSheet *tsDSO;
 	TTabSheet *tsDDS;
-	TMainMenu *MainMenu1;
-	TMenuItem *File1;
-	TMenuItem *Edit1;
-	TMenuItem *Save1;
 	TComboBox *cbDdsMode;
 	TLabel *Label1;
 	TCurrencyEdit *eFrq;
@@ -46,6 +41,8 @@ __published:	// IDE-managed Components
 	TGroupBox *gbTrgr;
 	TComboBox *cbEdge;
 	TComboBox *cbSrcTrg;
+	TGroupBox *GroupBox2;
+	TCurrencyEdit *eTimRef;
 	void __fastcall timRefTimer(TObject *Sender);
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall FormDestroy(TObject *Sender);
@@ -54,15 +51,20 @@ __published:	// IDE-managed Components
 	  int WheelDelta, TPoint &MousePos, bool &Handled);
 	void __fastcall FormStorage1RestorePlacement(TObject *Sender);
 	void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
+	void __fastcall pTaskMouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
+	void __fastcall TimeDivChange(TObject *Sender);
+	void __fastcall eTimRefChange(TObject *Sender);
 
 private:	// User declarations
 	String		StrVersion	;
+	double		SmplPerDiv	;
 
  void   __fastcall wrStatBar(int i,String val)
    { if(i<StatBar1->Panels->Count)StatBar1->Panels->Items[i]->Text = val	;}
  String	__fastcall rdStatBar(int i)
    { return (i<StatBar1->Panels->Count)? StatBar1->Panels->Items[i]->Text : String("")	;}
- void __fastcall ChnlOnChange(TObject *Sender);
+ void   __fastcall ChnlOnChange(TObject *Sender)	;
+ double __fastcall DisplaySampleRate()			;// вернёт кол-во отсчётов на 1 деление 
 
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);

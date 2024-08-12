@@ -13,14 +13,14 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-static int BUF_LEN = 512	;
+static int BUF_LEN = 0x1000	;
 
 CHard::CHard()
 {
-  m_nLeverPos[CH1] = 192;
-  m_nLeverPos[CH2] = 160;
-  m_nLeverPos[CH3] = 96;
-  m_nLeverPos[CH4] = 64;
+  m_nLeverPos[CH1] = 127;//192;
+  m_nLeverPos[CH2] = 127;//160;
+  m_nLeverPos[CH3] = 127;//96;
+  m_nLeverPos[CH4] = 127;//64;
   ULONG nCh = 0;
   m_nDeviceIndex = 0xFF;
   m_nDeviceNum = 0;
@@ -31,10 +31,10 @@ CHard::CHard()
 //  m_clrRGB[CH2] = RGB(  0, 255, 255)	;
 //  m_clrRGB[CH3] = RGB(255,   0, 255)	;
 //  m_clrRGB[CH4] = RGB(  0, 255,   0)	;
-  m_clrRGB[CH1] = RGB(  0,  0, 255)	;
-  m_clrRGB[CH2] = RGB(255,  0,   0)	;
-  m_clrRGB[CH3] = RGB(  0, 80,   0)	;
-  m_clrRGB[CH4] = RGB(127,  0, 127)	;
+  m_clrRGB[CH1] = clBlue;//RGB(  0,  0, 255)	;
+  m_clrRGB[CH2] = clRed;//RGB(255,  0,   0)	;
+  m_clrRGB[CH3] = clGreen;//RGB(  0, 80,   0)	;
+  m_clrRGB[CH4] = clPurple;//RGB(127,  0, 127)	;
   m_nTimeDIV    = 12			;//24;
 
   m_stControl.nCHSet 		= 0x0F		;//Все каналы открыты
@@ -50,7 +50,7 @@ CHard::CHard()
   m_stControl.nALT 		= 0		;//Factory Setup
 
   m_nYTFormat = m_nTimeDIV > 23 ? YT_SCAN : YT_NORMAL;
-  m_stControl.nHTriggerPos = m_nYTFormat == YT_SCAN ? 0 : 50;//Горизонтальное положение триггера (0-100)
+  m_stControl.nHTriggerPos = m_nYTFormat == YT_SCAN ? 0 : 25;//Горизонтальное положение триггера (0-100)
  for (nCh = 0; nCh < MAX_CH_NUM; nCh++){
    RelayControl.bCHEnable  [nCh] = 1	;
    RelayControl.nCHVoltDIV [nCh] = 5	;
@@ -69,10 +69,35 @@ CHard::CHard()
  m_nReadOK 	= 0	;
 }
 //---------------------------------------------------------------------------
-CHard::~CHard()
+void CHard::SetLvl(int nCh,USHORT lvl)
 {
-
+ m_nLeverPos[nCh] = lvl		;
+ if(m_nDeviceIndex == 0xFF) return	;
+ dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh], nCh, 4);
 }
+//---------------------------------------------------------------------------
+double CHard::SetTimeDiv(TTimeParams* timPrms)
+{
+ if(timPrms->nTimeDIV != -1)
+   m_nTimeDIV = timPrms->nTimeDIV	;
+ m_nYTFormat = m_nTimeDIV > 23 ? YT_SCAN : YT_NORMAL;
+
+ m_stControl.nTimeDIV = m_nTimeDIV	;//Factory Setup
+
+ double smplPerDiv = SamplingRate() * timPrms->TimeBase	;
+
+ if(m_nDeviceIndex != 0xFF){
+// Установить частоту дискретизации
+   dsoHTSetSampleRate(m_nDeviceIndex, m_nYTFormat, &RelayControl, &m_stControl)	;
+   for (int nCh = 0; nCh < MAX_CH_NUM; nCh++)
+     dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
+//Установите переключатель каналов и уровень напряжения
+   dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
+// Установите коррекцию амплитуды, вызванную режимом канала
+   dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
+ }
+
+ return smplPerDiv	;}
 //---------------------------------------------------------------------------
 void CHard::Init()
 {
@@ -121,21 +146,20 @@ void CHard::Init()
 //---------------------------------------------------------------------------
 void CHard::SetChnlParams(TChnlParams* params)
 {int nCh = params->IX	;
- if(m_nDeviceIndex == 0xFF) return	;
-
-// if(params->OnOff) m_stControl.nCHSet |=  _BV(nCh)	;//
-// else              m_stControl.nCHSet &= ~_BV(nCh)	;//
 
  RelayControl.bCHEnable  [nCh] = params->OnOff		;
- RelayControl.nCHVoltDIV [nCh] = params->IxVoltDiv	;
- RelayControl.nCHCoupling[nCh] = params->IxAcDc		;
+ if(params->IxVoltDiv != -1)
+   RelayControl.nCHVoltDIV [nCh] = params->IxVoltDiv	;
+ if(params->IxAcDc != -1)
+   RelayControl.nCHCoupling[nCh] = params->IxAcDc  	;
 
- dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
-
+ if(m_nDeviceIndex != 0xFF){
+   dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
 //Установите переключатель каналов и уровень напряжения
- dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
- dsoHTADCCHModGain(m_nDeviceIndex, 4)	;// Установите коррекцию амплитуды, вызванную режимом канала
-
+   dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
+// Установите коррекцию амплитуды, вызванную режимом канала
+   dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
+ }
 }
 //---------------------------------------------------------------------------
 USHORT CHard::CollectData()
@@ -163,11 +187,9 @@ USHORT CHard::CollectData()
  if (YT_NORMAL == m_nYTFormat){
    if (nState & 0x02){
      ReadData()			;
-     m_bStartNew = TRUE		;
-   }
+     m_bStartNew = TRUE		;}
    else{
-     m_bStartNew = FALSE	;
-   }
+     m_bStartNew = FALSE	;}
  }
  else if (m_nYTFormat == YT_SCAN){		// Скан действителен
    if(((nState >> 8) & 0x0F) >= 3)		// Предварительная коллекция заполнена)
@@ -193,7 +215,6 @@ void CHard::ReadData()
   int nCh = 0;
   USHORT* pReadData[MAX_CH_NUM]	;
   for (nCh = 0; nCh < MAX_CH_NUM; nCh++) {
-//    if(!RelayControl.bCHEnable[nCh]){ pReadData[nCh] = 0 ; continue	;}
     pReadData[nCh] = new USHORT[m_stControl.nReadDataLen];
     memset(pReadData[nCh], 0, m_stControl.nReadDataLen * sizeof(USHORT));//
   }
@@ -248,8 +269,29 @@ void CHard::ReadSCANData()
 void CHard::SourceToDisplay(USHORT* pData, ULONG nDataLen, USHORT nCH, int nOffset)
 {
  for (ULONG i = 0; i < nDataLen; i++){
-   m_pSrcData[nCH][i + nOffset] = pData[i] - (MAX_DATA - m_nLeverPos[nCH]);
+   m_pSrcData[nCH][i + nOffset] = pData[i];// - (MAX_DATA - m_nLeverPos[nCH]);
  }
 }
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+double CHard::SamplingRate()
+{static double tblSmplRate[] = {1.0e9,1.0e9,1.0e9,1.0e9 ,1.0e9, 1.0e9, 1.0e9,0.5e9,250e6,
+				125e6, 50e6, 25e6,12.5e6,  5e6, 2.5e6,1.25e6,500e3,250e3,
+				125e3, 50e3, 25e3,12.5e3,  5e3, 2.5e3,1.25e3,500.0,250.0,
+				125.0, 50.0, 25.0,12.5  ,  5.0, 2.5  ,1.25  ,0.5  ,0.25};
+ USHORT cntChn = CntChnlW()	;
+ double rate   = m_nTimeDIV < sizeof(tblSmplRate) ? tblSmplRate[m_nTimeDIV] : 0.0	;
+// на высоких частотах SampleRate меньше задаваемого !!!! (зависит от кол-ва вкл. каналов)
+ if(m_nTimeDIV < 7) rate = cntChn > 2 ? rate/4 : cntChn > 1 ? rate/2 : rate	;
+ if(m_nTimeDIV== 7) rate = cntChn > 2 ? rate/2 : rate	;
+
+ return rate	;
+}
+//---------------------------------------------------------------------------
+int CHard::CntChnlW()	// кол-во включенных каналов
+{int cnt = 0	;
+ for(int nCh=0;nCh<4;nCh++) if(RelayControl.bCHEnable[nCh]) cnt++	;
+ return cnt	;}
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

@@ -29,7 +29,7 @@ object FrmChnl: TFrmChnl
       Height = 21
       Hint = 'Volt/Div'
       Ctl3D = True
-      ItemHeight = 13
+      ItemHeight = 0
       ParentCtl3D = False
       TabOrder = 2
       TabStop = False
@@ -51,7 +51,7 @@ object FrmChnl: TFrmChnl
       Width = 66
       Height = 21
       Hint = 'DC/GND/AC'
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 3
       TabStop = False
       OnChange = BtnOnClick
@@ -64,11 +64,13 @@ object FrmChnl: TFrmChnl
   object FormStorage1: TFormStorage
     Options = []
     UseRegistry = False
+    OnRestorePlacement = FormStorage1RestorePlacement
     StoredProps.Strings = (
       'bOn.Checked'
       'cbX10.Checked'
       'cbVoltDiv.ItemIndex'
-      'cbAC_DC.ItemIndex')
+      'cbAC_DC.ItemIndex'
+      'cbVoltDiv.Tag')
     StoredValues = <>
     Left = 15
     Top = 65532

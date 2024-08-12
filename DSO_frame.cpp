@@ -6,6 +6,7 @@
 #include "ComWorL.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
+#pragma link "rxPlacemnt"
 #pragma resource "*.dfm"
 
 //---------------------------------------------------------------------------
@@ -29,93 +30,150 @@ struct TParamsDrawWave{
  double dbVertical	;// the vertical factor of zoom out/in
  USHORT nYTFormat	;// Fomat: Normal or Scan
  ULONG 	nScanLen	;// the scan data length, only invalidate in scan mode
+ USHORT CntGrid_H	;
+ USHORT CntGrid_V	;
+ double	SmplPerDiv	;
 };
 //---------------------------------------------------------------------------
 extern GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)	;
 //extern GLvoid	DrawPxlArrayGL(GLsizei width, GLsizei height,TPxlArrayGL* PxlArr)			;
-extern GLvoid DrawWaveGL(USHORT nCH,TParamsDrawWave* params)	;
-extern GLvoid DrawGridGL(USHORT nHoriGridNum,USHORT nVertGridNum,USHORT nBright,USHORT IsGrid);
-extern GLvoid DrawSceneGL(GLsizei width, GLsizei height)		;
+extern GLvoid DrawShapesGL(TShape_M* shp[])				;
+extern GLvoid DrawWaveGL(USHORT nCh,TParamsDrawWave* params)		;
+extern GLvoid DrawGridGL(USHORT cntGrid_H,USHORT cntGrid_V,USHORT nBright,USHORT IsGrid);
+extern GLvoid DrawSceneGL(GLsizei width, GLsizei height,TShape_M* shp[])	;
 extern GLvoid DestroyGL ()						;
 //---------------------------------------------------------------------------
 
-
-
 TFrmDSO *FrmDSO = 0	;
+//TShape_M* spmLvl[4] = {0,0,0,0}	;
 //---------------------------------------------------------------------------
-__fastcall TFrmDSO::TFrmDSO(TComponent* Owner): TFrame(Owner)
-{
+__fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Owner)
+{String		nam			;
+ FOnChange = _onChnge			;
+ TColor		_color			;
+// spLvl[0].Init(1,0.0,clBlue  ,Font)	;
+// spLvl[1].Init(2,0.0,clRed   ,Font)	;
+// spLvl[2].Init(3,0.0,clGreen ,Font)	;
+// spLvl[3].Init(4,0.0,clPurple,Font)	;
+
+ SmplPerDiv = 250			;
+ CntGrid_H  = 10	; CntGrid_V = 8	;
+
+// spmLvl[0] = new TShape_M(this,pLeft,"Spm1",TColor(m_Hard.m_clrRGB[0]))		;
+// spmLvl[0]->OnMouseMove = FMouseMove	;
+
+ for(int ch=0;ch<4;ch++){
+   nam.printf("ShpL%ld",ch+1)		;
+   _color = TColor(m_Hard.m_clrRGB[ch])	;
+   shpLvl[ch] = new TShape_M(this,pLeft,nam,_color)	;
+   shpLvl[ch]->OnMouseMove = FMouseMove	;
+ }
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::Init(TObject* Sender)
-{InitializeGL(pView->Handle,pView->Width,pView->Height)	;}
+void __fastcall TFrmDSO::Init(TObject* Sender,uint32_t _lvlsPos)
+{String		_cap	;
+ UCHAR	lvl255		;
+ Tag = _lvlsPos		;// это сейчас передаю через Tag!!!!
+ 
+ try{
+ for(int nCh=0;nCh<4;nCh++){
+   _cap = String(nCh+1)	;
+//   shpLvl[nCh]->Pos.SetLvl255(GetLvlPos(nCh))	;
+   lvl255 = LoadLvl255(nCh)		;
+   shpLvl[nCh]->Init(nCh,_cap,lvl255) 	;
+   m_Hard.SetLvl(nCh,lvl255)		;
+ }
+
+ InitializeGL(pView->Handle,pView->Width,pView->Height)	;
+ }DEF_CATCH
+}
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::Destroy(TObject* Sender){DestroyGL()	;}
+void __fastcall TFrmDSO::Destroy(TObject* Sender){
+ DestroyGL()	;
+}
 //---------------------------------------------------------------------------
 USHORT __fastcall TFrmDSO::CollectData(void)
 {
  return m_Hard.CollectData()	;
 }
 //---------------------------------------------------------------------------
+//void __fastcall TFrmDSO::DrawShapes(void)
+//{DrawShapesGL(shpLvl)		;
+//}
+//---------------------------------------------------------------------------
 void __fastcall TFrmDSO::DrawWaves(void)
 {
- for(int nCh=0;nCh<MAX_CH_NUM;nCh++)    //CH1/CH2/CH3/CH4
-   DrawWaveInYT(nCh)	;
-}
-//---------------------------------------------------------------------------
-void __fastcall TFrmDSO::DrawWaveInYT(USHORT nCH)
-{
  TParamsDrawWave params	;
- params.clrRGB        = m_Hard.m_clrRGB[nCH]		;// the color of the line
- params.nDisType      = 0				;// display type: Line or Dot
- params.pSrcData      = m_Hard.RelayControl.bCHEnable[nCH] ?
-			  m_Hard.m_pSrcData[nCH] : 0	;// the source data for drawing
- params.nSrcDataLen   = m_Hard.m_stControl.nBufferLen 	;// the source data length
- params.nDisDataLen   = 512				;// the display data length for drawing
- params.nCenterData   = params.nSrcDataLen / 2 		;// half of the source data
- params.nDisLeverPos  = m_Hard.m_nLeverPos[nCH]		;// the display position(Zero Level)
- params.dbHorizontal  = 1.0				;// the horizontal factor of zoom out/in
- params.dbVertical    = 1.0				;// the vertical factor of zoom out/in
- params.nYTFormat     = 0				;// Fomat: Normal or Scan
- params.nScanLen      = params.nSrcDataLen		;// the scan data length, only invalidate in scan mode
+ for(int nCh=0;nCh<MAX_CH_NUM;nCh++){    //CH1/CH2/CH3/CH4
+   params.clrRGB        = m_Hard.m_clrRGB[nCh]		;// the color of the line
+   params.nDisType      = 0				;// display type: Line or Dot
+   params.pSrcData      = m_Hard.RelayControl.bCHEnable[nCh] ?
+			    m_Hard.m_pSrcData[nCh] : 0	;// the source data for drawing
+   params.nSrcDataLen   = m_Hard.m_stControl.nBufferLen ;// the source data length
+   params.nDisDataLen   = m_Hard.m_stControl.nBufferLen	;// the display data length for drawing
+   params.nCenterData   = params.nSrcDataLen / 2 	;// half of the source data
+   params.nDisLeverPos  = m_Hard.m_nLeverPos[nCh]	;// the display position(Zero Level)
+   params.dbHorizontal  = 1.0				;// the horizontal factor of zoom out/in
+   params.dbVertical    = 1.0				;// the vertical factor of zoom out/in
+   params.nYTFormat     = 0				;// Fomat: Normal or Scan
+   params.nScanLen      = params.nSrcDataLen		;// the scan data length, only invalidate in scan mode
 
- DrawWaveGL(nCH,&params)				;//
+   params.CntGrid_H	= CntGrid_H			;
+   params.CntGrid_V	= CntGrid_V			;
+   params.SmplPerDiv    = SmplPerDiv			;
+   DrawWaveGL(nCh,&params)				;//
+ }
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::OnDraw(TObject *Sender)
 {static bool  flGrid = false			;
- int CliWdt = pView->ClientRect.Width()		;
- int CliHgt = pView->ClientRect.Height()	;
+// int CliWdt = pView->ClientRect.Width()		;
+// int CliHgt = pView->ClientRect.Height()	;
+ int CliWdt = pView->Width	;
+ int CliHgt = pView->Height	;
 
  try{
    if(!flGrid){ flGrid = true			;
-     DrawGridGL(12,8,200,1)			;}
-
+     DrawGridGL(CntGrid_H,CntGrid_V,200,1)	;}
    if(m_Hard.m_nDeviceIndex != 0xFF){
+////     DrawShapesGL(spLvl)			;
      DrawWaves()				;}
 
-   DrawSceneGL(CliWdt,CliHgt)			;
+   DrawSceneGL(CliWdt,CliHgt,shpLvl)		;
+
  }DEF_CATCH
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::pViewResize(TObject *Sender)
+{
+ for(int nCh=0;nCh<MAX_CH_NUM;nCh++)
+   shpLvl[nCh]->OnResize(pView->Height,pView->Width)	;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
+			 TShiftState Shift, int X, int Y)
+{TShape_M* shpM=dynamic_cast<TShape_M*>(Sender)	;
+ char str[100]	;
+ if(Shift.Contains(ssLeft)){
+   if(shpM){
+     Y += shpM->Top	;
+     Y = Min(Max(Y,0),shpM->Parent->Height)	;
+     shpM->Top = Y - shpM->Height/2		;
+     shpM->Pos.SetCursorPos(Y) 			;
+     m_Hard.SetLvl(shpM->NCh,shpM->Pos.Lvl255)	;
+     SaveLvl255(shpM->NCh,shpM->Pos.Lvl255)  	;// для сохр. в .ini файле
+     						 // это сейчас передаю через Tag!!!! 
+     if(FOnChange) FOnChange(this)		;
+     Application->ProcessMessages()	;
+//     sprintf(str,"Y=%ld, pos=%6.2lf, lvl255=%ld",
+//		Y, shpM->Pos.dPos,shpM->Pos.Lvl255)	;
+//     OutputDebugString(str)			;
+   }
+ }
 }
 //---------------------------------------------------------------------------
 
 
-//---------------------------------------------------------------------------
-#pragma pack(push,1)
-struct Trgb{
-  uint8_t	r,g,b,a	;
-  Trgb(TColor color) {Set(color)	;}
-
-  void  Set(TColor color){*(TColor*)this= color	;}
-  float rf()		{ return r/255.0	;}
-  float gf()		{ return g/255.0	;}
-  float bf()		{ return b/255.0	;}
-  void  glColor(TColor color){ Set(color)	; glColor3ub(r,g,b)	;}
-  void  glColor(void){ glColor3ub(r,g,b)	;}
-};
-#pragma pack(pop)
-//---------------------------------------------------------------------------
-void glColorT(TColor clr){Trgb rgb(clr)	; rgb.glColor()	;}
 //---------------------------------------------------------------------------
 static HGLRC ghRC = 0		;
 static HDC   ghDC = 0		;
@@ -126,16 +184,45 @@ static HWND  HandleGL = 0	;
 #define		CNL_2	12
 #define		CNL_3	13
 #define		CNL_4	14
+#define		LVL_1	21
+#define		LVL_2	21
+#define		LVL_3	21
+#define		LVL_4	21
 //---------------------------------------------------------------------------
 BOOL 	bSetupPixelFormat(HDC hdc)     	;
 //---------------------------------------------------------------------------
-GLvoid  DrawWaveGL(USHORT nCH,TParamsDrawWave* prms)
+//GLvoid  DrawShapesGL(TShape_M* shp[])
+//{uint32_t lstGL				;
+//
+// for(int nCh=0;nCh<MAX_CH_NUM;nCh++){
+//   lstGL = LVL_1+nCh				;
+//   if(glIsList(lstGL)) glDeleteLists(lstGL,1)	;
+//
+//   glNewList(lstGL,GL_COMPILE);{
+////     glLineWidth(2)				;
+////     glBegin(GL_LINE_LOOP) 			;{
+////       glColorT(shp[nCh].Color)			;
+////       glVertex2f(shp[nCh].dLft,shp[nCh].dTop)	;
+////       glVertex2f(shp[nCh].dRgt,shp[nCh].dTop)	;
+////       glVertex2f(shp[nCh].dRgt,shp[nCh].dBot)	;
+////       glVertex2f(shp[nCh].dLft,shp[nCh].dBot)	;
+////     } glEnd()	;
+//     shp[nCh]->DrawGL()	;
+//   }glEndList()	;
+// }
+//}
+//---------------------------------------------------------------------------
+GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
 {
- uint32_t lst = CNL_1+nCH	;
+ uint32_t lst = CNL_1+nCh	;
  if(glIsList(lst)) glDeleteLists(lst,1)	;
 
- double stpX = 2.0 / prms->nDisDataLen	;
- double stpY = 1.0 / 255	;
+// расчитаем шаг по горизонтали
+// исходные данные: кол-во делений по горизонтали  (CntGrid_H),
+//		    число  отсчётов на деление	 (SmplPerDiv),
+ double stpX = 2.0 / (double(prms->CntGrid_H) * prms->SmplPerDiv)	;
+
+ double stpY = 2.0 / 255	;// Шаг по горизонтали
 
  if(!prms->pSrcData) return	;
 
@@ -143,16 +230,16 @@ GLvoid  DrawWaveGL(USHORT nCH,TParamsDrawWave* prms)
    glLineWidth(1)		;
    glBegin(GL_LINE_STRIP) 	;{
      glColorT(prms->clrRGB)	;
-     
+
      for(ULONG ix=0;ix<prms->nSrcDataLen;ix++){
-       glVertex2f(ix * stpX-1.0,prms->pSrcData[ix] * stpY)	;
+       glVertex2f(ix * stpX-1.0,prms->pSrcData[ix] * stpY-1.0)	;
      }
 
    } glEnd()	;
  }glEndList()	;
 }
 //---------------------------------------------------------------------------
-GLvoid  DrawGridGL(USHORT nHoriGridNum,USHORT nVertGridNum,USHORT nBright,USHORT IsGrid)
+GLvoid  DrawGridGL(USHORT cntGrid_H,USHORT cntGrid_V,USHORT nBright,USHORT IsGrid)
 {
  float lenT1 = 1.0f, lenT2 = 0.015f	;
  glNewList(GRID,GL_COMPILE)	;{
@@ -164,24 +251,24 @@ GLvoid  DrawGridGL(USHORT nHoriGridNum,USHORT nVertGridNum,USHORT nBright,USHORT
      glVertex2f( 0.0f, 1.0f)	;
      glVertex2f( 0.0f,-1.0f)	;
 
-     for(float ix=-1.0;ix<1.0f;ix+=2.0f/nHoriGridNum){
+     for(float ix=-1.0;ix<1.0f;ix+=2.0f/cntGrid_H){
        glVertex2f( ix,-lenT1)	; glVertex2f( ix, lenT1) ;}
 
-     for(float ix=-1.0;ix<1.0f;ix+=0.4f/nHoriGridNum){
+     for(float ix=-1.0;ix<1.0f;ix+=0.4f/cntGrid_H){
        glVertex2f( ix,-lenT2)	; glVertex2f( ix, lenT2) ;}
 
-     lenT2 = lenT2 * nVertGridNum / nHoriGridNum	;
-     for(float ix=-1.0;ix<1.0f;ix+=2.0f/nVertGridNum){
+     lenT2 = lenT2 * cntGrid_V / cntGrid_H	;
+     for(float ix=-1.0;ix<1.0f;ix+=2.0f/cntGrid_V){
        glVertex2f(-lenT1, ix)	; glVertex2f( lenT1, ix) ;}
 
-     for(float ix=-1.0;ix<1.0f;ix+=0.4f/nVertGridNum){
+     for(float ix=-1.0;ix<1.0f;ix+=0.4f/cntGrid_V){
        glVertex2f(-lenT2, ix)	; glVertex2f( lenT2, ix) ;}
 
    } glEnd()	;
  }glEndList()	;
 }
 //---------------------------------------------------------------------------
-GLvoid	DrawSceneGL(GLsizei width, GLsizei height)
+GLvoid	DrawSceneGL(GLsizei width, GLsizei height,TShape_M* shp[])
 {if(!ghDC || !ghRC) return	;
 
  glViewport( 0, 0,width,height)	;// устанавливаем область вывода
@@ -189,19 +276,31 @@ GLvoid	DrawSceneGL(GLsizei width, GLsizei height)
  glLoadIdentity()	      	;// заменяем текущую матрицу видового преобразования
  glMatrixMode( GL_MODELVIEW ) 	;
 
+ glEnable(GL_BLEND);
+ glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // очищаем буфер кадра
+
+ glDisable(GL_BLEND)		;
 
  glPushMatrix()			;
  //-------
- 
+
+
+ for(int nCh=0;nCh<4;nCh++){
+   if(glIsList(CNL_1+nCh))
+     glCallList(CNL_1+nCh)	;
+ }
+ for(int nCh=0;nCh<4;nCh++){
+//   if(glIsList(LVL_1+nCh))
+//     glCallList(LVL_1+nCh)	;
+   shp[nCh]->DrawGL()		;
+ }
+ //-------
  glCallList(GRID)		;
 
- for(int nCH=0;nCH<4;nCH++){
-   if(glIsList(CNL_1+nCH))
-     glCallList(CNL_1+nCH)	;
- }
- 
- //-------
+// glDisable(GL_ALPHA_TEST)	;
+
  glDisable(GL_COLOR_MATERIAL)	;
  glEnable (GL_COLOR_MATERIAL)	;
  glPopMatrix()			;
@@ -247,7 +346,7 @@ GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)
   GLfloat position1  [] = { -1.0, 1.0, 1.0, 0.0 };
 
   Trgb rgb(clMoneyGreen)			;
-  glClearColor(rgb.rf(),rgb.gf(),rgb.bf(),0.0)	;// Set the clear color
+  glClearColor(rgb.rf(),rgb.gf(),rgb.bf(),1)	;// Set the clear color
 //  glClearColor(0.7, 0.7, 0.7, 0.0);
 
   // Set the shading model
@@ -328,3 +427,13 @@ BOOL bSetupPixelFormat(HDC hdc)
  return TRUE;
 }
 //-----------------------------------------------------------------------------
+
+void __fastcall TFrmDSO::PanResize(TObject *Sender)
+{
+// if(spmLvl[0]){
+//   spmLvl[0]->Width = spmLvl[0]->Parent->Width	;
+//   spmLvl[0]->Height= 20		;
+// }
+}
+//---------------------------------------------------------------------------
+

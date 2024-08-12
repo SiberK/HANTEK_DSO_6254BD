@@ -13,7 +13,7 @@ class CHard
 {
 public:
 	CHard();
-	virtual ~CHard();
+       ~CHard(){}
 //Attributes
 public:
   USHORT       	m_nDeviceIndex		;
@@ -38,8 +38,13 @@ public:
 //Operations
 public:
   void 	 	Init()			;
-  void  	SetChnlParams(TChnlParams* params);
+  void  	SetChnlParams(TChnlParams* params)	;
+  void		SetLvl(int nCh,USHORT lvl)		;
+  double   	SetTimeDiv(TTimeParams* timPrms)	;// вернёт SmplPerDiv
+  int 		CntChnlW()		;// кол-во включенных каналов
+  ULONG		BufferLen() { return m_stControl.nBufferLen	;}
 
+  double        SamplingRate()		;
 
   USHORT 	CollectData()		;// возвращаю m_nDeviceIndex (0xFF - устройство не обнаружено)
   bool 	 	FindeDev()		;

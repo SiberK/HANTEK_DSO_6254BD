@@ -9,26 +9,51 @@
 
 #include "windows.h"  
 #define HEAD_DATA 0x0174
+//---------------------------------------------------------------------------
 typedef struct _HT_RELAY_CONTROL
 {
- BOOL bCHEnable[MAX_CH_NUM]	;
- WORD nCHVoltDIV[MAX_CH_NUM]	;
- WORD nCHCoupling[MAX_CH_NUM]	;
- BOOL bCHBWLimit[MAX_CH_NUM]	;
- WORD nTrigSource		;
- BOOL bTrigFilt			;
- WORD nALT			;
+ BOOL bCHEnable[MAX_CH_NUM]	;// Chanel Switch Array. Value: 1 ON, 0 OFF.
+ WORD nCHVoltDIV[MAX_CH_NUM]	;// Chanel Voltage Array(Size to MAX_CH_NUM)
+ WORD nCHCoupling[MAX_CH_NUM]	;// Chanel Couple Array(Size to MAX_CH_NUM ).
+				 //   Value: 0 DC, 1 AC, 2 GND
+ BOOL bCHBWLimit[MAX_CH_NUM]	;// Chanel Band Limit Array(Size to MAX_CH_NUM ).
+				 //   Value: 1 ON, 0 OFF.
+ WORD nTrigSource		;// Trigger Source. 0 CH1, 1 CH2, 2 CH3, 3 CH4,5 EXT ,6 EXT
+ BOOL bTrigFilt			;// High Frequency Rejection. Value: 1 ON, 0 OFF
+ WORD nALT			;// Whether is alternate.
+				 //   Value: 1 is alternate ,0 i s non alternate.
+				 //   Example:
+				 //     Declare a variable: RELAYCONTROL myRelayControl;
+				 //	Declare a pointer: PRELAYCONTROL pRelayControl;
 }RELAYCONTROL,*PRELAYCONTROL	;
-
+//---------------------------------------------------------------------------
 struct TChnlParams{
   int	IX		;
   int	IxVoltDiv	;
   int	IxAcDc		;
   bool	XX10, OnOff	;
 	TChnlParams(void){
-	  IX = IxVoltDiv = XX10 = IxAcDc = 0	; OnOff = false	;}
+	  IX = IxVoltDiv = IxAcDc =  0	; XX10 = OnOff = false	;}
 };
 //---------------------------------------------------------------------------
+struct TTimeParams{
+ WORD 	nTrigSource	;
+ BOOL 	bTrigFilt  	;
+ WORD	nALT	   	;
+
+ short 	nTimeDIV   	;
+ WORD  	nHTriggerPos	;
+ WORD  	nVTriggerPos	;
+ WORD  	nTriggerSlope	;
+ ULONG 	nBufferLen	;// Соответствует 10К, 1М, 2М...16М.
+ ULONG 	nReadDataLen	;// Общая длина данных, которые будут считаны с оборудования.
+ ULONG 	nAlreadyReadLen	;// Запишите длину данных, которые были прочитаны в этот раз.
+			   // Она действительна в режиме сканирования/прокрутки
+			   // и недействительна в НОРМАЛЬНОМ режиме.
+ double TimeBase	;			   
+};
+//---------------------------------------------------------------------------
+
 
 // Узнайте, есть ли USB-устройство в портах 1-32.
 DLL_API WORD WINAPI dsoHTSearchDevice(short* pDevInfo);

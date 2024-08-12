@@ -7,7 +7,7 @@
 #define	_BV(X)	(1<<(X))
 #endif
 //---------------------------------------------------------------------------
-bool	CheckFloat(void* Val){ return ((*(DWord*)Val)&0x7F800000) != 0x7F800000	;}
+bool	CheckFloat(void* Val){ return ((*(uint32_t*)Val)&0x7F800000) != 0x7F800000	;}
 //---------------------------------------------------------------------------
 extern 	BOOL __fastcall	SetWinTransparent(HWND hdr,int color)	;
 //---------------------------------------------------------------------------

@@ -1,40 +1,34 @@
 [Closed Files]
-File_0=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles_UTF8\DefMacro.h',0,1,1,10,85,0,0,,
-File_1=TSourceModule,'B:\HANTEK_DSO_6254BD\StdAfx.h',0,1,4,29,19,0,0,,
-File_2=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\DefMacro.h',0,1,1,1,1,0,0,,
-File_3=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h',0,1,1,33,21,0,0,,
-File_4=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h',0,1,1,14,10,0,0,,
-File_5=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\SOURCE\WIN32\VCL\Controls.pas',0,1,8763,1,8785,0,0,,
-File_6=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\SOURCE\WIN32\RTL\SYS\system.pas',0,1,9659,1,9681,0,0,,
-File_7=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\SOURCE\WIN32\VCL\StdCtrls.pas',0,1,3904,1,3926,0,0,,
-File_8=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\source\Win32\rtl\common\TypInfo.pas',0,1,1295,1,1334,0,0,,
-File_9=TSourceModule,'B:\HANTEK_DSO_6254BD\ComWorL.cpp',0,1,1,1,1,0,0,,
+File_0=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h',0,1,1,1,21,0,0,,
+File_1=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h',0,1,7,1,53,0,0,,
+File_2=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\vcl\Graphics.hpp',0,1,1075,29,1095,0,0,,
+File_3=TSourceModule,'B:\HANTEK_DSO_6254BD\Hard.cpp',0,1,4,27,37,0,0,,{1,160,2}
+File_4=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\GL\gl.h',0,1,78,21,110,0,0,,
+File_5=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ExtCtrls.hpp',0,1,22,1,58,0,0,,
+File_6=TSourceModule,'B:\ECGmanager\StatWork.cpp',0,1,822,1,853,0,0,,
+File_7=TSourceModule,'B:\HANTEK_DSO_6254BD\ShapeM.cpp',0,1,1,1,1,0,0,,
+File_8=TSourceModule,'B:\HANTEK_DSO_6254BD\Chnl_frame.cpp',0,1,13,2,41,0,0,,
+File_9=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\wtypes.h',0,1,458,1,385,0,0,,
 
 [Modules]
-Module0=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
-Module1=B:\HANTEK_DSO_6254BD\Hard.cpp
-Module2=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
-Module3=B:\HANTEK_DSO_6254BD\Main.cpp
-Module4=default.htm
-Count=5
+Module0=B:\HANTEK_DSO_6254BD\Main.cpp
+Module1=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
+Module2=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
+Module3=default.htm
+Count=4
 EditWindowCount=1
 
-[B:\HANTEK_DSO_6254BD\DSO_frame.cpp]
+[B:\HANTEK_DSO_6254BD\Main.cpp]
 ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
 
-[B:\HANTEK_DSO_6254BD\Hard.cpp]
+[B:\HANTEK_DSO_6254BD\ShapeGL.cpp]
 ModuleType=TSourceModule
 FormState=0
 FormOnTop=0
 
-[B:\HANTEK_DSO_6254BD\Chnl_frame.cpp]
-ModuleType=TSourceModule
-FormState=1
-FormOnTop=0
-
-[B:\HANTEK_DSO_6254BD\Main.cpp]
+[B:\HANTEK_DSO_6254BD\DSO_frame.cpp]
 ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
@@ -43,13 +37,12 @@ FormOnTop=0
 ModuleType=TURLModule
 
 [EditWindow0]
-ViewCount=5
-CurrentEditView=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
+ViewCount=4
+CurrentEditView=B:\HANTEK_DSO_6254BD\Main.cpp
 View0=0
 View1=1
 View2=2
 View3=3
-View4=4
 PercentageSizes=1
 Create=1
 Visible=1
@@ -57,18 +50,20 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=4984
+Width=5635
 Height=9038
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=4984
+ClientWidth=5635
 ClientHeight=9038
 DockedToMainForm=1
 MessageView=MessageView@EditWindow0
 BorlandEditorCodeExplorer=BorlandEditorCodeExplorer@EditWindow0
 TopPanelSize=0
 LeftPanelSize=0
-RightPanelSize=0
+RightPanelSize=953
+RightPanelClients=ToolForm,PropertyInspector
+RightPanelData=00000800010100000000D71200000000000001B9030000000000000100000000951400001100000050726F7065727479496E73706563746F7201000000007E21000008000000546F6F6C466F726DFFFFFFFF
 BottomPanelSize=0
 BottomPanelClients=DockSite1
 BottomPanelData=0000080001000100000009000000446F636B53697465310624000000000000002007000000000000FFFFFFFF
@@ -76,7 +71,7 @@ BottomMiddlePanelSize=0
 BottomMiddlePanelClients=DockSite0
 BottomMiddelPanelData=0000080001000100000009000000446F636B53697465303619000000000000007D1B000000000000FFFFFFFF
 TabDockBottomClients=MessageView@EditWindow0=0
-TabDockRightClients=DockSite2=0,StructureView=1,PropertyInspector=2,ToolForm=3
+TabDockRightClients=DockSite2=0,StructureView=1
 
 [View0]
 CustomEditViewType=TWelcomePageView
@@ -85,9 +80,9 @@ WelcomePageURL=bds:/default.htm
 [View1]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\Main.cpp
-CursorX=10
-CursorY=53
-TopLine=77
+CursorX=45
+CursorY=141
+TopLine=101
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -96,38 +91,28 @@ EditViewName=B:\HANTEK_DSO_6254BD\Main.cpp
 [View2]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
-CursorX=16
-CursorY=138
-TopLine=1
+CursorX=51
+CursorY=144
+TopLine=115
 LeftCol=1
 Elisions=
-Bookmarks=
+Bookmarks={1,150,1}{2,282,1}{9,100,1}
 EditViewName=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
 
 [View3]
 CustomEditViewType=TEditView
-Module=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
-CursorX=1
-CursorY=41
-TopLine=2
+Module=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
+CursorX=49
+CursorY=47
+TopLine=6
 LeftCol=1
 Elisions=
 Bookmarks=
-EditViewName=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
-
-[View4]
-CustomEditViewType=TEditView
-Module=B:\HANTEK_DSO_6254BD\Hard.cpp
-CursorX=48
-CursorY=131
-TopLine=144
-LeftCol=1
-Elisions=
-Bookmarks={1,122,2}
-EditViewName=B:\HANTEK_DSO_6254BD\Hard.cpp
+EditViewName=B:\HANTEK_DSO_6254BD\ShapeGL.h
 
 [Watches]
-Count=0
+Count=1
+Watch0='Pixels',256,0,18,1,0,'Watches'
 
 [WatchWindow]
 WatchColumnWidth=120
@@ -164,11 +149,11 @@ Docked=0
 State=0
 Left=0
 Top=0
-Width=5068
+Width=5719
 Height=10000
 MaxLeft=-5
 MaxTop=-10
-ClientWidth=4984
+ClientWidth=5635
 ClientHeight=9629
 BottomPanelSize=8787
 BottomPanelClients=EditWindow0
@@ -196,17 +181,17 @@ StayOnTop=0
 [ToolForm]
 PercentageSizes=1
 Create=1
-Visible=0
+Visible=1
 Docked=1
 State=0
-Left=1631
-Top=456
+Left=0
+Top=592
 Width=953
-Height=8676
+Height=3181
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=953
-ClientHeight=8676
+ClientHeight=3181
 TBDockHeight=8676
 LRDockWidth=953
 Dockable=1
@@ -420,17 +405,17 @@ StayOnTop=0
 [PropertyInspector]
 PercentageSizes=1
 Create=1
-Visible=0
+Visible=1
 Docked=1
 State=0
-Left=117
-Top=454
+Left=0
+Top=23
 Width=953
-Height=410
+Height=5162
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=953
-ClientHeight=410
+ClientHeight=5162
 TBDockHeight=410
 LRDockWidth=953
 Dockable=1
@@ -439,8 +424,8 @@ SplitPos=111
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=Align,OnTimer
-ExpandedItems=Anchors=0,Constraints=0,Font=0,HorzScrollBar=0,Margins=0,Padding=0
+SelectedItem=,OnMouseMove
+ExpandedItems=Anchors=0,BevelEdges=0,Constraints=0,Font=0,Margins=0,Padding=0,HorzScrollBar=0
 
 [ModelViewTool]
 PercentageSizes=1
@@ -589,12 +574,12 @@ Docked=1
 State=0
 Left=8
 Top=1042
-Width=3849
-Height=1752
+Width=4328
+Height=933
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=3849
-ClientHeight=1752
+ClientWidth=4328
+ClientHeight=933
 TBDockHeight=933
 LRDockWidth=4328
 Dockable=1

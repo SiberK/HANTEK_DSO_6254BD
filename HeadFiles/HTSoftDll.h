@@ -1,4 +1,4 @@
-#ifndef _HT_SOFT_DLL_H
+п»ї#ifndef _HT_SOFT_DLL_H
 #define _HT_SOFT_DLL_H
 
 #ifndef DLL_API
@@ -8,23 +8,27 @@
 
 typedef struct _HT_CONTROL_DATA
 {
-	WORD  nCHSet		;
-	WORD  nTimeDIV		;
-	WORD  nTriggerSource	;
-	WORD  nHTriggerPos	;
-	WORD  nVTriggerPos	;
-	WORD  nTriggerSlope	;
-	ULONG nBufferLen	;// Соответствует 10К, 1М, 2М...16М.
-	ULONG nReadDataLen	;// Общая длина данных, которые будут считаны с оборудования.
-	ULONG nAlreadyReadLen	;// Запишите длину данных, которые были прочитаны в этот раз.
-				 // Она действительна в режиме сканирования/прокрутки
-				 // и недействительна в НОРМАЛЬНОМ режиме.
-	WORD  nALT		;
-	WORD  nETSOpen		;
-	WORD  nDriverCode	;// Номер водителя
-	ULONG nLastAddress	;// конечный адрес последнего чтения в режиме сканирования.
-	WORD  nFPGAVersion	;// FPGA номер версии
-// 	WORD  nAddressOffset	;// Джиттер триггера плюс смещение
+  WORD  nCHSet		;// channel Enable/Disable
+			   // the 0 bit: 0 CH1 is disable, 1 CH1 is enable
+			   // the 1 bit: 0 CH2 is disable, 1 CH2 is enable
+			   // the 2 bit: 0 CH3 is disable, 1 CH3 is enable
+			   // the 3 bit: 0 CH4 is disable, 1 CH4 is enable
+ WORD  nTimeDIV		;// the index of time base
+ WORD  nTriggerSource	;// the index of the trigger source
+ WORD  nHTriggerPos	;// the horizontal trigger pos (Value:0~100)
+ WORD  nVTriggerPos	;// the vertical trigger pos
+ WORD  nTriggerSlope	;// the edge trigger slope(0 is rise slope, 1 is fall slope)
+ ULONG nBufferLen	;// РЎРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ 10Рљ, 1Рњ, 2Рњ...16Рњ.
+ ULONG nReadDataLen	;// РћР±С‰Р°СЏ РґР»РёРЅР° РґР°РЅРЅС‹С…, РєРѕС‚РѕСЂС‹Рµ Р±СѓРґСѓС‚ СЃС‡РёС‚Р°РЅС‹ СЃ РѕР±РѕСЂСѓРґРѕРІР°РЅРёСЏ.
+ ULONG nAlreadyReadLen	;// Р—Р°РїРёС€РёС‚Рµ РґР»РёРЅСѓ РґР°РЅРЅС‹С…, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё РїСЂРѕС‡РёС‚Р°РЅС‹ РІ СЌС‚РѕС‚ СЂР°Р·.
+			   // РћРЅР° РґРµР№СЃС‚РІРёС‚РµР»СЊРЅР° РІ СЂРµР¶РёРјРµ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ/РїСЂРѕРєСЂСѓС‚РєРё
+			   // Рё РЅРµРґРµР№СЃС‚РІРёС‚РµР»СЊРЅР° РІ РќРћР РњРђР›Р¬РќРћРњ СЂРµР¶РёРјРµ.
+ WORD  nALT		;// is alternate trigger of not
+ WORD  nETSOpen		;// ETS enable/displayпј€no useпј‰
+ WORD  nDriverCode	;// РќРѕРјРµСЂ РІРѕРґРёС‚РµР»СЏ
+ ULONG nLastAddress	;// РєРѕРЅРµС‡РЅС‹Р№ Р°РґСЂРµСЃ РїРѕСЃР»РµРґРЅРµРіРѕ С‡С‚РµРЅРёСЏ РІ СЂРµР¶РёРјРµ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ.
+ WORD  nFPGAVersion	;// FPGA РЅРѕРјРµСЂ РІРµСЂСЃРёРё
+// 	WORD  nAddressOffset	;// Р”Р¶РёС‚С‚РµСЂ С‚СЂРёРіРіРµСЂР° РїР»СЋСЃ СЃРјРµС‰РµРЅРёРµ
 		
 		
 }CONTROLDATA,*PCONTROLDATA;
@@ -53,7 +57,7 @@ DLL_API double WINAPI dsoSFGetFFTSa(double dbTime);
 DLL_API BOOL   WINAPI dsoSFCalPassFailData(short* pSrcData,ULONG nSrcDataLen,short* pOutData,float fH,float fV);
 DLL_API BOOL   WINAPI dsoSFPassFail(short* pPFData,short* pSrcData,ULONG nDataLen);
 DLL_API WORD   WINAPI dsoSFProcessALTData4CH(WORD* pOutData,WORD* pInData1,WORD* pInData2,WORD* pInData3,WORD* pInData4,ULONG nDataLen,WORD nHTriggerPos,WORD nCalData);
-DLL_API double WINAPI dsoSFGetMiniScopeFFTSa(USHORT nTimeDIV,USHORT nCHNum,USHORT nMode);//·µ»ШµДКЗHz
+DLL_API double WINAPI dsoSFGetMiniScopeFFTSa(USHORT nTimeDIV,USHORT nCHNum,USHORT nMode);//В·ВµВ»РЁВµР”РљР—Hz
 DLL_API void   WINAPI dsoGetSoftTriggerPos(USHORT nTimeDIV,USHORT nTriggerSource,ULONG* pState,USHORT nFPGAVersion);
 DLL_API void   WINAPI dsoGetSoftTriggerPosNew(PCONTROLDATA Control,ULONG* pState,USHORT nFPGAVersion);
 

@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------
-
 #ifndef Chnl_frameH
 #define Chnl_frameH
 //---------------------------------------------------------------------------
@@ -12,8 +11,6 @@
 
 #include "StdAfx.h"
 //---------------------------------------------------------------------------
-typedef	void __fastcall (__closure *TOnChangeChnl)(TObject*)	;
-//---------------------------------------------------------------------------
 class TFrmChnl : public TFrame
 {
 __published:	// IDE-managed Components
@@ -24,15 +21,18 @@ __published:	// IDE-managed Components
 	TCheckBox *cbX10;
 	TComboBox *cbAC_DC;
 	void __fastcall BtnOnClick(TObject *Sender);
+	void __fastcall FormStorage1RestorePlacement(TObject *Sender);
 private:	// User declarations
- TOnChangeChnl	FOnChange	;
+ TNotifyEvent	FOnChange	;
  int 		IX		;
  TChnlParams    Prms		;
 public:		// User declarations
-	__fastcall TFrmChnl(TComponent* Owner,TWinControl* parent,int ch,TOnChangeChnl _onChnge);
+	__fastcall TFrmChnl(TComponent* Owner,TWinControl* parent,int ch,TNotifyEvent _onChnge);
 
  void   __fastcall SaveProps(void){ FormStorage1->SaveFormPlacement()	;}
  TChnlParams* __fastcall GetParams(void){ return &Prms	;}
+ uint16_t __fastcall GetLvlPos(void){ return Min(Max(cbVoltDiv->Tag,0),255)	;}
+ void     __fastcall SetLvlPos(uint16_t lvl){ cbVoltDiv->Tag = lvl	;}
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFrmChnl *FrmChnl;
