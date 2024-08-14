@@ -9,6 +9,9 @@
 const int WIDTH_LVL_MARK  = 8	;
 const int HEIGHT_LVL_MARK = 10	;
 //---------------------------------------------------------------------------
+typedef void __fastcall (__closure *TcbSetHardLvl)(UCHAR ch,int lvl)	;
+enum TShapeOrientation {soHrz,soVrt,soHrzM,soVrtM};
+//---------------------------------------------------------------------------
 #pragma pack(push,1)
 struct TRgbPxl {
  static TColor clTransparence	;
@@ -33,13 +36,14 @@ double	dMap(int dmin,int dmax,int dpos,double imin,double imax){
 //---------------------------------------------------------------------------
 
 struct TLvlPosition{
-  int		HgtGL, WdtGL	 	;
-//  TRect		Rect			;
+  short		HgtGL, WdtGL	 	;
   double	dLft,dRgt,dTop,dBot	;
 
-  double	dPos	;
-  int		iPos	;
-  int		Lvl255	;
+  double	dPos		;
+  short		iPos , iOfst	;
+  short		Lvl100		;
+  short		Lvl255		;
+  short		Ornt		;
 
   void __fastcall SetPos(double _pos)
   { dPos = _pos		; CalcRct()		;}
@@ -47,20 +51,28 @@ struct TLvlPosition{
   // Установить позицию от курсора
   void __fastcall SetCursorPos(int _pos)
   {if(HgtGL != 0){
-     dPos   = dMap(0,HgtGL,_pos,1.0,-1.0)	;
-     Lvl255 = iMap(-1.0,1.0,dPos,0,255)		;
+     if(Ornt == soVrt || Ornt == soVrtM){
+	  dPos = dMap(iOfst,HgtGL,_pos,1.0,-1.0)	;}
+     else dPos = dMap(0,HgtGL,_pos-iOfst,-1.0,1.0)	;
      CalcRct()			  		;}}
 
 // Установить позицию от LVL255
   void __fastcall SetLvl255(uint8_t lvl)
   {dPos = dMap(0,255,lvl,-1.0,1.0) ; CalcRct()	;}
 
+  void __fastcall SetLvl100(uint8_t lvl)
+  {dPos = dMap(0,100,lvl,-1.0,1.0) ; CalcRct()	;}
+
   void __fastcall CalcRct(void){
     if(!WdtGL || !HgtGL) 	        return 	;
     double dWdt = WIDTH_LVL_MARK  * 2.0 / WdtGL	;
     double dHgt = HEIGHT_LVL_MARK * 2.0 / HgtGL	;
 
-    iPos = iMap(1.0,-1.0,dPos,0,HgtGL)		;
+    if(Ornt == soVrt || Ornt == soVrtM)
+	 iPos = iMap(1.0,-1.0,dPos,0,HgtGL)	;
+    else iPos = iMap(-1.0,1.0,dPos,0,HgtGL) + iOfst	;
+    Lvl255 = iMap(-1.0,1.0,dPos,0,255)       	;
+    Lvl100 = iMap(-1.0,1.0,dPos,0,100)       	;
 
     dLft = -1	; dRgt = dLft + dWdt		;
     dTop = dPos + dHgt/2	;
@@ -75,16 +87,15 @@ struct TLvlPosition{
 
 
 //---------------------------------------------------------------------------
-enum TShapeOrientation {soHrz,soVrt};
-//---------------------------------------------------------------------------
-class TShape_M : public TShape
+class TShapeGL : public TShape
 {
  public:
  int		NCh	;
  AnsiString	Caption	;
  TLvlPosition	Pos	;
+ TcbSetHardLvl	cbSetHardLvl	;
 
-	__fastcall virtual TShape_M(Classes::TComponent* AOwner,
+	__fastcall virtual TShapeGL(Classes::TComponent* AOwner,
 				    TWinControl*  _parent,
 				    AnsiString    _name  ,
 				    TColor        _color ,
@@ -93,7 +104,10 @@ class TShape_M : public TShape
 
  void __fastcall Init(int _nCh, AnsiString _cap, UCHAR _lvl255)	;
  void __fastcall OnResize(int HgtP,int WdtP)			;
- void __fastcall DrawGL()	;
+ void __fastcall OnMove(int X,int Y)	;
+ void __fastcall DrawGL()		;
+ short __fastcall GetLvl(void)
+ { return Orientation == soHrz ? Pos.Lvl100 : Pos.Lvl255	;}
 
  private:
  int		Offset		;

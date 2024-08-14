@@ -13,7 +13,8 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-static int BUF_LEN = 0x1000	;
+static int BUF_LEN     = 0x1000	;//  4K
+static int MAX_BUF_LEN = 0x4000	;// 16K
 
 CHard::CHard()
 {
@@ -25,7 +26,7 @@ CHard::CHard()
   m_nDeviceIndex = 0xFF;
   m_nDeviceNum = 0;
   for (nCh = 0; nCh < MAX_CH_NUM; nCh++){
-    m_pSrcData[nCh] = new short[BUF_LEN];
+    m_pSrcData[nCh] = new short[MAX_BUF_LEN]	;
   }
 //  m_clrRGB[CH1] = RGB(255, 255,   0)	;
 //  m_clrRGB[CH2] = RGB(  0, 255, 255)	;
@@ -74,6 +75,20 @@ void CHard::SetLvl(int nCh,USHORT lvl)
  m_nLeverPos[nCh] = lvl		;
  if(m_nDeviceIndex == 0xFF) return	;
  dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh], nCh, 4);
+}
+//---------------------------------------------------------------------------
+void CHard::SetTrgT(int nCh,USHORT lvl)
+{m_stControl.nHTriggerPos = lvl		;
+ if(m_nDeviceIndex != 0xFF){
+   dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4)	;
+ }
+}
+//---------------------------------------------------------------------------
+void CHard::SetTrgV(int nCh,USHORT lvl)
+{
+ if(m_nDeviceIndex != 0xFF){
+    dsoHTSetVTriggerLevel(m_nDeviceIndex, lvl, 4);
+ }
 }
 //---------------------------------------------------------------------------
 double CHard::SetTimeDiv(TTimeParams* timPrms)
@@ -186,8 +201,8 @@ USHORT CHard::CollectData()
  short nState = dsoHTGetState(m_nDeviceIndex);
  if (YT_NORMAL == m_nYTFormat){
    if (nState & 0x02){
-     ReadData()			;
-     m_bStartNew = TRUE		;}
+     if(ReadData())
+       m_bStartNew = TRUE	;}
    else{
      m_bStartNew = FALSE	;}
  }
@@ -210,6 +225,36 @@ bool CHard::FindeDev()
  return rzlt			;
 }
 //---------------------------------------------------------------------------
+#ifndef OLOLO
+int CHard::ReadData()
+{
+  int nCh = 0;
+  for (nCh = 0; nCh < MAX_CH_NUM; nCh++) {
+    memset(m_pSrcData[nCh], 0, m_stControl.nReadDataLen * sizeof(USHORT));//
+  }
+
+//Фактическое значение напряжения j-й точки каждого канала
+// nCh = (pReadData[nCh][j]-m_nLeverPos[nCh])*8*значение напряжения/255
+  try{
+  m_nReadOK = dsoHTGetData(m_nDeviceIndex, (USHORT*)m_pSrcData[CH1], (USHORT*)m_pSrcData[CH2],
+					   (USHORT*)m_pSrcData[CH3], (USHORT*)m_pSrcData[CH4], &m_stControl);
+  }DEF_CATCH
+
+  for (nCh = 0; nCh < MAX_CH_NUM; nCh++){
+    if(RelayControl.nCHCoupling[nCh] == GND)
+      for(size_t ix=0;ix<m_stControl.nReadDataLen;ix++)
+        m_pSrcData[nCh][ix] = m_nLeverPos[nCh]		;//
+  }
+//  if(m_nReadOK == 1){
+//    for (nCh = 0; nCh < MAX_CH_NUM; nCh++){
+//      if(RelayControl.bCHEnable[nCh] && pReadData[nCh])
+//	SourceToDisplay(pReadData[nCh], m_stControl.nReadDataLen, nCh);// Для удобства отображения
+//    }
+//  }
+
+ return m_nReadOK	;}
+//---------------------------------------------------------------------------
+#else
 void CHard::ReadData()
 {
   int nCh = 0;
@@ -218,7 +263,7 @@ void CHard::ReadData()
     pReadData[nCh] = new USHORT[m_stControl.nReadDataLen];
     memset(pReadData[nCh], 0, m_stControl.nReadDataLen * sizeof(USHORT));//
   }
-  
+
 //Фактическое значение напряжения j-й точки каждого канала
 // nCh = (pReadData[nCh][j]-m_nLeverPos[nCh])*8*значение напряжения/255
   try{
@@ -238,6 +283,7 @@ void CHard::ReadData()
     delete[] pReadData[nCh]	;
   }
 }
+#endif
 //---------------------------------------------------------------------------
 void CHard::ReadSCANData()
 {

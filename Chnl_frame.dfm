@@ -51,7 +51,7 @@ object FrmChnl: TFrmChnl
       Width = 66
       Height = 21
       Hint = 'DC/GND/AC'
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 3
       TabStop = False
       OnChange = BtnOnClick

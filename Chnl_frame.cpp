@@ -24,7 +24,11 @@ __fastcall TFrmChnl::TFrmChnl(TComponent* Owner,TWinControl* parent,
  Parent = parent				;
  FOnChange = _onChnge				;
 
+ cbX10->Checked = true				;
+ bOn  ->Checked = false 			;
  cbVoltDiv->Items->CommaText = cbX10->Checked ? strVoltDiv10 : strVoltDiv1	;
+ cbVoltDiv->ItemIndex = 5			;
+ cbAC_DC  ->ItemIndex = 0			;
 
  FormStorage1->IniFileName = ChangeFileExt(ParamStr(0),".ini")	;
  FormStorage1->IniSection  = Name		;

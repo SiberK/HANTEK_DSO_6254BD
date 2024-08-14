@@ -58,6 +58,9 @@
 
 #define MAX_CH_NUM		    	4
 
+#define	TRG_T				4
+#define	TRG_V				5
+
 
 #define HORIZONTAL		    	MAX_CH_NUM    	//CH1/CH2/CH3/CH4/HORIZONTAL/(уровеньlever)
 #define MATH			    	MAX_CH_NUM    	//CH1/CH2/CH3/CH4/MATH/REF (вертикальный lever)

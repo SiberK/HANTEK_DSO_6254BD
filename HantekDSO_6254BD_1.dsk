@@ -1,27 +1,24 @@
 [Closed Files]
-File_0=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h',0,1,1,1,21,0,0,,
-File_1=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h',0,1,7,1,53,0,0,,
+File_0=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles_UTF8\DefMacro.h',0,1,32,1,61,0,0,,
+File_1=TSourceModule,'B:\ARM\RCTF\FrameCtrl.cpp',0,1,1,1,25,0,0,,
 File_2=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\vcl\Graphics.hpp',0,1,1075,29,1095,0,0,,
-File_3=TSourceModule,'B:\HANTEK_DSO_6254BD\Hard.cpp',0,1,4,27,37,0,0,,{1,160,2}
-File_4=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\GL\gl.h',0,1,78,21,110,0,0,,
-File_5=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ExtCtrls.hpp',0,1,22,1,58,0,0,,
-File_6=TSourceModule,'B:\ECGmanager\StatWork.cpp',0,1,822,1,853,0,0,,
-File_7=TSourceModule,'B:\HANTEK_DSO_6254BD\ShapeM.cpp',0,1,1,1,1,0,0,,
-File_8=TSourceModule,'B:\HANTEK_DSO_6254BD\Chnl_frame.cpp',0,1,13,2,41,0,0,,
-File_9=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\wtypes.h',0,1,458,1,385,0,0,,
+File_3=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\GL\gl.h',0,1,78,21,110,0,0,,
+File_4=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ExtCtrls.hpp',0,1,22,1,58,0,0,,
+File_5=TSourceModule,'B:\ECGmanager\StatWork.cpp',0,1,822,1,853,0,0,,
+File_6=TSourceModule,'B:\HANTEK_DSO_6254BD\ShapeM.cpp',0,1,1,1,1,0,0,,
 
 [Modules]
-Module0=B:\HANTEK_DSO_6254BD\Main.cpp
-Module1=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
-Module2=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
-Module3=default.htm
-Count=4
+Module0=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
+Module1=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
+Module2=B:\HANTEK_DSO_6254BD\Hard.cpp
+Module3=B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h
+Module4=B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h
+Module5=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
+Module6=B:\HANTEK_DSO_6254BD\Main.cpp
+Module7=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ComCtrls.hpp
+Module8=default.htm
+Count=9
 EditWindowCount=1
-
-[B:\HANTEK_DSO_6254BD\Main.cpp]
-ModuleType=TSourceModule
-FormState=1
-FormOnTop=0
 
 [B:\HANTEK_DSO_6254BD\ShapeGL.cpp]
 ModuleType=TSourceModule
@@ -33,16 +30,51 @@ ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
 
+[B:\HANTEK_DSO_6254BD\Hard.cpp]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[B:\HANTEK_DSO_6254BD\Chnl_frame.cpp]
+ModuleType=TSourceModule
+FormState=1
+FormOnTop=0
+
+[B:\HANTEK_DSO_6254BD\Main.cpp]
+ModuleType=TSourceModule
+FormState=1
+FormOnTop=0
+
+[c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ComCtrls.hpp]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
 [default.htm]
 ModuleType=TURLModule
 
 [EditWindow0]
-ViewCount=4
-CurrentEditView=B:\HANTEK_DSO_6254BD\Main.cpp
+ViewCount=9
+CurrentEditView=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
 View0=0
 View1=1
 View2=2
 View3=3
+View4=4
+View5=5
+View6=6
+View7=7
+View8=8
 PercentageSizes=1
 Create=1
 Visible=1
@@ -80,9 +112,9 @@ WelcomePageURL=bds:/default.htm
 [View1]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\Main.cpp
-CursorX=45
-CursorY=141
-TopLine=101
+CursorX=50
+CursorY=48
+TopLine=11
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -91,28 +123,84 @@ EditViewName=B:\HANTEK_DSO_6254BD\Main.cpp
 [View2]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
-CursorX=51
-CursorY=144
-TopLine=115
+CursorX=37
+CursorY=171
+TopLine=150
 LeftCol=1
 Elisions=
-Bookmarks={1,150,1}{2,282,1}{9,100,1}
+Bookmarks={1,69,1}{2,173,1}{9,112,1}
 EditViewName=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
 
 [View3]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
-CursorX=49
+CursorX=50
 CursorY=47
-TopLine=6
+TopLine=43
 LeftCol=1
 Elisions=
 Bookmarks=
 EditViewName=B:\HANTEK_DSO_6254BD\ShapeGL.h
 
+[View4]
+CustomEditViewType=TEditView
+Module=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
+CursorX=26
+CursorY=30
+TopLine=1
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
+
+[View5]
+CustomEditViewType=TEditView
+Module=B:\HANTEK_DSO_6254BD\Hard.cpp
+CursorX=1
+CursorY=88
+TopLine=42
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=B:\HANTEK_DSO_6254BD\Hard.cpp
+
+[View6]
+CustomEditViewType=TEditView
+Module=B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h
+CursorX=13
+CursorY=21
+TopLine=1
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h
+
+[View7]
+CustomEditViewType=TEditView
+Module=B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h
+CursorX=20
+CursorY=18
+TopLine=1
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h
+
+[View8]
+CustomEditViewType=TEditView
+Module=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ComCtrls.hpp
+CursorX=46
+CursorY=2330
+TopLine=2253
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ComCtrls.hpp
+
 [Watches]
-Count=1
-Watch0='Pixels',256,0,18,1,0,'Watches'
+Count=2
+Watch0='*m_pSrcData[2]',2,20,18,1,0,'Watches'
+Watch1='m_nLeverPos[2]',256,0,18,1,0,'Watches'
 
 [WatchWindow]
 WatchColumnWidth=120
@@ -422,11 +510,6 @@ Dockable=1
 StayOnTop=0
 SplitPos=111
 
-[PropInspDesignerSelection]
-ArrangeBy=Name
-SelectedItem=,OnMouseMove
-ExpandedItems=Anchors=0,BevelEdges=0,Constraints=0,Font=0,Margins=0,Padding=0,HorzScrollBar=0
-
 [ModelViewTool]
 PercentageSizes=1
 Create=1
@@ -559,8 +642,8 @@ Width=953
 Height=8676
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=870
-ClientHeight=8305
+ClientWidth=953
+ClientHeight=8676
 TBDockHeight=8676
 LRDockWidth=953
 Dockable=1
@@ -629,7 +712,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=1
 ActiveTabID=RefactoringForm
-TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,QAView,MetricsView,RefactoringsView,UsagesView
+TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,RefactoringsView,UsagesView,QAView,MetricsView
 
 [DockSite1]
 HostDockSite=DockBottomPanel
@@ -663,7 +746,7 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=801
+Left=845
 Top=113
 Width=724
 Height=8676

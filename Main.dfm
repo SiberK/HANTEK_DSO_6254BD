@@ -183,7 +183,7 @@ object Form1: TForm1
         Caption = 'Amplitude (0 ~ 3.5V)'
       end
       object Label3: TLabel
-        Left = 4
+        Left = 3
         Top = 123
         Width = 109
         Height = 15
@@ -197,6 +197,7 @@ object Form1: TForm1
         ItemHeight = 15
         ItemIndex = 0
         TabOrder = 0
+        TabStop = False
         Text = 'Off'
         OnChange = DDS_Change
         Items.Strings = (
@@ -233,10 +234,10 @@ object Form1: TForm1
         Width = 51
         Height = 23
         ItemHeight = 15
-        ItemIndex = 2
+        ItemIndex = 1
         TabOrder = 2
         TabStop = False
-        Text = 'MHz'
+        Text = 'kHZ'
         OnChange = DDS_Change
         Items.Strings = (
           'Hz'
@@ -255,10 +256,11 @@ object Form1: TForm1
         DisplayFormat = ',0.000;-,0.000'
         MaxValue = 3.500000000000000000
         TabOrder = 3
+        Value = 1.000000000000000000
         OnChange = DDS_Change
       end
       object eOffset: TCurrencyEdit
-        Left = 4
+        Left = 3
         Top = 140
         Width = 63
         Height = 23

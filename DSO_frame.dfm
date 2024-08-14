@@ -21,9 +21,9 @@ object FrmDSO: TFrmDSO
   end
   object pView: TScrollBox
     Left = 15
-    Top = 19
+    Top = 16
     Width = 395
-    Height = 296
+    Height = 303
     HorzScrollBar.Visible = False
     VertScrollBar.Visible = False
     Align = alClient
@@ -40,9 +40,8 @@ object FrmDSO: TFrmDSO
     TabOrder = 0
     OnMouseMove = FMouseMove
     OnResize = pViewResize
-    ExplicitLeft = 23
-    ExplicitTop = 13
-    ExplicitWidth = 388
+    ExplicitTop = 19
+    ExplicitHeight = 296
     object Label1: TLabel
       Left = 180
       Top = 143
@@ -62,9 +61,9 @@ object FrmDSO: TFrmDSO
   end
   object pLeft: TPanel
     Left = 0
-    Top = 19
+    Top = 16
     Width = 15
-    Height = 296
+    Height = 303
     Align = alLeft
     BevelOuter = bvNone
     Color = clMoneyGreen
@@ -77,12 +76,14 @@ object FrmDSO: TFrmDSO
     ParentFont = False
     TabOrder = 1
     OnResize = PanResize
+    ExplicitTop = 19
+    ExplicitHeight = 296
   end
   object pRight: TPanel
     Left = 410
-    Top = 19
+    Top = 16
     Width = 15
-    Height = 296
+    Height = 303
     Align = alRight
     BevelOuter = bvNone
     Color = clMoneyGreen
@@ -95,12 +96,14 @@ object FrmDSO: TFrmDSO
     ParentFont = False
     TabOrder = 2
     OnResize = PanResize
+    ExplicitTop = 19
+    ExplicitHeight = 296
   end
   object pTop: TPanel
     Left = 0
     Top = 0
     Width = 425
-    Height = 19
+    Height = 16
     Align = alTop
     BevelOuter = bvNone
     Color = clMoneyGreen
@@ -113,13 +116,12 @@ object FrmDSO: TFrmDSO
     ParentFont = False
     TabOrder = 3
     OnResize = PanResize
-    ExplicitWidth = 386
   end
   object pBottom: TPanel
     Left = 0
-    Top = 315
+    Top = 319
     Width = 425
-    Height = 20
+    Height = 16
     Align = alBottom
     BevelOuter = bvNone
     Color = clMoneyGreen
@@ -132,7 +134,17 @@ object FrmDSO: TFrmDSO
     ParentFont = False
     TabOrder = 4
     OnResize = PanResize
-    ExplicitTop = 294
-    ExplicitWidth = 386
+  end
+  object FormStorage1: TFormStorage
+    Options = []
+    UseRegistry = False
+    StoredProps.Strings = (
+      'pLeft.Tag'
+      'pRight.Tag'
+      'pTop.Tag'
+      'pBottom.Tag')
+    StoredValues = <>
+    Left = 30
+    Top = 29
   end
 end

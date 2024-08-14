@@ -30,6 +30,7 @@ struct TParamsDrawWave{
  double dbVertical	;// the vertical factor of zoom out/in
  USHORT nYTFormat	;// Fomat: Normal or Scan
  ULONG 	nScanLen	;// the scan data length, only invalidate in scan mode
+ 
  USHORT CntGrid_H	;
  USHORT CntGrid_V	;
  double	SmplPerDiv	;
@@ -37,10 +38,10 @@ struct TParamsDrawWave{
 //---------------------------------------------------------------------------
 extern GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)	;
 //extern GLvoid	DrawPxlArrayGL(GLsizei width, GLsizei height,TPxlArrayGL* PxlArr)			;
-extern GLvoid DrawShapesGL(TShape_M* shp[])				;
+extern GLvoid DrawShapesGL(TShapeGL* shp[])				;
 extern GLvoid DrawWaveGL(USHORT nCh,TParamsDrawWave* params)		;
 extern GLvoid DrawGridGL(USHORT cntGrid_H,USHORT cntGrid_V,USHORT nBright,USHORT IsGrid);
-extern GLvoid DrawSceneGL(GLsizei width, GLsizei height,TShape_M* shp[])	;
+extern GLvoid DrawSceneGL(GLsizei width, GLsizei height,TShapeGL* shp[])	;
 extern GLvoid DestroyGL ()						;
 //---------------------------------------------------------------------------
 
@@ -51,38 +52,46 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
 {String		nam			;
  FOnChange = _onChnge			;
  TColor		_color			;
-// spLvl[0].Init(1,0.0,clBlue  ,Font)	;
-// spLvl[1].Init(2,0.0,clRed   ,Font)	;
-// spLvl[2].Init(3,0.0,clGreen ,Font)	;
-// spLvl[3].Init(4,0.0,clPurple,Font)	;
 
  SmplPerDiv = 250			;
  CntGrid_H  = 10	; CntGrid_V = 8	;
+ pLeft->Tag = 0x2060A0E0		;// для начального установа Lvl255!!!
 
-// spmLvl[0] = new TShape_M(this,pLeft,"Spm1",TColor(m_Hard.m_clrRGB[0]))		;
-// spmLvl[0]->OnMouseMove = FMouseMove	;
+ FormStorage1->IniFileName = ChangeFileExt(ParamStr(0),".ini")	;
+ FormStorage1->IniSection  = Name     	;
+ FormStorage1->RestoreFormPlacement() 	;
 
  for(int ch=0;ch<4;ch++){
    nam.printf("ShpL%ld",ch+1)		;
    _color = TColor(m_Hard.m_clrRGB[ch])	;
-   shpLvl[ch] = new TShape_M(this,pLeft,nam,_color)	;
-   shpLvl[ch]->OnMouseMove = FMouseMove	;
+   shpLvl[ch] = new TShapeGL(this,pLeft,nam,_color)	;
+   shpLvl[ch]->OnMouseMove  = FMouseMove		;
+   shpLvl[ch]->cbSetHardLvl = SetHardLvlChnl		;
  }
+ shpLvl[TRG_T] = new TShapeGL(this,pTop,"TrgT",clYellow,soHrz,pLeft->Width)	;
+ shpLvl[TRG_T]->OnMouseMove  = FMouseMove	;
+ shpLvl[TRG_T]->cbSetHardLvl = SetHardLvlChnl	;
+
+ shpLvl[TRG_V] = new TShapeGL(this,pRight,"TrgV",clGray,soVrtM,0)	;
+ shpLvl[TRG_V]->OnMouseMove  = FMouseMove	;
+ shpLvl[TRG_V]->cbSetHardLvl = SetHardLvlChnl	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::Init(TObject* Sender,uint32_t _lvlsPos)
-{String		_cap	;
- UCHAR	lvl255		;
- Tag = _lvlsPos		;// это сейчас передаю через Tag!!!!
- 
+{String	_cap				;
+ UCHAR	lvl255				;
+ UCHAR* LvlCh = (UCHAR*)&(pLeft->Tag) 	;// для сохр. в .ini файле
+
  try{
  for(int nCh=0;nCh<4;nCh++){
-   _cap = String(nCh+1)	;
-//   shpLvl[nCh]->Pos.SetLvl255(GetLvlPos(nCh))	;
-   lvl255 = LoadLvl255(nCh)		;
+   _cap = String(nCh+1)			;
+   lvl255 = LvlCh[nCh]			;
    shpLvl[nCh]->Init(nCh,_cap,lvl255) 	;
    m_Hard.SetLvl(nCh,lvl255)		;
  }
+
+ shpLvl[TRG_T]->Init(TRG_T,"T",pTop  ->Tag)  	;
+ shpLvl[TRG_V]->Init(TRG_V,"T",pRight->Tag) 	;
 
  InitializeGL(pView->Handle,pView->Width,pView->Height)	;
  }DEF_CATCH
@@ -126,9 +135,7 @@ void __fastcall TFrmDSO::DrawWaves(void)
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::OnDraw(TObject *Sender)
-{static bool  flGrid = false			;
-// int CliWdt = pView->ClientRect.Width()		;
-// int CliHgt = pView->ClientRect.Height()	;
+{static bool  flGrid = false	;
  int CliWdt = pView->Width	;
  int CliHgt = pView->Height	;
 
@@ -136,7 +143,6 @@ void __fastcall TFrmDSO::OnDraw(TObject *Sender)
    if(!flGrid){ flGrid = true			;
      DrawGridGL(CntGrid_H,CntGrid_V,200,1)	;}
    if(m_Hard.m_nDeviceIndex != 0xFF){
-////     DrawShapesGL(spLvl)			;
      DrawWaves()				;}
 
    DrawSceneGL(CliWdt,CliHgt,shpLvl)		;
@@ -146,34 +152,75 @@ void __fastcall TFrmDSO::OnDraw(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::pViewResize(TObject *Sender)
 {
- for(int nCh=0;nCh<MAX_CH_NUM;nCh++)
+ for(int nCh=0;nCh<CNT_SHP;nCh++)
    shpLvl[nCh]->OnResize(pView->Height,pView->Width)	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
 			 TShiftState Shift, int X, int Y)
-{TShape_M* shpM=dynamic_cast<TShape_M*>(Sender)	;
+{TShapeGL* shpM= dynamic_cast<TShapeGL*>(Sender)	;
+ TPanel*   pan = shpM ? dynamic_cast<TPanel*>(shpM->Parent) : 0	;
+ 
  char str[100]	;
  if(Shift.Contains(ssLeft)){
    if(shpM){
-     Y += shpM->Top	;
-     Y = Min(Max(Y,0),shpM->Parent->Height)	;
-     shpM->Top = Y - shpM->Height/2		;
-     shpM->Pos.SetCursorPos(Y) 			;
-     m_Hard.SetLvl(shpM->NCh,shpM->Pos.Lvl255)	;
-     SaveLvl255(shpM->NCh,shpM->Pos.Lvl255)  	;// для сохр. в .ini файле
-     						 // это сейчас передаю через Tag!!!! 
-     if(FOnChange) FOnChange(this)		;
-     Application->ProcessMessages()	;
-//     sprintf(str,"Y=%ld, pos=%6.2lf, lvl255=%ld",
-//		Y, shpM->Pos.dPos,shpM->Pos.Lvl255)	;
-//     OutputDebugString(str)			;
+     shpM->OnMove(X,Y)	    	;// обработка перемещения маркера
+				 // из неё через cbSetHardLvl будет
+				 // вызов процедуры SetHardLvlChnl
+     short iLvl = shpM->GetLvl()	;
+     sprintf(str,"%3d (%6.2lf)",iLvl,shpM->Pos.dPos);
+     shpM->Hint = str	;
+
+//     Application->ProcessMessages()		;
    }
  }
 }
 //---------------------------------------------------------------------------
+void __fastcall TFrmDSO::SetHardLvlChnl(UCHAR ch,int lvl)
+{char str[80]	;
+ UCHAR* LvlCh = (UCHAR*)&(pLeft->Tag) 	;// для сохр. в .ini файле
+ UCHAR	CurCh = CH1		;
+
+ switch(ch){
+ case CH1 : case CH2 :
+ case CH3 : case CH4 :
+	m_Hard.SetLvl(ch,lvl)	;
+	LvlCh[ch] = lvl		;// для сохр. в .ini файле
+ break	;
+
+ case TRG_T :
+	m_Hard.SetTrgT(CurCh,lvl);// TODO
+	pTop->Tag = lvl		;
+//	pTop->Caption = lvl	;
+ break	;
+
+ case TRG_V :
+	m_Hard.SetTrgV(CurCh,lvl);// TODO
+	pRight->Tag = lvl	;
+//	pRight->Caption = lvl	;
+ break	;
+ }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::PanResize(TObject *Sender)
+{
+// if(spmLvl[0]){
+//   spmLvl[0]->Width = spmLvl[0]->Parent->Width	;
+//   spmLvl[0]->Height= 20		;
+// }
+}
+//---------------------------------------------------------------------------
+//     sprintf(str,"Y=%ld, pos=%6.2lf, lvl255=%ld",
+//		Y, shpM->Pos.dPos,shpM->Pos.Lvl255)	;
+//     OutputDebugString(str)			;
+//---------------------------------------------------------------------------
 
 
+
+
+
+//---------------------------------------------------------------------------
+// OpenGL  OpenGL  OpenGL  OpenGL  OpenGL  OpenGL  OpenGL  OpenGL
 //---------------------------------------------------------------------------
 static HGLRC ghRC = 0		;
 static HDC   ghDC = 0		;
@@ -268,7 +315,7 @@ GLvoid  DrawGridGL(USHORT cntGrid_H,USHORT cntGrid_V,USHORT nBright,USHORT IsGri
  }glEndList()	;
 }
 //---------------------------------------------------------------------------
-GLvoid	DrawSceneGL(GLsizei width, GLsizei height,TShape_M* shp[])
+GLvoid	DrawSceneGL(GLsizei width, GLsizei height,TShapeGL* shp[])
 {if(!ghDC || !ghRC) return	;
 
  glViewport( 0, 0,width,height)	;// устанавливаем область вывода
@@ -291,13 +338,14 @@ GLvoid	DrawSceneGL(GLsizei width, GLsizei height,TShape_M* shp[])
    if(glIsList(CNL_1+nCh))
      glCallList(CNL_1+nCh)	;
  }
- for(int nCh=0;nCh<4;nCh++){
+ for(int nShp=0;nShp<CNT_SHP;nShp++){
 //   if(glIsList(LVL_1+nCh))
 //     glCallList(LVL_1+nCh)	;
-   shp[nCh]->DrawGL()		;
+   shp[nShp]->DrawGL()		;
  }
  //-------
- glCallList(GRID)		;
+ if(glIsList(GRID))
+   glCallList(GRID)		;
 
 // glDisable(GL_ALPHA_TEST)	;
 
@@ -428,12 +476,4 @@ BOOL bSetupPixelFormat(HDC hdc)
 }
 //-----------------------------------------------------------------------------
 
-void __fastcall TFrmDSO::PanResize(TObject *Sender)
-{
-// if(spmLvl[0]){
-//   spmLvl[0]->Width = spmLvl[0]->Parent->Width	;
-//   spmLvl[0]->Height= 20		;
-// }
-}
-//---------------------------------------------------------------------------
 

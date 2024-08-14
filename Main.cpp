@@ -41,10 +41,12 @@ static const char strSmplRat[] = "1G/sec   ,0.5G/sec,250M/sec ,"
 static TFrmChnl*	ChnlFrm[4] = {0,0,0,0}		;				 
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner): TForm(Owner)
-{FormStorage1->IniFileName = ChangeFileExt(ParamStr(0),".ini")	;
+{FormStorage1->IniFileName   = ChangeFileExt(ParamStr(0),".ini")	;
  cbTimeDiv->Items->CommaText = strTimeDiv	;
+ cbTimeDiv->ItemIndex        = 17		;
  cbSmplDiv->Items->CommaText = strSmplDiv	;
- pDSO->Tag = 0x2060A0E0	;
+ cbSmplDiv->ItemIndex        = 1		;
+// pDSO->Tag = 0x2060A0E0	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::FormCreate(TObject *Sender)
@@ -81,6 +83,7 @@ void __fastcall TForm1::FormDestroy(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TForm1::FormCloseQuery(TObject *Sender, bool &CanClose)
 {
+ if(FrmDSO) FrmDSO->SaveProps()			;
  for(int ch=0;ch<4;ch++)
     if(ChnlFrm[ch]) ChnlFrm[ch]->SaveProps()	;
 }
@@ -150,9 +153,9 @@ void __fastcall TForm1::ChnlOnChange(TObject *Sender)
  if(Chnl){
    FrmDSO->SetChnlParams(Chnl->GetParams())		;
  }
- if(Dso){
-   pDSO->Tag = Dso->Tag		;// здесь инит LvlsPos!!!
- }
+// if(Dso){
+//   pDSO->Tag = Dso->Tag		;// здесь инит LvlsPos!!!
+// }
  DisplaySampleRate()		;
 }
 //---------------------------------------------------------------------------
