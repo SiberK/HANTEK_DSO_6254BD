@@ -2,14 +2,13 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include	<RxVerInf.hpp>
-#include	<RxStrUtils.hpp>
+#include <RxVerInf.hpp>
+#include <RxStrUtils.hpp>
 #include "Main.h"
-#include "DSO_frame.h"
-#include "Chnl_frame.h"
 
-#include "Hard.h"
 #include "ComWorL.h"
+#include "DdsDlg.h"
+#include "DSO_frame.h"	// ЭТО (#include "Hard.h") ДОЛЖНО БЫТЬ НИЖЕ ВСЕХ rx*.h !!!!!
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma link "rxPlacemnt"
@@ -38,7 +37,6 @@ static const char strSmplRat[] = "1G/sec   ,0.5G/sec,250M/sec ,"
 				 "125/sec  ,50/sec  ,25/sec   ,"
 				 "12.5/sec ,5/sec   ,2.5/sec  ,"
 				 "1.25/sec ,0.5/sec ,0.25/sec "  ;
-static TFrmChnl*	ChnlFrm[4] = {0,0,0,0}		;				 
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner): TForm(Owner)
 {FormStorage1->IniFileName   = ChangeFileExt(ParamStr(0),".ini")	;
@@ -61,13 +59,14 @@ void __fastcall TForm1::FormStorage1RestorePlacement(TObject *Sender)
  FrmDSO->Align  = alClient		;
 
  FrmDSO->Init(this,pDSO->Tag)		;// здесь инит LvlsPos!!!
- pcTool->ActivePage = tsDSO		;
 
  for(int ch=0;ch<4;ch++){
    ChnlFrm[ch] = new TFrmChnl(this,gbChnl,ch,ChnlOnChange);
    ChnlFrm[ch]->Align  = alBottom	;
-   ChnlFrm[ch]->Align  = alTop		;
- }
+   ChnlFrm[ch]->Align  = alTop		;}
+
+ FrmDSO->cbGetChnlParams = GetChnlParams	;
+ FrmDSO->cbSendChnlParams= SendChnlParams	;
 
  TimeDivChange(cbTimeDiv)		;
  timRefTimer(this)	;
@@ -76,7 +75,7 @@ void __fastcall TForm1::FormStorage1RestorePlacement(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TForm1::FormDestroy(TObject *Sender)
 {try{
-   DDS_Change(this)		;
+//   DDS_Change(this)		;
    if(FrmDSO) FrmDSO->Destroy(this)	;
  } DEF_CATCH
 }
@@ -142,7 +141,7 @@ double __fastcall TForm1::DisplaySampleRate()
 		smplRate > 250.0e3 ? "MSa" :
 		smplRate > 250.0   ? "KSa" : "Sa"	;
  Str.printf("%6.1lf %s (%6.1lf Sa/Div ) %6.2lfmSec",srm,strPp.c_str(),smplPerDiv,timCollect)	;
- StatMsg[3] = Str	;
+ StatMsg[0] = Str	;
  return smplPerDiv	;
 }
 //---------------------------------------------------------------------------
@@ -171,104 +170,28 @@ void __fastcall TForm1::timRefTimer(TObject *Sender)
    timRef->Enabled = true  	;}
 }
 //---------------------------------------------------------------------------
-enum TModeDDS{ddsOff ,ddsSine,ddsSquare,ddsRamp,ddsTrapezia,
-	      ddsArb ,ddsExponent,ddsAM_FM,ddsGause,ddsWhite};
-enum TWaveType{wtSine,wtRamp,wtSquare,wtDC=4,wtNoise=8};
-//---------------------------------------------------------------------------
-void __fastcall TForm1::DDS_Change(TObject *Sender)
-{WORD 	devIx = FrmDSO ? FrmDSO->GetDevIx() : 0xFF	;
- if(devIx == 0xFF) return		;
-
- WORD	WaveNum		;
- WORD	PeriodNum	;
- float	Phase, Duty	;
-
- double Amp  = eAmpl->Value*1000      	;// mV
- double	Freq = eFrq->Value * (cbFrq->ItemIndex == 2 ? 1e6 :
-			      cbFrq->ItemIndex == 1 ? 1e3 : 1	);
- short	Offset = eOffset->Value * 1000	;// mV
-
- int mode = Sender == this ? ddsOff : cbDdsMode->ItemIndex	;
- switch(mode){
-   case ddsSine:
-	ddsSetCmd(devIx,0)			;
-	ddsSDKSetFre(devIx,Freq)		;
-	ddsSDKSetAmp(devIx, Amp)		;
-	ddsSDKSetOffset(devIx, Offset)		;
-	ddsSDKSetWaveType(devIx,wtSine)		;
-	ddsSetOnOff(devIx,1)			; break	;
-   case ddsSquare:
-	ddsSetCmd(devIx,0)			;
-	ddsSDKSetFre(devIx,Freq)		;
-	ddsSDKSetAmp(devIx, Amp)		;
-	ddsSDKSetOffset(devIx, Offset)		;
-	ddsSDKSetWaveType(devIx,wtSquare)	;
-	ddsSetOnOff(devIx,1)			; break	;
-
-   default : ddsSetOnOff(devIx,0)	; break	;
- }
-}
-//---------------------------------------------------------------------------
-static void __fastcall	WhMouse(TCurrencyEdit* ed,TPoint &MPos,int Sgn, double mux)
-{if(ed && ed->ClientRect.Contains(ed->ScreenToClient(MPos))){
-   double Val = ed->Value * mux			;
-   double Stp = (Sgn >= 0) ? (Val <   10.0 ?   1.0 :
-			      Val <  100.0 ?  10.0 :  100.0) :
-			     (Val <=  10.0 ?  -1.0 :
-			      Val <= 100.0 ? -10.0 : -100.0) ;
-   ed->Value = (Val + Stp)/mux			;}
-}
-//---------------------------------------------------------------------------
-void __fastcall TForm1::FormMouseWheel(TObject *Sender, TShiftState Shift,
-      int WheelDelta, TPoint &MousePos, bool &Handled)
-{if(pcTool->Visible){
-   if(pcTool->ActivePage == tsDDS){
-     WhMouse(eFrq   ,MousePos,WheelDelta,1.0 )	;
-     WhMouse(eAmpl  ,MousePos,WheelDelta,100.0)	;
-     WhMouse(eOffset,MousePos,WheelDelta,10.0)	;}
- }
-}
-//---------------------------------------------------------------------------
 void __fastcall TForm1::eTimRefChange(TObject *Sender)
 {timRef->Enabled  = false		;
  timRef->Interval = eTimRef->Value	;
  timRef->Enabled  = true		;
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm1::pTaskMouseMove(TObject *Sender, TShiftState Shift, int X, int Y)
-{
-// TShape*	shp = dynamic_cast<TShape*>(Sender)	;
-// if(shp && Shift.Contains(ssLeft)){
-//   int minPos = 0	;
-//   int maxPos = shp->Parent->Height - shp->Height	;
-//
-//   if(shp->Top < minPos) shp->Top = minPos		;
-//   if(shp->Top > maxPos) shp->Top = maxPos		;
-//
-//   Y += shp->Top	; shp->Top = Y - shp->Height/2	;
-//   Application->ProcessMessages()			;
-// }
-//   if(shTask   ->Left < 0) shTask   ->Left = 0					;
-//   if(shTask   ->Left > shTask->Parent->Width-shTask->Width) shTask->Left = shTask->Parent->Width-shTask->Width	;
-//   if(shMarker1->Left < 0) shMarker1->Left = 0					;
-//   if(shMarker1->Left > shMarker1->Parent->Width-shMarker1->Width) shMarker1->Left = shMarker1->Parent->Width-shMarker1->Width	;
-//   if(shMarker2->Left < 0) shMarker2->Left = 0					;
-//   if(shMarker2->Left > shMarker2->Parent->Width-shMarker2->Width) shMarker2->Left = shMarker2->Parent->Width-shMarker2->Width	;
-//
-//
-//   X += shp->Left	;
-//   shp->Left = X - shp->Width/2		; Application->ProcessMessages()	;
-////   double    PosTS = double(X) / pTask->Width	;
-//   double    PosTS = (shp->Left+shp->Width/2.0) / pTask->Width	;
-//   int	     Mark  = shp->ClientToScreen(TPoint(shp->Width/2,0)).x	;
-//
-//   StrStatBar[0] = String(Mark)	;
-//
-//   if(shp == shTask){
-//     FrECG->PosTS = PosTS	; FrFCG->PosTS    = PosTS	; FrPW ->PosTS    = PosTS	;
-//     if(FrKig) FrKig->SetPosMark(FrECG->StartTS,FrECG->StopTS)	;
-//   }
+void __fastcall TForm1::PanDblClick(TObject *Sender)
+{if(pTool->Visible){ pTool->Hide()	; panSwtch->Caption = ">"	;}
+ else{               pTool->Show() 	; panSwtch->Caption = "<"	;}}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::SendChnlParams(TChnlParams* params)
+{uint8_t ch = params->IX		;
+ if(ch<4) ChnlFrm[ch]->SetParams(params);}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::GetChnlParams(uint8_t ch,TChnlParams* params)
+{*params = *ChnlFrm[ch]->GetParams()	;}
+//---------------------------------------------------------------------------
 
+void __fastcall TForm1::FormMouseWheel(TObject *Sender, TShiftState Shift,
+      int WheelDelta, TPoint &MousePos, bool &Handled)
+{
+ FrmDSO->FrameMouseWheel(Sender,Shift,WheelDelta,MousePos,Handled)	;
 }
 //---------------------------------------------------------------------------
 

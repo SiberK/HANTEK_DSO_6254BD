@@ -30,9 +30,10 @@ public:		// User declarations
 	__fastcall TFrmChnl(TComponent* Owner,TWinControl* parent,int ch,TNotifyEvent _onChnge);
 
  void   __fastcall SaveProps(void){ FormStorage1->SaveFormPlacement()	;}
- TChnlParams* __fastcall GetParams(void){ return &Prms	;}
  uint16_t __fastcall GetLvlPos(void){ return Min(Max(cbVoltDiv->Tag,0),255)	;}
  void     __fastcall SetLvlPos(uint16_t lvl){ cbVoltDiv->Tag = lvl	;}
+ TChnlParams* __fastcall GetParams(void)	;//{ return &Prms	;}
+ void __fastcall SetParams(TChnlParams* prms)	;
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFrmChnl *FrmChnl;

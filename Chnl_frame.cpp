@@ -7,10 +7,10 @@
 #pragma package(smart_init)
 #pragma link "rxPlacemnt"
 #pragma resource "*.dfm"
-static const char strVoltDiv1 [] = "2mV  ,5mV  ,10mV ,20mV ,50mV ,100mV,"
-				   "200mV,500mV,1V   ,2V   ,5V   ,10V   ";
-static const char strVoltDiv10[] = "20mV ,50mV ,100mV,200mV,500mV,1V   ,"
-				   "2V   ,5V   ,10V  ,20V  ,50V  ,100V  ";
+const char* strVoltDiv1  = "2mV ,5mV  ,10mV ,20mV ,50mV ,0.1V ,"
+			   "0.2V,0.5V ,1V   ,2V   ,5V   ,10V   ";
+const char* strVoltDiv10 = "20mV,50mV ,0.1V ,0.2V ,0.5V ,1V   ,"
+			   "2V  ,5V   ,10V  ,20V  ,50V  ,100V  ";
 enum	{vd20mV,vd50mV,vd100mV,vd200mV,vd500mV,vd1V,
 		    vd2V  ,vd5V  ,vd10V  ,vd20V  ,vd50V  ,vd100V}	;
 enum	{adDC,adGnd,adAC}		;
@@ -38,6 +38,8 @@ __fastcall TFrmChnl::TFrmChnl(TComponent* Owner,TWinControl* parent,
  cbVoltDiv->Enabled = bOn->Checked  		;
  cbAC_DC  ->Enabled = bOn->Checked  		;
 }
+//---------------------------------------------------------------------------
+void __fastcall TFrmChnl::FormStorage1RestorePlacement(TObject *Sender){ BtnOnClick(this)	;}
 //---------------------------------------------------------------------------
 void __fastcall TFrmChnl::BtnOnClick(TObject *Sender)
 {TComboBox* cmbox = dynamic_cast<TComboBox*>(Sender)	;
@@ -68,9 +70,21 @@ void __fastcall TFrmChnl::BtnOnClick(TObject *Sender)
  }
 }
 //---------------------------------------------------------------------------
-
-void __fastcall TFrmChnl::FormStorage1RestorePlacement(TObject *Sender)
+TChnlParams* __fastcall TFrmChnl::GetParams(void)
 {
+ Prms.IX        = IX			;
+ Prms.IxVoltDiv = cbVoltDiv->ItemIndex	;
+ Prms.IxAcDc    = cbAC_DC  ->ItemIndex	;
+ Prms.XX10   	= cbX10    ->Checked	;
+ Prms.OnOff 	= bOn      ->Checked  	;
+ return &Prms	;}
+//---------------------------------------------------------------------------
+void __fastcall TFrmChnl::SetParams(TChnlParams* prms)
+{
+ cbX10->Checked       = prms->XX10	;
+ bOn  ->Checked	      = prms->OnOff	;
+ cbVoltDiv->ItemIndex = prms->IxVoltDiv	;
+ cbAC_DC  ->ItemIndex = prms->IxAcDc	;
  BtnOnClick(this)	;
 }
 //---------------------------------------------------------------------------

@@ -105,6 +105,7 @@ class TShapeGL : public TShape
  void __fastcall Init(int _nCh, AnsiString _cap, UCHAR _lvl255)	;
  void __fastcall OnResize(int HgtP,int WdtP)			;
  void __fastcall OnMove(int X,int Y)	;
+ void __fastcall MouseWheel(int WheelDelta, TPoint &MousePos)	;
  void __fastcall DrawGL()		;
  short __fastcall GetLvl(void)
  { return Orientation == soHrz ? Pos.Lvl100 : Pos.Lvl255	;}
@@ -114,6 +115,9 @@ class TShapeGL : public TShape
  TShapeOrientation Orientation	;
  protected:
 	virtual void __fastcall Paint(void);
+__published:
+	__property OnDblClick ;
+	
 };
 //---------------------------------------------------------------------------
 #pragma pack(push,1)

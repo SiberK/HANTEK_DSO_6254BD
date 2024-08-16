@@ -27,7 +27,7 @@ object Form1: TForm1
     Panels = <
       item
         Bevel = pbNone
-        Width = 150
+        Width = 250
       end
       item
         Width = 200
@@ -42,237 +42,138 @@ object Form1: TForm1
   object pDSO: TPanel
     Left = 0
     Top = 0
-    Width = 472
+    Width = 462
     Height = 359
     Align = alClient
     Color = clMoneyGreen
     ParentBackground = False
     TabOrder = 1
   end
-  object pcTool: TPageControl
-    Left = 472
+  object panSwtch: TPanel
+    Left = 605
     Top = 0
-    Width = 149
+    Width = 16
     Height = 359
-    ActivePage = tsDSO
     Align = alRight
-    ParentShowHint = False
-    ShowHint = True
+    BevelOuter = bvNone
+    Caption = '<'
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentFont = False
     TabOrder = 2
-    TabStop = False
-    object tsDSO: TTabSheet
-      Caption = 'DSO'
-      object GroupBox1: TGroupBox
-        Left = 0
-        Top = 0
-        Width = 141
-        Height = 49
-        Align = alTop
-        Caption = '  Time   '
+    OnDblClick = PanDblClick
+  end
+  object pTool: TPanel
+    Left = 462
+    Top = 0
+    Width = 143
+    Height = 359
+    Align = alRight
+    BevelOuter = bvNone
+    TabOrder = 3
+    object GroupBox1: TGroupBox
+      Left = 0
+      Top = 0
+      Width = 143
+      Height = 49
+      Align = alTop
+      Caption = '  Time   '
+      TabOrder = 0
+      object cbTimeDiv: TComboBox
+        Tag = 121
+        Left = 3
+        Top = 20
+        Width = 60
+        Height = 23
+        Hint = 'Sec/Div'
+        ItemHeight = 15
         TabOrder = 0
-        object cbTimeDiv: TComboBox
-          Tag = 121
-          Left = 3
-          Top = 20
-          Width = 60
-          Height = 23
-          Hint = 'Sec/Div'
-          ItemHeight = 15
-          TabOrder = 0
-          OnChange = TimeDivChange
-        end
-        object cbSmplDiv: TComboBox
-          Tag = 122
-          Left = 78
-          Top = 20
-          Width = 60
-          Height = 23
-          Hint = 'Smpl/Div'
-          ItemHeight = 15
-          TabOrder = 1
-          OnChange = TimeDivChange
-        end
+        OnChange = TimeDivChange
       end
-      object gbChnl: TGroupBox
-        Left = 0
-        Top = 49
-        Width = 141
-        Height = 171
-        Align = alClient
-        Caption = '  Volts   '
+      object cbSmplDiv: TComboBox
+        Tag = 122
+        Left = 78
+        Top = 20
+        Width = 60
+        Height = 23
+        Hint = 'Smpl/Div'
+        ItemHeight = 15
         TabOrder = 1
-      end
-      object gbTrgr: TGroupBox
-        Left = 0
-        Top = 286
-        Width = 141
-        Height = 43
-        Align = alBottom
-        Caption = '  Trigger  '
-        TabOrder = 2
-        object cbEdge: TComboBox
-          Tag = 132
-          Left = 78
-          Top = 16
-          Width = 60
-          Height = 23
-          ItemHeight = 15
-          TabOrder = 0
-          OnChange = TimeDivChange
-          Items.Strings = (
-            'Rise'
-            'Falling')
-        end
-        object cbSrcTrg: TComboBox
-          Tag = 131
-          Left = 3
-          Top = 16
-          Width = 60
-          Height = 23
-          Hint = 'Sec/Div'
-          ItemHeight = 15
-          TabOrder = 1
-          OnChange = TimeDivChange
-          Items.Strings = (
-            'Off'
-            'CH1'
-            'CH2'
-            'CH3'
-            'CH4')
-        end
-      end
-      object GroupBox2: TGroupBox
-        Left = 0
-        Top = 220
-        Width = 141
-        Height = 66
-        Align = alBottom
-        TabOrder = 3
-        object eTimRef: TCurrencyEdit
-          Left = 4
-          Top = 12
-          Width = 64
-          Height = 23
-          Margins.Left = 4
-          Margins.Top = 1
-          DecimalPlaces = 0
-          DisplayFormat = ',0.00 mS;-,0.00 mS'
-          MaxValue = 1000.000000000000000000
-          MinValue = 10.000000000000000000
-          TabOrder = 0
-          Value = 10.000000000000000000
-          OnChange = eTimRefChange
-        end
+        OnChange = TimeDivChange
       end
     end
-    object tsDDS: TTabSheet
-      Caption = 'DDS'
-      ImageIndex = 1
-      object Label1: TLabel
-        Left = 3
-        Top = 32
-        Width = 131
-        Height = 15
-        Caption = 'Frequency  (0 ~ 75MHz)'
-      end
-      object Label2: TLabel
-        Left = 3
-        Top = 77
-        Width = 113
-        Height = 15
-        Caption = 'Amplitude (0 ~ 3.5V)'
-      end
-      object Label3: TLabel
-        Left = 3
-        Top = 123
-        Width = 109
-        Height = 15
-        Caption = 'Offset         (-7 ~ 7V)'
-      end
-      object cbDdsMode: TComboBox
-        Left = 3
-        Top = 3
-        Width = 67
+    object gbChnl: TGroupBox
+      Left = 0
+      Top = 49
+      Width = 143
+      Height = 201
+      Align = alClient
+      Caption = '  Volts   '
+      TabOrder = 1
+    end
+    object gbTrgr: TGroupBox
+      Left = 0
+      Top = 316
+      Width = 143
+      Height = 43
+      Align = alBottom
+      Caption = '  Trigger  '
+      TabOrder = 2
+      object cbEdge: TComboBox
+        Tag = 132
+        Left = 78
+        Top = 16
+        Width = 60
         Height = 23
         ItemHeight = 15
-        ItemIndex = 0
         TabOrder = 0
-        TabStop = False
-        Text = 'Off'
-        OnChange = DDS_Change
+        OnChange = TimeDivChange
+        Items.Strings = (
+          'Rise'
+          'Falling')
+      end
+      object cbSrcTrg: TComboBox
+        Tag = 131
+        Left = 3
+        Top = 16
+        Width = 60
+        Height = 23
+        Hint = 'Sec/Div'
+        ItemHeight = 15
+        TabOrder = 1
+        OnChange = TimeDivChange
         Items.Strings = (
           'Off'
-          'Sine'
-          'Square'
-          'Ramp'
-          'Trapezia'
-          'Arb'
-          'Exponent'
-          'AM/FM'
-          'Gause'
-          'White')
+          'CH1'
+          'CH2'
+          'CH3'
+          'CH4')
       end
-      object eFrq: TCurrencyEdit
-        Left = 3
-        Top = 48
-        Width = 63
+    end
+    object GroupBox2: TGroupBox
+      Left = 0
+      Top = 250
+      Width = 143
+      Height = 66
+      Align = alBottom
+      TabOrder = 3
+      object eTimRef: TCurrencyEdit
+        Left = 4
+        Top = 12
+        Width = 64
         Height = 23
         Margins.Left = 4
         Margins.Top = 1
-        TabStop = False
-        DecimalPlaces = 3
-        DisplayFormat = ',0.0;-,0.0'
+        DecimalPlaces = 0
+        DisplayFormat = ',0.00 mS;-,0.00 mS'
         MaxValue = 1000.000000000000000000
-        MinValue = 1.000000000000000000
-        TabOrder = 1
-        Value = 1.000000000000000000
-        OnChange = DDS_Change
-      end
-      object cbFrq: TComboBox
-        Left = 66
-        Top = 48
-        Width = 51
-        Height = 23
-        ItemHeight = 15
-        ItemIndex = 1
-        TabOrder = 2
-        TabStop = False
-        Text = 'kHZ'
-        OnChange = DDS_Change
-        Items.Strings = (
-          'Hz'
-          'kHZ'
-          'MHz')
-      end
-      object eAmpl: TCurrencyEdit
-        Left = 3
-        Top = 94
-        Width = 63
-        Height = 23
-        Margins.Left = 4
-        Margins.Top = 1
-        TabStop = False
-        DecimalPlaces = 3
-        DisplayFormat = ',0.000;-,0.000'
-        MaxValue = 3.500000000000000000
-        TabOrder = 3
-        Value = 1.000000000000000000
-        OnChange = DDS_Change
-      end
-      object eOffset: TCurrencyEdit
-        Left = 3
-        Top = 140
-        Width = 63
-        Height = 23
-        Margins.Left = 4
-        Margins.Top = 1
-        TabStop = False
-        DecimalPlaces = 3
-        DisplayFormat = ',0.000;-,0.000'
-        MaxValue = 7.000000000000000000
-        MinValue = -7.000000000000000000
-        TabOrder = 4
-        OnChange = DDS_Change
+        MinValue = 10.000000000000000000
+        TabOrder = 0
+        Value = 10.000000000000000000
+        OnChange = eTimRefChange
       end
     end
   end
@@ -280,15 +181,12 @@ object Form1: TForm1
     UseRegistry = False
     OnRestorePlacement = FormStorage1RestorePlacement
     StoredProps.Strings = (
-      'eFrq.Value'
-      'eAmpl.Value'
-      'eOffset.Value'
-      'cbFrq.ItemIndex'
       'cbTimeDiv.ItemIndex'
       'cbSmplDiv.ItemIndex'
       'cbEdge.ItemIndex'
       'cbSrcTrg.ItemIndex'
-      'pDSO.Tag')
+      'pDSO.Tag'
+      'pTool.Visible')
     StoredValues = <>
     Left = 4
     Top = 1

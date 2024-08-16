@@ -41,8 +41,8 @@ __fastcall TShapeGL::TShapeGL(Classes::TComponent* AOwner,
 }
 //---------------------------------------------------------------------------
 void __fastcall TShapeGL::Init(int _nCh, AnsiString _cap, UCHAR _lvl255)
-{NCh     = _nCh	; Pos.Ornt = Orientation	; 
- Caption = _cap	;
+{NCh     = _nCh	; Pos.Ornt = Orientation	;
+ Caption = _cap	; Tag = _nCh + 1		;
 
  if(Orientation == soVrt || Orientation == soVrtM){
       Pos.iOfst = 0				;
@@ -81,6 +81,11 @@ void __fastcall TShapeGL::OnMove(int X,int Y)
    Pos.SetCursorPos(X)				;
    if(cbSetHardLvl) cbSetHardLvl(NCh,Pos.Lvl100);
  }
+}
+//---------------------------------------------------------------------------
+void __fastcall TShapeGL::MouseWheel(int WheelDelta, TPoint &MousePos)
+{
+
 }
 //---------------------------------------------------------------------------
 void __fastcall TShapeGL::Paint(void)

@@ -66,14 +66,6 @@
     <Borland.ProjectType>CppVCLApplication</Borland.ProjectType>
     <BorlandProject>
 <BorlandProject><CPlusPlusBuilder.Personality><Source><Source Name="MainSource">HantekDSO_6254BD_1.cpp</Source></Source><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">1049</VersionInfo><VersionInfo Name="CodePage">1251</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><HistoryLists_hlIncludePath><HistoryLists_hlIncludePath Name="Count">4</HistoryLists_hlIncludePath><HistoryLists_hlIncludePath Name="Item0">$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;B:\forIPH\AZUR\user;L:\RAD\PacketFrms;B:\HANTEK_DSO_6254BD</HistoryLists_hlIncludePath><HistoryLists_hlIncludePath Name="Item1">HeadFiles;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;B:\forIPH\AZUR\user;L:\RAD\PacketFrms;B:\HANTEK_DSO_6254BD</HistoryLists_hlIncludePath><HistoryLists_hlIncludePath Name="Item2">HeadFiles_UTF8;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;B:\forIPH\AZUR\user;L:\RAD\PacketFrms;B:\HANTEK_DSO_6254BD</HistoryLists_hlIncludePath><HistoryLists_hlIncludePath Name="Item3">$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;B:\forIPH\AZUR\user;L:\RAD\PacketFrms</HistoryLists_hlIncludePath></HistoryLists_hlIncludePath><HistoryLists_hlFinalOutputDir><HistoryLists_hlFinalOutputDir Name="Count">1</HistoryLists_hlFinalOutputDir><HistoryLists_hlFinalOutputDir Name="Item0">.</HistoryLists_hlFinalOutputDir></HistoryLists_hlFinalOutputDir><HistoryLists_hlILINK_LibraryPath><HistoryLists_hlILINK_LibraryPath Name="Count">1</HistoryLists_hlILINK_LibraryPath><HistoryLists_hlILINK_LibraryPath Name="Item0">$(BDS)\lib\debug;$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;B:\forIPH\AZUR\user;L:\RAD\PacketFrms;B:\HANTEK_DSO_6254BD</HistoryLists_hlILINK_LibraryPath><HistoryLists_hlILINK_LibraryPath Name="Item1">$(BDS)\lib\debug;$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;B:\forIPH\AZUR\user;L:\RAD\PacketFrms</HistoryLists_hlILINK_LibraryPath></HistoryLists_hlILINK_LibraryPath><HistoryLists_hlDefines><HistoryLists_hlDefines Name="Count">1</HistoryLists_hlDefines><HistoryLists_hlDefines Name="Item0">_DEBUG;NO_STRICT</HistoryLists_hlDefines></HistoryLists_hlDefines><HistoryLists_hlIntermediateOutputDir><HistoryLists_hlIntermediateOutputDir Name="Count">1</HistoryLists_hlIntermediateOutputDir><HistoryLists_hlIntermediateOutputDir Name="Item0">Debug</HistoryLists_hlIntermediateOutputDir></HistoryLists_hlIntermediateOutputDir><Debugging><Debugging Name="DebugSourceDirs"></Debugging></Debugging><Parameters><Parameters Name="RunParams"></Parameters><Parameters Name="Launcher"></Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="DebugCWD"></Parameters><Parameters Name="HostApplication"></Parameters><Parameters Name="RemoteHost"></Parameters><Parameters Name="RemotePath"></Parameters><Parameters Name="RemoteParams"></Parameters><Parameters Name="RemoteLauncher"></Parameters><Parameters Name="UseRemoteLauncher">False</Parameters><Parameters Name="RemoteCWD"></Parameters><Parameters Name="RemoteDebug">False</Parameters><Parameters Name="Debug Symbols Search Path"></Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><Excluded_Packages>
-      
-      
-      
-      
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\bcboffice2k100.bpl">CodeGear C++Builder Office 2000 Servers Package</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\bcbofficexp100.bpl">CodeGear C++Builder Office XP Servers Package</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -94,6 +86,15 @@
     <CppCompile Include="ComWorL.cpp">
       <DependentOn>ComWorL.h</DependentOn>
       <BuildOrder>10</BuildOrder>
+    </CppCompile>
+    <CppCompile Include="DdsDlg.cpp">
+      <Form>DdsDialog</Form>
+      <DependentOn>DdsDlg.h</DependentOn>
+      <BuildOrder>12</BuildOrder>
+    </CppCompile>
+    <CppCompile Include="DrawOGL.cpp">
+      <DependentOn>DrawOGL.h</DependentOn>
+      <BuildOrder>13</BuildOrder>
     </CppCompile>
     <CppCompile Include="DSO_frame.cpp">
       <Form>FrmDSO</Form>
@@ -130,6 +131,7 @@
       <BuildOrder>6</BuildOrder>
     </LibFiles>
     <FormResources Include="Chnl_frame.dfm" />
+    <FormResources Include="DdsDlg.dfm" />
     <FormResources Include="DSO_frame.dfm" />
     <FormResources Include="Main.dfm" />
     <BuildConfiguration Include="Debug">
