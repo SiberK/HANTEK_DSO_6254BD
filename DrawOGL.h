@@ -26,6 +26,9 @@ struct TParamsDrawWave{
  USHORT CntGrid_H	;
  USHORT CntGrid_V	;
  double	SmplPerDiv	;
+ double Offset_H	;
+ double dLenWave	;
+ double dPercentX	;
 };
 //---------------------------------------------------------------------------
 extern GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)	;

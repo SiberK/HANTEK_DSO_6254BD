@@ -1,17 +1,12 @@
 //---------------------------------------------------------------------------
-
-
 #pragma hdrstop
-
 #include "DrawOGL.h"
-
 //---------------------------------------------------------------------------
-
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 // OpenGL  OpenGL  OpenGL  OpenGL  OpenGL  OpenGL  OpenGL  OpenGL
 //---------------------------------------------------------------------------
-double OffsetVaweGL   = -1.0	;
+//double OffsetVaweGL   = -1.0	;
 static HGLRC ghRC     = 0	;
 static HDC   ghDC     = 0	;
 static HWND  HandleGL = 0	;
@@ -54,22 +49,23 @@ GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
  uint32_t lst = CNL_1+nCh	;
  if(glIsList(lst)) glDeleteLists(lst,1)	;
 
-// расчитаем шаг по горизонтали
-// исходные данные: кол-во делений по горизонтали  (CntGrid_H),
-//		    число  отсчётов на деление	 (SmplPerDiv),
- double stpX = 2.0 / (double(prms->CntGrid_H) * prms->SmplPerDiv)	;
-
- double stpY = 2.0 / 255	;// Шаг по горизонтали
+// кол-во отсчётов в ViewOGL
+ double	nDisDataLen = prms->nDisDataLen	;
+ double stpX = 2.0 / nDisDataLen;// шаг по горизонтали
+ double stpY = 2.0 / 255	;// Шаг по вертикали
+ double ofst = prms->Offset_H	;
+ double shrn = prms->dbHorizontal;// растяжка по горизонтали
 
  if(!prms->pSrcData) return	;
+ prms->dLenWave = stpX * prms->nSrcDataLen * shrn	;
 
- glNewList(lst,GL_COMPILE);{
+ glNewList(lst,GL_COMPILE)	;{
    glLineWidth(1)		;
    glBegin(GL_LINE_STRIP) 	;{
      glColorT(prms->clrRGB)	;
 
      for(ULONG ix=0;ix<prms->nSrcDataLen;ix++){
-       glVertex2f(ix * stpX + OffsetVaweGL,prms->pSrcData[ix] * stpY-1.0)	;
+       glVertex2f((ix * stpX + ofst)*shrn,prms->pSrcData[ix] * stpY-1.0)	;
      }
 
    } glEnd()	;

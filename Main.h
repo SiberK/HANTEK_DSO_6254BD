@@ -60,6 +60,7 @@ private:	// User declarations
 
  void __fastcall SendChnlParams(TChnlParams* params)	;
  void __fastcall GetChnlParams(uint8_t ch,TChnlParams* params)	;
+ void __fastcall ChngTimDiv(int chng)			;
 
  public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);

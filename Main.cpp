@@ -67,6 +67,7 @@ void __fastcall TForm1::FormStorage1RestorePlacement(TObject *Sender)
 
  FrmDSO->cbGetChnlParams = GetChnlParams	;
  FrmDSO->cbSendChnlParams= SendChnlParams	;
+ FrmDSO->cbChngTimDiv    = ChngTimDiv		;
 
  TimeDivChange(cbTimeDiv)		;
  timRefTimer(this)	;
@@ -100,19 +101,19 @@ void __fastcall TForm1::TimeDivChange(TObject *Sender)
 	  if(ixTB >= maxTB) ixTB = 17			;
 
  TTimeParams	timPrms	;
- timPrms.nTrigSource = cbSrcTrg->ItemIndex	;
+ timPrms.nTrigSource = cbSrcTrg->ItemIndex		;
+ timPrms.nTimeDIV    = ixTB				;
+ timPrms.TimeBase    = tblTimeDiv[ixTB]			;
  timPrms.nHTriggerPos	;
- timPrms.nTimeDIV    = ixTB			;
  timPrms.nHTriggerPos	;
  timPrms.nVTriggerPos	;
  timPrms.nTriggerSlope	;
- timPrms.TimeBase = tblTimeDiv[ixTB]		;
 
  switch(tag){
    case 121 :	// cbTimeDiv
    case 122 :	// cbSmplDiv
-	FrmDSO->SetTimeDiv(&timPrms)		;
-	DisplaySampleRate()      		;
+	FrmDSO->SetTimeDiv(&timPrms,cbTimeDiv->Text)	;
+	DisplaySampleRate()      			;
    break	;
 
    case 131 :	// Trg_Src
@@ -173,12 +174,17 @@ void __fastcall TForm1::timRefTimer(TObject *Sender)
 void __fastcall TForm1::eTimRefChange(TObject *Sender)
 {timRef->Enabled  = false		;
  timRef->Interval = eTimRef->Value	;
- timRef->Enabled  = true		;
-}
+ timRef->Enabled  = true		;}
 //---------------------------------------------------------------------------
 void __fastcall TForm1::PanDblClick(TObject *Sender)
 {if(pTool->Visible){ pTool->Hide()	; panSwtch->Caption = ">"	;}
  else{               pTool->Show() 	; panSwtch->Caption = "<"	;}}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::ChngTimDiv(int chng)
+{int ix = cbTimeDiv->ItemIndex + chng		;
+ cbTimeDiv->ItemIndex = Min(Max(ix,0),cbTimeDiv->Items->Count-1)	;
+ TimeDivChange(cbTimeDiv)		;
+}
 //---------------------------------------------------------------------------
 void __fastcall TForm1::SendChnlParams(TChnlParams* params)
 {uint8_t ch = params->IX		;
@@ -187,11 +193,10 @@ void __fastcall TForm1::SendChnlParams(TChnlParams* params)
 void __fastcall TForm1::GetChnlParams(uint8_t ch,TChnlParams* params)
 {*params = *ChnlFrm[ch]->GetParams()	;}
 //---------------------------------------------------------------------------
-
 void __fastcall TForm1::FormMouseWheel(TObject *Sender, TShiftState Shift,
       int WheelDelta, TPoint &MousePos, bool &Handled)
-{
- FrmDSO->FrameMouseWheel(Sender,Shift,WheelDelta,MousePos,Handled)	;
+{//if(Shift.Contains(ssCtrl))
+   FrmDSO->FrameMouseWheel(Sender,Shift,WheelDelta,MousePos,Handled)	;
 }
 //---------------------------------------------------------------------------
 

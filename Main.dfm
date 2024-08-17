@@ -89,7 +89,7 @@ object Form1: TForm1
         Width = 60
         Height = 23
         Hint = 'Sec/Div'
-        ItemHeight = 15
+        ItemHeight = 0
         TabOrder = 0
         OnChange = TimeDivChange
       end
@@ -100,7 +100,7 @@ object Form1: TForm1
         Width = 60
         Height = 23
         Hint = 'Smpl/Div'
-        ItemHeight = 15
+        ItemHeight = 0
         TabOrder = 1
         OnChange = TimeDivChange
       end
@@ -128,7 +128,7 @@ object Form1: TForm1
         Top = 16
         Width = 60
         Height = 23
-        ItemHeight = 15
+        ItemHeight = 0
         TabOrder = 0
         OnChange = TimeDivChange
         Items.Strings = (
@@ -142,7 +142,7 @@ object Form1: TForm1
         Width = 60
         Height = 23
         Hint = 'Sec/Div'
-        ItemHeight = 15
+        ItemHeight = 0
         TabOrder = 1
         OnChange = TimeDivChange
         Items.Strings = (

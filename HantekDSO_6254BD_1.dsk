@@ -1,22 +1,23 @@
 [Closed Files]
-File_0=TSourceModule,'B:\HANTEK_DSO_6254BD\DdsDlg.cpp',0,1,2,62,22,0,0,,
-File_1=TSourceModule,'B:\HANTEK_DSO_6254BD\DSO_frame.dfm',0,1,1,1,1,0,0,,
-File_2=TSourceModule,'B:\HANTEK_DSO_6254BD\DSO_frame.cpp',0,1,1,1,1,0,0,,
-File_3=TSourceModule,'B:\HANTEK_DSO_6254BD\DrawOGL.cpp',0,1,4,26,16,0,0,,
-File_4=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\GL\gl.h',0,1,1124,14,1153,0,0,,
-File_5=TSourceModule,'B:\HANTEK_DSO_6254BD\Hard.cpp',0,1,69,46,90,0,0,,
-File_6=TSourceModule,'L:\RAD\RX_2010\Units\include\RxCtrls.hpp',0,1,928,45,957,0,0,,
-File_7=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h',0,1,1,57,219,0,0,,
-File_8=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h',0,1,1,20,18,0,0,,
+File_0=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\SOURCE\WIN32\VCL\Controls.pas',0,1,4017,1,4039,0,0,,
+File_1=TSourceModule,'B:\HANTEK_DSO_6254BD\DdsDlg.cpp',0,1,2,62,22,0,0,,
+File_2=TSourceModule,'B:\HANTEK_DSO_6254BD\DSO_frame.dfm',0,1,1,1,1,0,0,,
+File_3=TSourceModule,'c:\program files (x86)\codegear\rad studio\5.0\include\GL\gl.h',0,1,1124,14,1153,0,0,,
+File_4=TSourceModule,'B:\HANTEK_DSO_6254BD\Hard.cpp',0,1,69,46,90,0,0,,
+File_5=TSourceModule,'L:\RAD\RX_2010\Units\include\RxCtrls.hpp',0,1,928,45,957,0,0,,
+File_6=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTHardDll.h',0,1,1,57,219,0,0,,
+File_7=TSourceModule,'B:\HANTEK_DSO_6254BD\HeadFiles\HTSoftDll.h',0,1,1,20,18,0,0,,
 
 [Modules]
 Module0=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
-Module1=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
+Module1=B:\HANTEK_DSO_6254BD\DrawOGL.cpp
 Module2=B:\HANTEK_DSO_6254BD\Main.cpp
-Module3=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
-Module4=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ExtCtrls.hpp
-Module5=default.htm
-Count=6
+Module3=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\Classes.hpp
+Module4=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
+Module5=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
+Module6=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ExtCtrls.hpp
+Module7=default.htm
+Count=8
 EditWindowCount=1
 
 [B:\HANTEK_DSO_6254BD\DSO_frame.cpp]
@@ -24,12 +25,22 @@ ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
 
-[B:\HANTEK_DSO_6254BD\Chnl_frame.cpp]
+[B:\HANTEK_DSO_6254BD\DrawOGL.cpp]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[B:\HANTEK_DSO_6254BD\Main.cpp]
 ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
 
-[B:\HANTEK_DSO_6254BD\Main.cpp]
+[c:\program files (x86)\codegear\rad studio\5.0\include\vcl\Classes.hpp]
+ModuleType=TSourceModule
+FormState=0
+FormOnTop=0
+
+[B:\HANTEK_DSO_6254BD\Chnl_frame.cpp]
 ModuleType=TSourceModule
 FormState=1
 FormOnTop=0
@@ -48,7 +59,7 @@ FormOnTop=0
 ModuleType=TURLModule
 
 [EditWindow0]
-ViewCount=6
+ViewCount=8
 CurrentEditView=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
 View0=0
 View1=1
@@ -56,6 +67,8 @@ View2=2
 View3=3
 View4=4
 View5=5
+View6=6
+View7=7
 PercentageSizes=1
 Create=1
 Visible=1
@@ -74,9 +87,7 @@ MessageView=MessageView@EditWindow0
 BorlandEditorCodeExplorer=BorlandEditorCodeExplorer@EditWindow0
 TopPanelSize=0
 LeftPanelSize=0
-RightPanelSize=953
-RightPanelClients=ToolForm,PropertyInspector
-RightPanelData=00000800010100000000D71200000000000001B9030000000000000100000000951400001100000050726F7065727479496E73706563746F7201000000007E21000008000000546F6F6C466F726DFFFFFFFF
+RightPanelSize=0
 BottomPanelSize=0
 BottomPanelClients=DockSite1
 BottomPanelData=0000080001000100000009000000446F636B53697465310624000000000000002007000000000000FFFFFFFF
@@ -84,7 +95,7 @@ BottomMiddlePanelSize=0
 BottomMiddlePanelClients=DockSite0
 BottomMiddelPanelData=0000080001000100000009000000446F636B53697465303619000000000000007D1B000000000000FFFFFFFF
 TabDockBottomClients=MessageView@EditWindow0=0
-TabDockRightClients=DockSite2=0,StructureView=1
+TabDockRightClients=DockSite2=0,StructureView=1,ToolForm=2,PropertyInspector=3
 
 [View0]
 CustomEditViewType=TWelcomePageView
@@ -94,8 +105,8 @@ WelcomePageURL=bds:/default.htm
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\Main.cpp
 CursorX=1
-CursorY=195
-TopLine=154
+CursorY=187
+TopLine=157
 LeftCol=1
 Elisions=
 Bookmarks=
@@ -104,15 +115,37 @@ EditViewName=B:\HANTEK_DSO_6254BD\Main.cpp
 [View2]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
-CursorX=29
-CursorY=245
-TopLine=221
+CursorX=1
+CursorY=177
+TopLine=151
 LeftCol=1
 Elisions=
-Bookmarks=
+Bookmarks={1,226,1}
 EditViewName=B:\HANTEK_DSO_6254BD\DSO_frame.cpp
 
 [View3]
+CustomEditViewType=TEditView
+Module=B:\HANTEK_DSO_6254BD\DrawOGL.cpp
+CursorX=1
+CursorY=54
+TopLine=34
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=B:\HANTEK_DSO_6254BD\DrawOGL.cpp
+
+[View4]
+CustomEditViewType=TEditView
+Module=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\Classes.hpp
+CursorX=50
+CursorY=52
+TopLine=16
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\Classes.hpp
+
+[View5]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
 CursorX=24
@@ -123,7 +156,7 @@ Elisions=
 Bookmarks=
 EditViewName=B:\HANTEK_DSO_6254BD\ShapeGL.cpp
 
-[View4]
+[View6]
 CustomEditViewType=TEditView
 Module=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ExtCtrls.hpp
 CursorX=1
@@ -134,7 +167,7 @@ Elisions=
 Bookmarks=
 EditViewName=c:\program files (x86)\codegear\rad studio\5.0\include\vcl\ExtCtrls.hpp
 
-[View5]
+[View7]
 CustomEditViewType=TEditView
 Module=B:\HANTEK_DSO_6254BD\Chnl_frame.cpp
 CursorX=26
@@ -217,17 +250,17 @@ StayOnTop=0
 [ToolForm]
 PercentageSizes=1
 Create=1
-Visible=1
+Visible=0
 Docked=1
 State=0
-Left=0
-Top=592
+Left=1631
+Top=456
 Width=953
-Height=3181
+Height=8676
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=953
-ClientHeight=3181
+ClientWidth=870
+ClientHeight=8305
 TBDockHeight=8676
 LRDockWidth=953
 Dockable=1
@@ -441,27 +474,27 @@ StayOnTop=0
 [PropertyInspector]
 PercentageSizes=1
 Create=1
-Visible=1
+Visible=0
 Docked=1
 State=0
-Left=0
-Top=23
+Left=117
+Top=454
 Width=953
-Height=5162
+Height=410
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=953
-ClientHeight=5162
+ClientHeight=410
 TBDockHeight=410
 LRDockWidth=953
 Dockable=1
 StayOnTop=0
-SplitPos=100
+SplitPos=86
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=Action,OnMouseWheel
-ExpandedItems=Anchors=0,BevelEdges=0,Constraints=0,Font=0,HorzScrollBar=0,Margins=0,Padding=0,PopupMenu=0,MenuAnimation=0,BorderIcons=0,GlassFrame=0,VertScrollBar=0
+SelectedItem=Name,OnContextPopup
+ExpandedItems=Anchors=0,Constraints=0,Font=0,Margins=0,BorderIcons=0,GlassFrame=0,HorzScrollBar=0,Padding=0,Brush=0,Pen=0
 
 [ModelViewTool]
 PercentageSizes=1
@@ -595,8 +628,8 @@ Width=953
 Height=8676
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=953
-ClientHeight=8676
+ClientWidth=870
+ClientHeight=8305
 TBDockHeight=8676
 LRDockWidth=953
 Dockable=1
@@ -611,12 +644,12 @@ State=0
 Left=8
 Top=1042
 Width=4328
-Height=2343
+Height=933
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=4328
-ClientHeight=2343
-TBDockHeight=2343
+ClientHeight=933
+TBDockHeight=933
 LRDockWidth=4328
 Dockable=1
 StayOnTop=0
@@ -665,7 +698,7 @@ Dockable=1
 StayOnTop=0
 TabPosition=1
 ActiveTabID=RefactoringForm
-TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,QAView,MetricsView,RefactoringsView,UsagesView
+TabDockClients=RefactoringForm,FindReferencsForm,ToDo List,RefactoringsView,UsagesView,QAView,MetricsView
 
 [DockSite1]
 HostDockSite=DockBottomPanel

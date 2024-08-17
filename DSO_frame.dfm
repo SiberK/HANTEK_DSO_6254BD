@@ -110,7 +110,7 @@ object FrmDSO: TFrmDSO
     ParentFont = False
     TabOrder = 3
     OnResize = PanResize
-    object btn2: TSpeedButton
+    object bStretch: TSpeedButton
       Tag = 12
       Left = 409
       Top = 0
@@ -119,6 +119,7 @@ object FrmDSO: TFrmDSO
       Align = alRight
       AllowAllUp = True
       GroupIndex = 12
+      OnClick = BtnClick
       ExplicitLeft = 410
     end
     object btn1: TSpeedButton
@@ -140,6 +141,13 @@ object FrmDSO: TFrmDSO
       BevelOuter = bvNone
       ParentColor = True
       TabOrder = 0
+      object shpView: TShape
+        Left = 54
+        Top = 1
+        Width = 65
+        Height = 14
+        Brush.Style = bsClear
+      end
     end
   end
   object pBottom2: TPanel
@@ -165,9 +173,17 @@ object FrmDSO: TFrmDSO
       Top = 0
       Width = 16
       Height = 16
+      Hint = 'DDS'
       Align = alRight
       AllowAllUp = True
       GroupIndex = 13
+      Caption = 'DDS'
+      Font.Charset = RUSSIAN_CHARSET
+      Font.Color = clBlack
+      Font.Height = -8
+      Font.Name = 'GOST type A'
+      Font.Style = [fsBold]
+      ParentFont = False
       OnClick = BtnClick
       ExplicitLeft = 410
     end
@@ -196,6 +212,16 @@ object FrmDSO: TFrmDSO
       ParentColor = True
       ParentFont = False
       TabOrder = 0
+      object lblTimDiv: TLabel
+        Left = 343
+        Top = 0
+        Width = 50
+        Height = 16
+        Align = alRight
+        AutoSize = False
+        Caption = 'lblTimDiv'
+        ExplicitLeft = 349
+      end
     end
   end
   object FormStorage1: TFormStorage
@@ -216,7 +242,6 @@ object FrmDSO: TFrmDSO
     object On1: TMenuItem
       AutoCheck = True
       Caption = 'On'
-      OnClick = On1Click
     end
     object VDiv1: TMenuItem
       Caption = 'V/Div'
