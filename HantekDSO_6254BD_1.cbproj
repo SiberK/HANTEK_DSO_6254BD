@@ -81,54 +81,48 @@
       <Form>FrmChnl</Form>
       <DesignClass>TFrame</DesignClass>
       <DependentOn>Chnl_frame.h</DependentOn>
-      <BuildOrder>9</BuildOrder>
+      <BuildOrder>5</BuildOrder>
     </CppCompile>
     <CppCompile Include="ComWorL.cpp">
       <DependentOn>ComWorL.h</DependentOn>
-      <BuildOrder>10</BuildOrder>
+      <BuildOrder>6</BuildOrder>
     </CppCompile>
     <CppCompile Include="DdsDlg.cpp">
       <Form>DdsDialog</Form>
       <DependentOn>DdsDlg.h</DependentOn>
-      <BuildOrder>12</BuildOrder>
+      <BuildOrder>8</BuildOrder>
     </CppCompile>
     <CppCompile Include="DrawOGL.cpp">
       <DependentOn>DrawOGL.h</DependentOn>
-      <BuildOrder>13</BuildOrder>
+      <BuildOrder>9</BuildOrder>
     </CppCompile>
     <CppCompile Include="DSO_frame.cpp">
       <Form>FrmDSO</Form>
       <DesignClass>TFrame</DesignClass>
       <DependentOn>DSO_frame.h</DependentOn>
-      <BuildOrder>8</BuildOrder>
+      <BuildOrder>4</BuildOrder>
     </CppCompile>
     <CppCompile Include="HantekDSO_6254BD_1.cpp">
-      <BuildOrder>2</BuildOrder>
+      <BuildOrder>3</BuildOrder>
     </CppCompile>
     <CppCompile Include="Hard.cpp">
       <DependentOn>Hard.h</DependentOn>
-      <BuildOrder>7</BuildOrder>
+      <BuildOrder>1</BuildOrder>
     </CppCompile>
     <CppCompile Include="Main.cpp">
       <Form>Form1</Form>
       <DependentOn>Main.h</DependentOn>
-      <BuildOrder>1</BuildOrder>
+      <BuildOrder>2</BuildOrder>
     </CppCompile>
     <CppCompile Include="ShapeGL.cpp">
       <DependentOn>ShapeGL.h</DependentOn>
-      <BuildOrder>11</BuildOrder>
+      <BuildOrder>7</BuildOrder>
     </CppCompile>
-    <LibFiles Include="HTDisplayDll.lib">
-      <BuildOrder>3</BuildOrder>
-    </LibFiles>
     <LibFiles Include="HTHardDll.lib">
-      <BuildOrder>4</BuildOrder>
+      <BuildOrder>10</BuildOrder>
     </LibFiles>
     <LibFiles Include="HTSoftDll.lib">
-      <BuildOrder>5</BuildOrder>
-    </LibFiles>
-    <LibFiles Include="MeasDll.lib">
-      <BuildOrder>6</BuildOrder>
+      <BuildOrder>11</BuildOrder>
     </LibFiles>
     <FormResources Include="Chnl_frame.dfm" />
     <FormResources Include="DdsDlg.dfm" />

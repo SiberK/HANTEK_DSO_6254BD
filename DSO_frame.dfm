@@ -7,18 +7,20 @@ object FrmDSO: TFrmDSO
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
   Font.Height = -16
-  Font.Name = 'GOST type A'
+  Font.Name = 'Calibri'
   Font.Style = [fsBold]
   ParentCtl3D = False
   ParentFont = False
+  ParentShowHint = False
+  ShowHint = True
   TabOrder = 0
   OnMouseDown = FrameMouseDown
   OnMouseWheel = FrameMouseWheel
   object Label2: TLabel
     Left = 277
     Top = 101
-    Width = 40
-    Height = 17
+    Width = 44
+    Height = 19
     Caption = 'Label2'
   end
   object pView: TScrollBox
@@ -67,13 +69,7 @@ object FrmDSO: TFrmDSO
     Align = alLeft
     BevelOuter = bvNone
     Color = clMoneyGreen
-    Font.Charset = RUSSIAN_CHARSET
-    Font.Color = clBlue
-    Font.Height = -13
-    Font.Name = 'GOST type A'
-    Font.Style = [fsBold]
     ParentBackground = False
-    ParentFont = False
     TabOrder = 1
   end
   object pRight: TPanel
@@ -84,13 +80,7 @@ object FrmDSO: TFrmDSO
     Align = alRight
     BevelOuter = bvNone
     Color = clMoneyGreen
-    Font.Charset = RUSSIAN_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'GOST type A'
-    Font.Style = [fsBold]
     ParentBackground = False
-    ParentFont = False
     TabOrder = 2
   end
   object pTop2: TPanel
@@ -101,13 +91,7 @@ object FrmDSO: TFrmDSO
     Align = alTop
     BevelOuter = bvNone
     Color = clMoneyGreen
-    Font.Charset = RUSSIAN_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'GOST type A'
-    Font.Style = [fsBold]
     ParentBackground = False
-    ParentFont = False
     TabOrder = 3
     OnResize = PanResize
     object bStretch: TSpeedButton
@@ -116,21 +100,24 @@ object FrmDSO: TFrmDSO
       Top = 0
       Width = 16
       Height = 16
+      Hint = #1056#1072#1089#1090#1103#1078#1082#1072' x0.1'
       Align = alRight
       AllowAllUp = True
       GroupIndex = 12
       OnClick = BtnClick
       ExplicitLeft = 410
     end
-    object btn1: TSpeedButton
+    object bFixTrgT: TSpeedButton
       Tag = 11
       Left = 0
       Top = 0
       Width = 16
       Height = 16
+      Hint = #1092#1080#1082#1089'. TrgT'
       Align = alLeft
       AllowAllUp = True
       GroupIndex = 11
+      OnClick = BtnClick
     end
     object pTop: TPanel
       Left = 16
@@ -141,12 +128,24 @@ object FrmDSO: TFrmDSO
       BevelOuter = bvNone
       ParentColor = True
       TabOrder = 0
+      object lblTrgT: TLabel
+        Left = 363
+        Top = 0
+        Width = 30
+        Height = 16
+        Align = alRight
+        Alignment = taCenter
+        AutoSize = False
+        Caption = 'lblTrgT'
+        ExplicitLeft = 347
+      end
       object shpView: TShape
         Left = 54
         Top = 1
         Width = 65
         Height = 14
         Brush.Style = bsClear
+        OnMouseMove = FMouseMove
       end
     end
   end
@@ -158,13 +157,7 @@ object FrmDSO: TFrmDSO
     Align = alBottom
     BevelOuter = bvNone
     Color = clMoneyGreen
-    Font.Charset = RUSSIAN_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'GOST type A'
-    Font.Style = [fsBold]
     ParentBackground = False
-    ParentFont = False
     TabOrder = 4
     OnResize = PanResize
     object btn3: TSpeedButton
@@ -204,13 +197,7 @@ object FrmDSO: TFrmDSO
       Height = 16
       Align = alClient
       BevelOuter = bvNone
-      Font.Charset = RUSSIAN_CHARSET
-      Font.Color = clBlack
-      Font.Height = -16
-      Font.Name = 'Calibri'
-      Font.Style = [fsBold]
       ParentColor = True
-      ParentFont = False
       TabOrder = 0
       object lblTimDiv: TLabel
         Left = 343
@@ -220,7 +207,8 @@ object FrmDSO: TFrmDSO
         Align = alRight
         AutoSize = False
         Caption = 'lblTimDiv'
-        ExplicitLeft = 349
+        ExplicitLeft = 337
+        ExplicitTop = 6
       end
     end
   end
@@ -230,8 +218,30 @@ object FrmDSO: TFrmDSO
     StoredProps.Strings = (
       'pLeft.Tag'
       'pRight.Tag'
-      'pTop2.Tag'
-      'pBottom2.Tag')
+      'pBottom.Tag'
+      'pTop.Tag'
+      'miALT.Checked'
+      'miAUTO.Checked'
+      'miCAN.Checked'
+      'miCH1.Checked'
+      'miCH2.Checked'
+      'miCH3.Checked'
+      'miCH4.Checked'
+      'miEdge.Checked'
+      'miFalling.Checked'
+      'miI2C.Checked'
+      'miLin.Checked'
+      'miNORMAL.Checked'
+      'miPulse.Checked'
+      'miRising.Checked'
+      'miSINGLE.Checked'
+      'miSPI.Checked'
+      'miUART.Checked'
+      'miVideo.Checked'
+      'miMode.Tag'
+      'miSlope.Tag'
+      'miSource.Tag'
+      'miSweep.Tag')
     StoredValues = <>
     Left = 30
     Top = 29
@@ -262,6 +272,167 @@ object FrmDSO: TFrmDSO
       end
       object GND1: TMenuItem
         Caption = 'GND'
+      end
+    end
+  end
+  object popTrgV: TPopupMenu
+    Left = 61
+    Top = 74
+    object miMode: TMenuItem
+      Caption = 'Mode'
+      object miEdge: TMenuItem
+        Tag = 11
+        AutoCheck = True
+        Caption = 'Edge'
+        GroupIndex = 10
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miPulse: TMenuItem
+        Tag = 12
+        AutoCheck = True
+        Caption = 'Pulse'
+        GroupIndex = 10
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miVideo: TMenuItem
+        Tag = 13
+        AutoCheck = True
+        Caption = 'Video'
+        GroupIndex = 10
+        RadioItem = True
+        Visible = False
+        OnClick = popTrgClick
+      end
+      object miCAN: TMenuItem
+        Tag = 14
+        AutoCheck = True
+        Caption = 'CAN'
+        GroupIndex = 10
+        RadioItem = True
+        Visible = False
+        OnClick = popTrgClick
+      end
+      object miLin: TMenuItem
+        Tag = 15
+        AutoCheck = True
+        Caption = 'LIN'
+        GroupIndex = 10
+        RadioItem = True
+        Visible = False
+        OnClick = popTrgClick
+      end
+      object miUART: TMenuItem
+        Tag = 16
+        AutoCheck = True
+        Caption = 'UART'
+        GroupIndex = 10
+        RadioItem = True
+        Visible = False
+        OnClick = popTrgClick
+      end
+      object miSPI: TMenuItem
+        Tag = 17
+        AutoCheck = True
+        Caption = 'SPI'
+        GroupIndex = 10
+        RadioItem = True
+        Visible = False
+        OnClick = popTrgClick
+      end
+      object miI2C: TMenuItem
+        Tag = 18
+        AutoCheck = True
+        Caption = 'I2C'
+        GroupIndex = 10
+        RadioItem = True
+        Visible = False
+        OnClick = popTrgClick
+      end
+      object miALT: TMenuItem
+        Tag = 19
+        AutoCheck = True
+        Caption = 'ALT'
+        GroupIndex = 10
+        RadioItem = True
+        Visible = False
+        OnClick = popTrgClick
+      end
+    end
+    object miSweep: TMenuItem
+      Caption = 'Sweep'
+      object miAUTO: TMenuItem
+        Tag = 21
+        AutoCheck = True
+        Caption = 'AUTO'
+        GroupIndex = 20
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miNORMAL: TMenuItem
+        Tag = 22
+        AutoCheck = True
+        Caption = 'NORMAL'
+        GroupIndex = 20
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miSINGLE: TMenuItem
+        Tag = 23
+        AutoCheck = True
+        Caption = 'SINGLE'
+        GroupIndex = 20
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+    end
+    object miSource: TMenuItem
+      Caption = 'Source'
+      object miCH1: TMenuItem
+        Tag = 31
+        AutoCheck = True
+        Caption = 'CH1'
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miCH2: TMenuItem
+        Tag = 32
+        AutoCheck = True
+        Caption = 'CH2'
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miCH3: TMenuItem
+        Tag = 33
+        AutoCheck = True
+        Caption = 'CH3'
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miCH4: TMenuItem
+        Tag = 34
+        AutoCheck = True
+        Caption = 'CH4'
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+    end
+    object miSlope: TMenuItem
+      Caption = 'Slope'
+      object miRising: TMenuItem
+        Tag = 41
+        AutoCheck = True
+        Caption = '/'
+        RadioItem = True
+        OnClick = popTrgClick
+      end
+      object miFalling: TMenuItem
+        Tag = 42
+        AutoCheck = True
+        Caption = '\'
+        RadioItem = True
+        OnClick = popTrgClick
       end
     end
   end

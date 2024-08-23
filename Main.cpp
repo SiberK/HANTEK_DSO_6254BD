@@ -38,8 +38,24 @@ static const char strSmplRat[] = "1G/sec   ,0.5G/sec,250M/sec ,"
 				 "12.5/sec ,5/sec   ,2.5/sec  ,"
 				 "1.25/sec ,0.5/sec ,0.25/sec "  ;
 //---------------------------------------------------------------------------
+static int FL_CHECK_RUN = 0	;
+//---------------------------------------------------------------------------
+static int CheckRepeatRun()
+{HANDLE hMutex = CreateMutex( NULL, true, "ScopeMutex" );
+ int rzlt = 0	;
+ if( GetLastError() == ERROR_ALREADY_EXISTS ){
+   rzlt = 1	;
+   ShowMessage( "Запускаете программу 2-ой раз !!!" );
+   CloseHandle( hMutex )			;
+   Application->Terminate()			;}
+
+ return rzlt	;}
+//---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner): TForm(Owner)
-{FormStorage1->IniFileName   = ChangeFileExt(ParamStr(0),".ini")	;
+{FL_CHECK_RUN = CheckRepeatRun()		;
+ if(FL_CHECK_RUN) return			;
+ 
+ FormStorage1->IniFileName   = ChangeFileExt(ParamStr(0),".ini")	;
  cbTimeDiv->Items->CommaText = strTimeDiv	;
  cbTimeDiv->ItemIndex        = 17		;
  cbSmplDiv->Items->CommaText = strSmplDiv	;
@@ -53,6 +69,8 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TForm1::FormStorage1RestorePlacement(TObject *Sender)
 {
+ if(FL_CHECK_RUN) return		;
+
  try{
  FrmDSO = new TFrmDSO(this,ChnlOnChange);
  FrmDSO->Parent = pDSO			;
@@ -141,7 +159,8 @@ double __fastcall TForm1::DisplaySampleRate()
  String strPp = smplRate > 250.0e6 ? "GSa" :
 		smplRate > 250.0e3 ? "MSa" :
 		smplRate > 250.0   ? "KSa" : "Sa"	;
- Str.printf("%6.1lf %s (%6.1lf Sa/Div ) %6.2lfmSec",srm,strPp.c_str(),smplPerDiv,timCollect)	;
+ Str.printf("%6.1lf %s (%6.1lf Sa/Div ) %ldsmpl (%6.2lfmSec)",
+ 		srm,strPp.c_str(),smplPerDiv,cntSmpls,timCollect)	;
  StatMsg[0] = Str	;
  return smplPerDiv	;
 }

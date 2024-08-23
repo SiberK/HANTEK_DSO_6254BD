@@ -66,6 +66,8 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
  shpLvl[TRG_V] = new TShapeGL(this,pRight,"TrgV",clGray,soVrtM,0)	;
  shpLvl[TRG_V]->OnMouseMove  = FMouseMove	;
  shpLvl[TRG_V]->cbSetHardLvl = SetHardLvlChnl	;
+ shpLvl[TRG_V]->OnMouseDown  = FrameMouseDown	;
+ lblTrgT->Caption = ""				;
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::Destroy(TObject* Sender){ DestroyGL()	;}
@@ -84,12 +86,23 @@ void __fastcall TFrmDSO::Init(TObject* Sender,uint32_t _lvlsPos)
 
    lblCh[ch]->Font->Color = GetChColor(ch)	;
  }
+ m_Hard.FindeDev()			;
 
  shpLvl[TRG_T]->Init(TRG_T,"T",pTop  ->Tag)  	;
  shpLvl[TRG_V]->Init(TRG_V,"T",pRight->Tag) 	;
 
  InitializeGL(pView->Handle,pView->Width,pView->Height)	;
  }DEF_CATCH
+
+ try{
+   m_Hard.SetTriggerMode (miMode  ->Tag)	;
+   m_Hard.SetTriggerSweep(miSweep ->Tag)	;
+   m_Hard.SetTriggerSrc  (miSource->Tag)	;
+   m_Hard.SetTriggerSlope(miSlope ->Tag)	;
+   CalcDrawWaves()	;
+ }DEF_CATCH
+
+ CalcDrawWaves()				;
 }
 //---------------------------------------------------------------------------
 extern const char* strVoltDiv1 	;
@@ -122,8 +135,38 @@ USHORT __fastcall TFrmDSO::CollectData(void)
 //{DrawShapesGL(shpLvl)		;
 //}
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::DrawWaves(void)
-{
+void __fastcall TFrmDSO::SetHardLvlChnl(UCHAR ch,int lvl)
+{char str[80]	;
+ UCHAR* LvlCh = (UCHAR*)&(pLeft->Tag) 	;// для сохр. в .ini файле
+ UCHAR	CurCh = CH1		;
+
+ switch(ch){
+ case CH1 : case CH2 :
+ case CH3 : case CH4 :
+	m_Hard.SetLvl(ch,lvl)	;
+	LvlCh[ch] = lvl		;// для сохр. в .ini файле
+ break	;
+
+ case TRG_T :
+	m_Hard.SetTrgT(CurCh,lvl);// TODO
+	pTop->Tag = lvl		;
+        sprintf(str,"%d%%",lvl)	;
+//	lblTrgT->Caption = lvl	;
+	shpLvl[TRG_T]->Hint = str	;
+	CalcDrawWaves()		;
+ break	;
+
+ case TRG_V :
+	m_Hard.SetTrgV(CurCh,lvl);// TODO
+	pRight->Tag = lvl	;
+ break	;
+ }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::CalcDrawWaves(void)
+{char	str[80]	;
+ double	Tprc = shpLvl[TRG_T]->Pos.Lvl100/100.0		;// 0.0 ... 1.0  % положение T относительно полной длины последовательности
+
  PrmsDW.nDisType      = 0				;// display type: Line or Dot
  PrmsDW.nSrcDataLen   = m_Hard.m_stControl.nBufferLen	;// the source data length
 // PrmsDW.nDisDataLen   = m_Hard.m_stControl.nBufferLen	;// the display data length for drawing
@@ -132,20 +175,52 @@ void __fastcall TFrmDSO::DrawWaves(void)
  PrmsDW.dbVertical    = 1.0				;// the vertical factor of zoom out/in
  PrmsDW.nYTFormat     = 0				;// Fomat: Normal or Scan
  PrmsDW.nScanLen      = PrmsDW.nSrcDataLen		;// the scan data length, only invalidate in scan mode
- PrmsDW.nDisDataLen   = CntGrid_H * SmplPerDiv		;// the display data length for drawing
 
  PrmsDW.CntGrid_H     = CntGrid_H			;
  PrmsDW.CntGrid_V     = CntGrid_V			;
- PrmsDW.SmplPerDiv    = SmplPerDiv			;
+ PrmsDW.SmplPerDiv    = SmplPerDiv / PrmsDW.dbHorizontal;// отсчётов на деление  с учётом растяжки(масштаба)
+ // the display data length for drawing
+ PrmsDW.nDisDataLen   = PrmsDW.SmplPerDiv * CntGrid_H 	;// сколько отсчётов войдёт на экран? с учётом растяжки(масштаба)
+ PrmsDW.StpOGL	      = 2.0/PrmsDW.nDisDataLen		;// шаг отображения отсчётов в OGL (-1.0 .. 1.0)
+
+// длительность набираемой последовательности отсчётов (мСек)
+ PrmsDW.dLenWave      = PrmsDW.nSrcDataLen * PrmsDW.StpOGL		;
 
 // !!! (SC_OGL) - система координат контекста OGL !!! (причём видимая часть контекста -1.0 ... 1.0)!!!
- int    SmplPerDspl = CntGrid_H * SmplPerDiv		;// сколько смпл войдёт на экран?
- double stpX = 2.0 / SmplPerDspl			;
- double	lenX = stpX * m_Hard.m_stControl.nBufferLen 	;// полная длина последовательности (SC_OGL)
- double	posT = shpLvl[4]->Pos.Lvl100/100.0		;// 0.0 ... 1.0  % положение T относительно полной длины последовательности
+ if(!bFixTrgT->Down){
+   PrmsDW.Offset_H = Tprc*(2.0-PrmsDW.StpOGL*PrmsDW.nSrcDataLen) -1.0	;}
+ else{
+   int    iMin = 0, iMax = pTop->Width - shpView->Width		;
+   int    iPos = shpView->Left					;
+   double dMin = -1.0, dMax = 1.0 - PrmsDW.dLenWave,dPos	;
 
- PrmsDW.Offset_H = shpLvl[4]->Pos.dPos - lenX * posT	;// начало последовательности (SC_OGL)
+   dPos = dMap(iMin,iMax,iPos,dMin,dMax)			;
+   PrmsDW.Offset_H = dPos					;
+// рассчёт положения отметки TrgT
+   dPos = PrmsDW.Offset_H + Tprc * PrmsDW.dLenWave		;
 
+   shpLvl[TRG_T]->Pos.SetPos(dPos,bFixTrgT->Down)		;
+   shpLvl[TRG_T]->OnResize(pView->Height,pView->Width,bFixTrgT->Down)		;
+
+   sprintf(str,"ipos=%ld,ofst=%6.3lf,tpos=%6.3lf",iPos,PrmsDW.Offset_H,dPos);
+   pTop->Hint = str	;
+ }
+
+ ShowShpView(bFixTrgT->Down) 		;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::ShowShpView(bool Fix_TrgT)	// показать область видимости
+{if(PrmsDW.dLenWave > 1.0 && PrmsDW.nSrcDataLen > 0){
+   double scale1 = double(PrmsDW.nDisDataLen) / PrmsDW.nSrcDataLen	;
+   double scale2 = (-1.0 - PrmsDW.Offset_H)/2.0	;
+   shpView->Width = pTop->Width * scale1+0.5	;
+   if(!Fix_TrgT)
+     shpView->Left  = shpView->Width * scale2	;
+ }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::DrawWaves(void)
+{
  for(int ch=0;ch<MAX_CH_NUM;ch++){    //CH1/CH2/CH3/CH4
    PrmsDW.clrRGB        = m_Hard.m_clrRGB[ch]		;// the color of the line
    PrmsDW.pSrcData      = m_Hard.RelayControl.bCHEnable[ch] ?
@@ -171,15 +246,6 @@ void __fastcall TFrmDSO::OnDraw(TObject *Sender)
  }DEF_CATCH
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::ShowShpView(void)	// показать область видимости
-{if(PrmsDW.dLenWave > 1.0 && PrmsDW.nSrcDataLen > 0){
-   double scale1 = double(PrmsDW.nDisDataLen) / PrmsDW.nSrcDataLen	;
-   double scale2 = (-1.0 - PrmsDW.Offset_H)/2.0	;
-   shpView->Width = pTop->Width * scale1+0.5	;
-   shpView->Left  = shpView->Width * scale2	;
- }
-}
-//---------------------------------------------------------------------------
 void __fastcall TFrmDSO::pViewResize(TObject *Sender)
 {
  for(int ch=0;ch<CNT_SHP;ch++)
@@ -189,53 +255,29 @@ void __fastcall TFrmDSO::pViewResize(TObject *Sender)
 void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
 			 TShiftState Shift, int X, int Y)
 {TShapeGL* shpGL= dynamic_cast<TShapeGL*>(Sender)	;
- TPanel*   pan = shpGL ? dynamic_cast<TPanel*>(shpGL->Parent) : 0	;
+ TShape*   shp  = shpGL ? 0 : dynamic_cast<TShape*>(Sender) 	;
 
  char str[100]	;
  if(Shift.Contains(ssLeft)){
-   if(shpGL){
+   if(shpGL && !(shpGL->NCh == TRG_T && bFixTrgT->Down)){
      shpGL->OnMove(X,Y)	    	;// обработка перемещения маркера
 				 // из неё через cbSetHardLvl будет
 				 // вызов процедуры SetHardLvlChnl
-     short iLvl = shpGL->GetLvl();
-     sprintf(str,"%3d (%6.2lf)",iLvl,shpGL->Pos.dPos);
-     shpGL->Hint = str		;
-
-//     if(shpGL->NCh == 4){	 // TrgT_
-//
-//     }
-//     Application->ProcessMessages()		;
    }
- }
-}
-//---------------------------------------------------------------------------
-void __fastcall TFrmDSO::SetHardLvlChnl(UCHAR ch,int lvl)
-{char str[80]	;
- UCHAR* LvlCh = (UCHAR*)&(pLeft->Tag) 	;// для сохр. в .ini файле
- UCHAR	CurCh = CH1		;
-
- switch(ch){
- case CH1 : case CH2 :
- case CH3 : case CH4 :
-	m_Hard.SetLvl(ch,lvl)	;
-	LvlCh[ch] = lvl		;// для сохр. в .ini файле
- break	;
-
- case TRG_T :
-	m_Hard.SetTrgT(CurCh,lvl);// TODO
-	pTop->Tag = lvl		;
-	ShowShpView()		;
- break	;
-
- case TRG_V :
-	m_Hard.SetTrgV(CurCh,lvl);// TODO
-	pRight->Tag = lvl	;
- break	;
+   else if(shp == shpView && bFixTrgT->Down){
+     X += shp->Left				;
+     X = Min(Max(X,shp->Width/2 ),shp->Parent->Width-shp->Width/2 )	;
+     shp->Left = X - shp->Width/2 	 	;
+     CalcDrawWaves()	;
+     sprintf(str,"%ld  %ld", X, shp->Left)	;
+//     pTop->Caption = str	;
+   }
  }
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::SetTimeDiv(TTimeParams* timPrms, String StrTimDiv)
 {SmplPerDiv = m_Hard.SetTimeDiv(timPrms)	;
+ CalcDrawWaves()	;
  lblTimDiv->Caption = StrTimDiv			;}
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::PanResize(TObject *Sender)
@@ -249,6 +291,7 @@ void __fastcall TFrmDSO::PanResize(TObject *Sender)
 void __fastcall TFrmDSO::BtnClick(TObject *Sender)
 {TSpeedButton* btn = dynamic_cast<TSpeedButton*>(Sender)	;
  int tag = btn ? btn->Tag : 0	;
+ pTop->Hint = ""		;
 
  switch(tag){
    case 13: if(!DdsDialog) DdsDialog = new TDdsDialog(this)	;
@@ -256,6 +299,7 @@ void __fastcall TFrmDSO::BtnClick(TObject *Sender)
    break	;
 
    case 12:		// растяжка!!!
+	    CalcDrawWaves()	;
    break	;
  }
 }
@@ -276,6 +320,7 @@ void __fastcall TFrmDSO::FrameMouseWheel(TObject *Sender, TShiftState Shift,
  if(lblTimDiv->ClientRect.Contains(lblTimDiv->ScreenToClient(MousePos))){
    if(cbChngTimDiv && iWhl!=0) cbChngTimDiv(iWhl > 0 ? 1:-1)	;
    nCh = 9 	;
+   CalcDrawWaves()	;
  }
 
  for(int ch=0;ch<CNT_SHP && iWhl && nCh > 10;ch++){
@@ -310,9 +355,11 @@ void __fastcall TFrmDSO::FrameMouseDown(TObject *Sender, TMouseButton Button,
 {TShapeGL* shp = dynamic_cast<TShapeGL*>(Sender)	;
  TPoint	   pnt	;
  if(shp){
-//   if(Shift.Contains(ssRight)){
-//     GetCursorPos(&pnt)			;
-//     pmChnl->Popup(pnt.x,pnt.y)		;}
+   if(shp->NCh == TRG_V){
+     if(Shift.Contains(ssRight)){
+       GetCursorPos(&pnt)			;
+       popTrgV->Popup(pnt.x,pnt.y)		;}
+   }
  }
 }
 //---------------------------------------------------------------------------
@@ -324,6 +371,31 @@ void __fastcall TFrmDSO::FDblClick(TObject *Sender)
    cbGetChnlParams(shp->NCh,&params) 	;
    params.OnOff ^= true			;
    cbSendChnlParams(&params)		;
+ }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::popTrgClick(TObject *Sender)
+{TMenuItem* mi = dynamic_cast<TMenuItem*>(Sender)	;
+ int tag = mi ? mi->Tag : 0	;
+ if(mi) mi->Checked = true	;
+
+ switch(tag){
+   case tmEdge : case tmPulse : case tmVideo : case tmCAN:
+   case tmLIN  : case tmUART  : case tmSPI   : case tmI2C: case tmALT:
+	miMode->Tag = tag - tmEdge  		;
+	m_Hard.SetTriggerMode(miMode->Tag)	; break	;
+
+   case tsAUTO : case tsNORMAL : case tsSINGLE :
+	miSweep->Tag = tag - tsAUTO  		;
+	m_Hard.SetTriggerSweep(miSweep->Tag)	; break	;
+
+   case srcCH1 : case srcCH2 : case srcCH3 : case srcCH4 :
+	miSource->Tag = tag - srcCH1		;
+	m_Hard.SetTriggerSrc(miSource->Tag)	; break	;
+
+   case slRising : case slFalling :
+	miSlope->Tag = tag - slRising		;
+	m_Hard.SetTriggerSlope(miSlope->Tag )	; break	;
  }
 }
 //---------------------------------------------------------------------------

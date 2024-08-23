@@ -23,6 +23,11 @@ typedef void __fastcall (__closure *TcbGetChnlParams )(uint8_t,TChnlParams*)	;
 typedef void __fastcall (__closure *TcbSendTimParams )(TTimeParams*)	;
 typedef void __fastcall (__closure *TcbGetTimParams  )(uint8_t,TTimeParams*)	;
 typedef void __fastcall (__closure *TcbChngTimDiv    )(int chng)	;
+
+enum  TTrgMode	{tmEdge=11,tmPulse,tmVideo,tmCAN,tmLIN,tmUART,tmSPI,tmI2C,tmALT};
+enum  TTrgSweep {tsAUTO=21,tsNORMAL,tsSINGLE};
+enum  TTrgSrc   {srcCH1=31,srcCH2,srcCH3,srcCH4};
+enum  TTrgSlope {slRising=41,slFalling};
 //---------------------------------------------------------------------------
 class TFrmDSO : public TFrame
 {
@@ -37,7 +42,7 @@ __published:	// IDE-managed Components
 	TFormStorage *FormStorage1;
 	TPanel *pTop;
 	TSpeedButton *bStretch;
-	TSpeedButton *btn1;
+	TSpeedButton *bFixTrgT;
 	TSpeedButton *btn3;
 	TSpeedButton *btn4;
 	TPanel *pBottom;
@@ -52,6 +57,30 @@ __published:	// IDE-managed Components
 	TMenuItem *GND1;
 	TLabel *lblTimDiv;
 	TShape *shpView;
+	TLabel *lblTrgT;
+	TPopupMenu *popTrgV;
+	TMenuItem *miMode;
+	TMenuItem *miEdge;
+	TMenuItem *miPulse;
+	TMenuItem *miVideo;
+	TMenuItem *miCAN;
+	TMenuItem *miLin;
+	TMenuItem *miUART;
+	TMenuItem *miSPI;
+	TMenuItem *miI2C;
+	TMenuItem *miALT;
+	TMenuItem *miSweep;
+	TMenuItem *miAUTO;
+	TMenuItem *miNORMAL;
+	TMenuItem *miSINGLE;
+	TMenuItem *miSource;
+	TMenuItem *miCH1;
+	TMenuItem *miCH2;
+	TMenuItem *miCH3;
+	TMenuItem *miCH4;
+	TMenuItem *miSlope;
+	TMenuItem *miRising;
+	TMenuItem *miFalling;
 	void __fastcall FMouseMove(TObject *Sender,TShiftState Shift,int X,int Y);
 	void __fastcall pViewResize(TObject *Sender);
 	void __fastcall PanResize(TObject *Sender);
@@ -61,6 +90,7 @@ __published:	// IDE-managed Components
 	void __fastcall FrameMouseDown(TObject *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
 	void __fastcall FDblClick(TObject *Sender);
+	void __fastcall popTrgClick(TObject *Sender);
 private:	// User declarations
 //	uint32_t        LvlsPos		;
 	CHard		m_Hard		;
@@ -73,11 +103,12 @@ private:	// User declarations
 	TShapeGL* 	shpLvl[CNT_SHP]		;// shapes chnl + shapes triggers
 	TLabel*		lblCh[4]		;
 
- void   __fastcall DrawWaves   (void)    	;
- void   __fastcall DrawShapes  (void)    	;
- void   __fastcall DrawWaveInYT(USHORT nCH)	;
- void	__fastcall SetHardLvlChnl(UCHAR ch,int lvl);
- void	__fastcall ShowShpView(void)		;
+ void __fastcall CalcDrawWaves(void)		;
+ void __fastcall DrawWaves   (void)    		;
+ void __fastcall DrawShapes  (void)    		;
+ void __fastcall DrawWaveInYT(USHORT nCH)	;
+ void __fastcall SetHardLvlChnl(UCHAR ch,int lvl);
+ void __fastcall ShowShpView(bool Fix_TrgT=false) 	;
 
 
 public:		// User declarations

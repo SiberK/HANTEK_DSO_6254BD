@@ -31,5 +31,8 @@
     <Transaction>2024.08.15 13:57:27.220.dfm,B:\HANTEK_DSO_6254BD\Unit2.dfm=B:\HANTEK_DSO_6254BD\DdsDlg.dfm</Transaction>
     <Transaction>2024.08.16 11:15:18.426.cpp,B:\HANTEK_DSO_6254BD\Unit1.cpp=B:\HANTEK_DSO_6254BD\DrawOGL.cpp</Transaction>
     <Transaction>2024.08.16 11:15:18.426.h,B:\HANTEK_DSO_6254BD\Unit1.h=B:\HANTEK_DSO_6254BD\DrawOGL.h</Transaction>
+    <Transaction>2024.08.19 14:36:01.143.lib,B:\HANTEK_DSO_6254BD\HTDisplayDll.lib=</Transaction>
+    <Transaction>2024.08.19 14:36:13.325.lib,B:\HANTEK_DSO_6254BD\MeasDll.lib=</Transaction>
+    <Transaction>2024.08.19 14:36:18.920.lib,B:\HANTEK_DSO_6254BD\HTSoftDll.lib=</Transaction>
   </Transactions>
 </BorlandProject>

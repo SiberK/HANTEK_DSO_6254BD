@@ -43,6 +43,12 @@ public:
   void		SetTrgT(int nCh,USHORT lvl)		;
   void		SetTrgV(int nCh,USHORT lvl)		;
   double   	SetTimeDiv(TTimeParams* timPrms)	;// вернёт SmplPerDiv
+
+  void 		SetTriggerMode (uint16_t val)		;
+  void 		SetTriggerSweep(uint16_t val)		;
+  void 		SetTriggerSlope(uint16_t val)		;
+  void 		SetTriggerSrc  (uint16_t val)		;
+
   int 		CntChnlW()		;// кол-во включенных каналов
   ULONG		BufferLen() { return m_stControl.nBufferLen	;}
 

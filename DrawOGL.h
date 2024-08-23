@@ -26,6 +26,7 @@ struct TParamsDrawWave{
  USHORT CntGrid_H	;
  USHORT CntGrid_V	;
  double	SmplPerDiv	;
+ double StpOGL		;//
  double Offset_H	;
  double dLenWave	;
  double dPercentX	;

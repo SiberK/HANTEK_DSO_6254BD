@@ -9,10 +9,9 @@
 __fastcall TShapeGL::TShapeGL(Classes::TComponent* AOwner,
 				    TWinControl * _parent,
 				    AnsiString    _name  ,
-				    TColor	  _color,
-				TShapeOrientation _ornt ,
-				    int		  _ofst
-				    ) : TShape(AOwner)
+				    TColor	  _color ,
+				TShapeOrientation _ornt  ,
+				    int		  _ofst  ) : TShape(AOwner)
 {
  Parent = _parent	; Name  = _name		;
  Offset = _ofst		; Color = _color	;
@@ -47,21 +46,25 @@ void __fastcall TShapeGL::Init(int _nCh, AnsiString _cap, UCHAR _lvl255)
  if(Orientation == soVrt || Orientation == soVrtM){
       Pos.iOfst = 0				;
       Pos.SetLvl255(_lvl255)		       	;
-      Top  = Pos.iPos - Height/2		;}
+      Top  = Pos.iPos - Height/2		;
+      if(cbSetHardLvl)
+	cbSetHardLvl(NCh,Pos.Lvl255)		;}
 
  else{Pos.iOfst = Offset			;
       Pos.SetLvl100(_lvl255)		       	;
-      Left = Pos.iPos - Width /2 		;}
+      Left = Pos.iPos - Width /2 		;
+      if(cbSetHardLvl)
+        cbSetHardLvl(NCh,Pos.Lvl100)		;}
 }
 //---------------------------------------------------------------------------
-void __fastcall TShapeGL::OnResize(int HgtP,int WdtP)
+void __fastcall TShapeGL::OnResize(int HgtP,int WdtP,bool fix)
 {if(Orientation == soVrt || Orientation == soVrtM){
    Pos.HgtGL = HgtP	; Pos.WdtGL = WdtP	;
    Top = Pos.iPos - Height/2			;}
  else{ Pos.HgtGL = WdtP	; Pos.WdtGL = HgtP	;
    Left = Pos.iPos - Width/2			;}
 
- Pos.CalcRct()		;
+ if(!fix) Pos.CalcRct()	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TShapeGL::OnMove(int X,int Y)
@@ -83,22 +86,20 @@ void __fastcall TShapeGL::OnMove(int X,int Y)
  }
 }
 //---------------------------------------------------------------------------
-void __fastcall TShapeGL::MouseWheel(int WheelDelta, TPoint &MousePos)
-{
-
-}
+//void __fastcall TShapeGL::MouseWheel(int WheelDelta, TPoint &MousePos)
+//{
+//
+//}
 //---------------------------------------------------------------------------
 void __fastcall TShapeGL::Paint(void)
 {TPanel* pnl = dynamic_cast<TPanel*>(Parent)	; if(!pnl) return	;
 
  if(Orientation == soVrt || Orientation == soVrtM){
-   Width = pnl->Width	;
-   Canvas->Rectangle(1,1,Width,Height)		;
-   Canvas->TextOut  (4,1,Caption)	       	;}
- else{ Height = pnl->Height			;
-   Canvas->Rectangle(1,1,Width,Height)		;
-   Canvas->TextOut  (4,1,Caption)	       	;
- }
+       Width  = pnl->Width		    	;}
+ else{ Height = pnl->Height			;}
+ 
+ Canvas->Rectangle(1,1,Width,Height)		;
+ Canvas->TextOut  (4,-2,Caption)	       	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TShapeGL::DrawGL()

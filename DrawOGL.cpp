@@ -51,13 +51,12 @@ GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
 
 // кол-во отсчётов в ViewOGL
  double	nDisDataLen = prms->nDisDataLen	;
- double stpX = 2.0 / nDisDataLen;// шаг по горизонтали
+ double stpX = prms->StpOGL	;// шаг по горизонтали
  double stpY = 2.0 / 255	;// Шаг по вертикали
  double ofst = prms->Offset_H	;
- double shrn = prms->dbHorizontal;// растяжка по горизонтали
+// double shrn = prms->dbHorizontal;// растяжка по горизонтали
 
  if(!prms->pSrcData) return	;
- prms->dLenWave = stpX * prms->nSrcDataLen * shrn	;
 
  glNewList(lst,GL_COMPILE)	;{
    glLineWidth(1)		;
@@ -65,7 +64,7 @@ GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
      glColorT(prms->clrRGB)	;
 
      for(ULONG ix=0;ix<prms->nSrcDataLen;ix++){
-       glVertex2f((ix * stpX + ofst)*shrn,prms->pSrcData[ix] * stpY-1.0)	;
+       glVertex2f((ix * stpX + ofst),prms->pSrcData[ix] * stpY-1.0)	;
      }
 
    } glEnd()	;

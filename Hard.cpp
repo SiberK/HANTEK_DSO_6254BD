@@ -61,7 +61,7 @@ CHard::CHard()
  RelayControl.nTrigSource      = CH1	;
  RelayControl.bTrigFilt        = 0	;
  RelayControl.nALT 	       = 0	;
- 
+
  m_nTriggerMode  = EDGE	;
  m_nTriggerSlope = RISE	;
  m_nTriggerSweep = AUTO	;
@@ -69,6 +69,27 @@ CHard::CHard()
  m_bCollect 	= TRUE	;
  m_nReadOK 	= 0	;
 }
+//---------------------------------------------------------------------------
+void CHard::SetTriggerMode (uint16_t val){ m_nTriggerMode  = val	;}
+//---------------------------------------------------------------------------
+void CHard::SetTriggerSweep(uint16_t val){ m_nTriggerSweep = val	;}
+//---------------------------------------------------------------------------
+void CHard::SetTriggerSlope(uint16_t val){
+ m_stControl.nTriggerSlope = m_nTriggerSlope = val	;
+ if(m_nDeviceIndex == 0xFF) return	;
+
+ dsoHTSetTrigerMode(m_nDeviceIndex, m_nTriggerMode, m_stControl.nTriggerSlope, DC);
+}
+//---------------------------------------------------------------------------
+void CHard::SetTriggerSrc  (uint16_t val){
+ RelayControl.nTrigSource = val	; m_stControl.nTriggerSource = val	;
+ if(m_nDeviceIndex == 0xFF) return	;
+
+//Установить источник триггера
+ dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDIV,
+					     m_stControl.nCHSet  ,
+					     m_stControl.nTriggerSource, 0)	;
+ }
 //---------------------------------------------------------------------------
 void CHard::SetLvl(int nCh,USHORT lvl)
 {
@@ -85,9 +106,10 @@ void CHard::SetTrgT(int nCh,USHORT lvl)
 }
 //---------------------------------------------------------------------------
 void CHard::SetTrgV(int nCh,USHORT lvl)
-{
+{m_stControl.nVTriggerPos = lvl		;
+
  if(m_nDeviceIndex != 0xFF){
-    dsoHTSetVTriggerLevel(m_nDeviceIndex, lvl, 4);
+   dsoHTSetVTriggerLevel(m_nDeviceIndex,m_stControl.nVTriggerPos, 4);
  }
 }
 //---------------------------------------------------------------------------
@@ -104,15 +126,42 @@ double CHard::SetTimeDiv(TTimeParams* timPrms)
  if(m_nDeviceIndex != 0xFF){
 // Установить частоту дискретизации
    dsoHTSetSampleRate(m_nDeviceIndex, m_nYTFormat, &RelayControl, &m_stControl)	;
+//Установить источник триггера
+   dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDIV,
+					       m_stControl.nCHSet  ,
+					       m_stControl.nTriggerSource, 0)	;
    for (int nCh = 0; nCh < MAX_CH_NUM; nCh++)
      dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
 //Установите переключатель каналов и уровень напряжения
    dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
 // Установите коррекцию амплитуды, вызванную режимом канала
    dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
+
+   dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDIV,RelayControl.nCHVoltDIV,m_nLeverPos);
  }
 
  return smplPerDiv	;}
+//---------------------------------------------------------------------------
+void CHard::SetChnlParams(TChnlParams* params)
+{int nCh = params->IX	;
+
+ RelayControl.bCHEnable  [nCh] = params->OnOff		;
+ if(params->IxVoltDiv != -1)
+   RelayControl.nCHVoltDIV [nCh] = params->IxVoltDiv	;
+ if(params->IxAcDc != -1)
+   RelayControl.nCHCoupling[nCh] = params->IxAcDc  	;
+
+ if(m_nDeviceIndex == 0xFF) return	;
+ 
+ dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
+//Установите переключатель каналов и уровень напряжения
+ dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
+
+// Установите коррекцию амплитуды, вызванную режимом канала
+ dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
+
+ dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDIV,RelayControl.nCHVoltDIV,m_nLeverPos);
+}
 //---------------------------------------------------------------------------
 void CHard::Init()
 {
@@ -159,28 +208,14 @@ void CHard::Init()
  }DEF_CATCH
 }
 //---------------------------------------------------------------------------
-void CHard::SetChnlParams(TChnlParams* params)
-{int nCh = params->IX	;
-
- RelayControl.bCHEnable  [nCh] = params->OnOff		;
- if(params->IxVoltDiv != -1)
-   RelayControl.nCHVoltDIV [nCh] = params->IxVoltDiv	;
- if(params->IxAcDc != -1)
-   RelayControl.nCHCoupling[nCh] = params->IxAcDc  	;
-
- if(m_nDeviceIndex != 0xFF){
-   dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
-//Установите переключатель каналов и уровень напряжения
-   dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
-// Установите коррекцию амплитуды, вызванную режимом канала
-   dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
- }
-}
-//---------------------------------------------------------------------------
 USHORT CHard::CollectData()
 {
  if(m_nDeviceIndex == 0xFF){
-   if(!FindeDev()){
+   if(FindeDev()){
+     dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4)	;//
+     dsoHTSetVTriggerLevel (m_nDeviceIndex, m_stControl.nVTriggerPos, 4);//
+   }
+   else{
      Application->MessageBox("No suitble device was found!","!!!",MB_OK);
      return m_nDeviceIndex 	;}
  }
@@ -217,11 +252,16 @@ USHORT CHard::CollectData()
 //---------------------------------------------------------------------------
 bool CHard::FindeDev()
 {bool rzlt = false		;
+ short	DevInfo[32]		;
+ m_nDeviceIndex = 0xFF		;
+
+ short  CntDev = dsoHTSearchDevice(DevInfo)	;
+ if(!CntDev) return false	;
+
  for (m_nDeviceIndex = 0; m_nDeviceIndex < 32; m_nDeviceIndex++){
    if (dsoHTDeviceConnect(m_nDeviceIndex)){
      Init()	; rzlt = true	; break		;}
  }
- if(!rzlt) m_nDeviceIndex = 0xFF;
  return rzlt			;
 }
 //---------------------------------------------------------------------------

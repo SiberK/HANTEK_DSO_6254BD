@@ -45,8 +45,17 @@ struct TLvlPosition{
   short		Lvl255		;
   short		Ornt		;
 
-  void __fastcall SetPos(double _pos)
-  { dPos = _pos		; CalcRct()		;}
+  void __fastcall SetPos(double _pos,bool fix=0)
+  { dPos = _pos		; CalcRct(fix)		;}
+
+//  void __fastcall SetFixPos(double _pos)
+//  { dPos = _pos	; dLft = -1	;
+//    if(!WdtGL || !HgtGL) 	        return 	;
+//    double dWdt = WIDTH_LVL_MARK  * 2.0 / WdtGL	;
+//    double dHgt = HEIGHT_LVL_MARK * 2.0 / HgtGL	;
+//    dRgt = dLft + dWdt		;
+//    dTop = dPos + dHgt/2	;
+//    dBot = dPos - dHgt/2	;}
 
   // Установить позицию от курсора
   void __fastcall SetCursorPos(int _pos)
@@ -63,7 +72,7 @@ struct TLvlPosition{
   void __fastcall SetLvl100(uint8_t lvl)
   {dPos = dMap(0,100,lvl,-1.0,1.0) ; CalcRct()	;}
 
-  void __fastcall CalcRct(void){
+  void __fastcall CalcRct(bool fix=0){
     if(!WdtGL || !HgtGL) 	        return 	;
     double dWdt = WIDTH_LVL_MARK  * 2.0 / WdtGL	;
     double dHgt = HEIGHT_LVL_MARK * 2.0 / HgtGL	;
@@ -71,8 +80,10 @@ struct TLvlPosition{
     if(Ornt == soVrt || Ornt == soVrtM)
 	 iPos = iMap(1.0,-1.0,dPos,0,HgtGL)	;
     else iPos = iMap(-1.0,1.0,dPos,0,HgtGL) + iOfst	;
-    Lvl255 = iMap(-1.0,1.0,dPos,0,255)       	;
-    Lvl100 = iMap(-1.0,1.0,dPos,0,100)       	;
+    
+    if(!fix){
+      Lvl255 = iMap(-1.0,1.0,dPos,0,255)       	;
+      Lvl100 = iMap(-1.0,1.0,dPos,0,100)       	;}
 
     dLft = -1	; dRgt = dLft + dWdt		;
     dTop = dPos + dHgt/2	;
@@ -103,9 +114,9 @@ class TShapeGL : public TShape
 				    int		  _ofst = 0)	;
 
  void __fastcall Init(int _nCh, AnsiString _cap, UCHAR _lvl255)	;
- void __fastcall OnResize(int HgtP,int WdtP)			;
+ void __fastcall OnResize(int HgtP,int WdtP,bool fix=0)		;
  void __fastcall OnMove(int X,int Y)	;
- void __fastcall MouseWheel(int WheelDelta, TPoint &MousePos)	;
+// void __fastcall MouseWheel(int WheelDelta, TPoint &MousePos)	;
  void __fastcall DrawGL()		;
  short __fastcall GetLvl(void)
  { return Orientation == soHrz ? Pos.Lvl100 : Pos.Lvl255	;}
