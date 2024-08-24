@@ -2,16 +2,15 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include	<RxStrUtils.hpp>
-#include "ComWorL.h"
-#include "DdsDlg.h"
-#include "DSO_frame.h"
 #include "DrawOGL.h"
+#include <RxStrUtils.hpp>
+#include "ComWorL.h"
+#include "DSO_frame.h"
+#include "DdsDlg.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
-#pragma link "rxPlacemnt"
+//#pragma link "rxPlacemnt"
 #pragma resource "*.dfm"
-
 //---------------------------------------------------------------------------
 //#include	<Math.h>
 #include	<StdIO.h>
@@ -24,6 +23,8 @@ TFrmDSO *FrmDSO = 0	;
 static 	TParamsDrawWave PrmsDW		;
 static char* strHint1="Колёсиком мыши\n выбрать чувствительность\n канала по Y"	;
 static char* strHint2="Колёсиком мыши\n выбрать развертку"	;
+
+const TColor COLOR_V_CURSOR = clBlue	;
 //---------------------------------------------------------------------------
 __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Owner)
 {String		nam			;
@@ -50,7 +51,7 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
    shpLvl[ch] = new TShapeGL(this,pLeft,nam,_color)	;
    shpLvl[ch]->OnMouseMove  = FMouseMove		;
    shpLvl[ch]->cbSetHardLvl = SetHardLvlChnl		;
-   shpLvl[ch]->OnMouseDown  = FrameMouseDown		;
+   shpLvl[ch]->OnMouseDown  = FMouseDown		;
    shpLvl[ch]->OnDblClick   = FDblClick			;
    shpLvl[ch]->Hint = strHint1		;
 
@@ -68,9 +69,16 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
  shpLvl[TRG_V] = new TShapeGL(this,pRight,"TrgV",clGray,soVrtM,0)	;
  shpLvl[TRG_V]->OnMouseMove  = FMouseMove	;
  shpLvl[TRG_V]->cbSetHardLvl = SetHardLvlChnl	;
- shpLvl[TRG_V]->OnMouseDown  = FrameMouseDown	;
+ shpLvl[TRG_V]->OnMouseDown  = FMouseDown	;
  lblTrgT->Caption = ""				;
  lblTimDiv->Hint  = strHint2			;
+
+ double _pos[4] = {-0.8,-0.4,0.4,0.8}		;
+ for(int ix=0;ix<4;ix++){
+   nam.printf("V_Cursor%ld",ix+1)		;
+   _color = COLOR_V_CURSOR			;
+   VCursor[ix] = new TDsoCursor(this,nam,_pos[ix],_color);
+ }
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::Destroy(TObject* Sender){ DestroyGL()	;}
@@ -244,21 +252,61 @@ void __fastcall TFrmDSO::OnDraw(TObject *Sender)
    if(m_Hard.m_nDeviceIndex != 0xFF){
      DrawWaves()	 			;}
 
-   DrawSceneGL(CliWdt,CliHgt,shpLvl)		;
-
+   DrawCursorsGL(VCursor,4)		;
+   DrawShapesGL (shpLvl ,CNT_SHP)	;
+   DrawSceneGL  (CliWdt ,CliHgt )	;
  }DEF_CATCH
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::pViewResize(TObject *Sender)
+void __fastcall TFrmDSO::FResize(TObject *Sender)
 {
  for(int ch=0;ch<CNT_SHP;ch++)
    shpLvl[ch]->OnResize(pView->Height,pView->Width)	;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::SetTimeDiv(TTimeParams* timPrms, String StrTimDiv)
+{SmplPerDiv = m_Hard.SetTimeDiv(timPrms)	;
+ CalcDrawWaves()	;
+ lblTimDiv->Caption = StrTimDiv			;}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::FMouseDown(TObject *Sender, TMouseButton Button,
+      TShiftState Shift, int X, int Y)
+{TShapeGL* shp = dynamic_cast<TShapeGL*>(Sender)	;
+ TScrollBox* box = dynamic_cast<TScrollBox*>(Sender)	;
+ TPoint	   pnt	;
+
+ if(shp){
+   if(shp->NCh == TRG_V){
+     if(Shift.Contains(ssRight)){
+       GetCursorPos(&pnt)			;
+       popTrgV->Popup(pnt.x,pnt.y)		;}
+   }
+ }
+ else if(box){
+     double    _posX = dMap(0,box->Width,X,-1.0,1.0)	;
+     for(int ic=0;ic<4;ic++){
+       if(VCursor[ic]->OnSelect(_posX)) break		;
+     }
+ }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::FMouseUp(TObject *Sender, TMouseButton Button,
+      TShiftState Shift, int X, int Y)
+{
+ TScrollBox* box = dynamic_cast<TScrollBox*>(Sender)	;
+ if(box){
+     double    _posX = -8.0	;//dMap(0,box->Width,X,-1.0,1.0)	;
+     for(int ic=0;ic<4;ic++){
+       if(VCursor[ic]->OnSelect(_posX)) break		;
+     }
+ }
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
 			 TShiftState Shift, int X, int Y)
 {TShapeGL* shpGL= dynamic_cast<TShapeGL*>(Sender)	;
  TShape*   shp  = shpGL ? 0 : dynamic_cast<TShape*>(Sender) 	;
+ TScrollBox* box = dynamic_cast<TScrollBox*>(Sender)	;
 
  char str[100]	;
  if(Shift.Contains(ssLeft)){
@@ -275,13 +323,14 @@ void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
      sprintf(str,"%ld  %ld", X, shp->Left)	;
 //     pTop->Caption = str	;
    }
+   else if(box){
+     double    _posX = dMap(0,box->Width,X,-1.0,1.0)	;
+     for(int ic=0;ic<4;ic++){
+       if(VCursor[ic]->OnMove(_posX)) break		;
+     }
+   }
  }
 }
-//---------------------------------------------------------------------------
-void __fastcall TFrmDSO::SetTimeDiv(TTimeParams* timPrms, String StrTimDiv)
-{SmplPerDiv = m_Hard.SetTimeDiv(timPrms)	;
- CalcDrawWaves()	;
- lblTimDiv->Caption = StrTimDiv			;}
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::PanResize(TObject *Sender)
 {
@@ -353,19 +402,6 @@ void __fastcall TFrmDSO::FrameMouseWheel(TObject *Sender, TShiftState Shift,
 //		Y, shpGL->Pos.dPos,shpGL->Pos.Lvl255)	;
 //     OutputDebugString(str)			;
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::FrameMouseDown(TObject *Sender, TMouseButton Button,
-      TShiftState Shift, int X, int Y)
-{TShapeGL* shp = dynamic_cast<TShapeGL*>(Sender)	;
- TPoint	   pnt	;
- if(shp){
-   if(shp->NCh == TRG_V){
-     if(Shift.Contains(ssRight)){
-       GetCursorPos(&pnt)			;
-       popTrgV->Popup(pnt.x,pnt.y)		;}
-   }
- }
-}
-//---------------------------------------------------------------------------
 void __fastcall TFrmDSO::FDblClick(TObject *Sender)
 {TChnlParams	params	;
 
@@ -402,4 +438,5 @@ void __fastcall TFrmDSO::popTrgClick(TObject *Sender)
  }
 }
 //---------------------------------------------------------------------------
+
 

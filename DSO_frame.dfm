@@ -14,7 +14,7 @@ object FrmDSO: TFrmDSO
   ParentShowHint = False
   ShowHint = True
   TabOrder = 0
-  OnMouseDown = FrameMouseDown
+  OnMouseDown = FMouseDown
   OnMouseWheel = FrameMouseWheel
   object Label2: TLabel
     Left = 277
@@ -42,8 +42,10 @@ object FrmDSO: TFrmDSO
     ParentColor = False
     ParentFont = False
     TabOrder = 0
+    OnMouseDown = FMouseDown
     OnMouseMove = FMouseMove
-    OnResize = pViewResize
+    OnMouseUp = FMouseUp
+    OnResize = FResize
     object Label1: TLabel
       Left = 180
       Top = 143

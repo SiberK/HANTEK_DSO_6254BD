@@ -34,5 +34,7 @@
     <Transaction>2024.08.19 14:36:01.143.lib,B:\HANTEK_DSO_6254BD\HTDisplayDll.lib=</Transaction>
     <Transaction>2024.08.19 14:36:13.325.lib,B:\HANTEK_DSO_6254BD\MeasDll.lib=</Transaction>
     <Transaction>2024.08.19 14:36:18.920.lib,B:\HANTEK_DSO_6254BD\HTSoftDll.lib=</Transaction>
+    <Transaction>2024.08.24 18:02:40.489.cpp,B:\HANTEK_DSO_6254BD\Unit1.cpp=B:\HANTEK_DSO_6254BD\DSO_cursor.cpp</Transaction>
+    <Transaction>2024.08.24 18:02:40.489.h,B:\HANTEK_DSO_6254BD\Unit1.h=B:\HANTEK_DSO_6254BD\DSO_cursor.h</Transaction>
   </Transactions>
 </BorlandProject>

@@ -6,6 +6,8 @@
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+bool 	TShapeGL::flChng = false	;
+//---------------------------------------------------------------------------
 __fastcall TShapeGL::TShapeGL(Classes::TComponent* AOwner,
 				    TWinControl * _parent,
 				    AnsiString    _name  ,
@@ -54,7 +56,8 @@ void __fastcall TShapeGL::Init(int _nCh, AnsiString _cap, UCHAR _lvl255)
       Pos.SetLvl100(_lvl255)		       	;
       Left = Pos.iPos - Width /2 		;
       if(cbSetHardLvl)
-        cbSetHardLvl(NCh,Pos.Lvl100)		;}
+	cbSetHardLvl(NCh,Pos.Lvl100)		;}
+ flChng = true	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TShapeGL::OnResize(int HgtP,int WdtP,bool fix)
@@ -65,6 +68,7 @@ void __fastcall TShapeGL::OnResize(int HgtP,int WdtP,bool fix)
    Left = Pos.iPos - Width/2			;}
 
  if(!fix) Pos.CalcRct()	;
+ flChng = true	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TShapeGL::OnMove(int X,int Y)
@@ -84,6 +88,7 @@ void __fastcall TShapeGL::OnMove(int X,int Y)
    Pos.SetCursorPos(X)				;
    if(cbSetHardLvl) cbSetHardLvl(NCh,Pos.Lvl100);
  }
+ flChng = true	;
 }
 //---------------------------------------------------------------------------
 //void __fastcall TShapeGL::MouseWheel(int WheelDelta, TPoint &MousePos)

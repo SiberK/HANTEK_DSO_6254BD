@@ -19,10 +19,10 @@
     <CfgParent>Base</CfgParent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base)'!=''">
-    <OutputExt>exe</OutputExt>
     <BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
-    <Defines>NO_STRICT</Defines>
+    <OutputExt>exe</OutputExt>
     <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
+    <Defines>NO_STRICT</Defines>
     <DynamicRTL>true</DynamicRTL>
     <ILINK_ObjectSearchPath>B:\forIPH\AZUR\user;L:\RAD\PacketFrms;B:\HANTEK_DSO_6254BD</ILINK_ObjectSearchPath>
     <ProjectType>CppVCLApplication</ProjectType>
@@ -34,12 +34,12 @@
     <Multithreaded>true</Multithreaded>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1)'!=''">
-    <DCC_Optimize>false</DCC_Optimize>
     <BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
-    <Defines>_DEBUG;$(Defines)</Defines>
+    <DCC_Optimize>false</DCC_Optimize>
     <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
-    <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+    <Defines>_DEBUG;$(Defines)</Defines>
     <DynamicRTL>false</DynamicRTL>
+    <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
     <BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
     <ILINK_DisableIncrementalLinking>true</ILINK_DisableIncrementalLinking>
     <BCC_UseRegisterVariables>None</BCC_UseRegisterVariables>
@@ -48,10 +48,10 @@
     <FinalOutputDir>.</FinalOutputDir>
     <IntermediateOutputDir>Debug</IntermediateOutputDir>
     <TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
-    <BCC_waus>false</BCC_waus>
     <BCC_StackFrames>true</BCC_StackFrames>
-    <ILINK_LibraryPath>$(BDS)\lib\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    <BCC_waus>false</BCC_waus>
     <BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+    <ILINK_LibraryPath>$(BDS)\lib\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
     <TASM_Debugging>Full</TASM_Debugging>
     <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
   </PropertyGroup>
@@ -95,6 +95,10 @@
     <CppCompile Include="DrawOGL.cpp">
       <DependentOn>DrawOGL.h</DependentOn>
       <BuildOrder>9</BuildOrder>
+    </CppCompile>
+    <CppCompile Include="DSO_cursor.cpp">
+      <DependentOn>DSO_cursor.h</DependentOn>
+      <BuildOrder>12</BuildOrder>
     </CppCompile>
     <CppCompile Include="DSO_frame.cpp">
       <Form>FrmDSO</Form>

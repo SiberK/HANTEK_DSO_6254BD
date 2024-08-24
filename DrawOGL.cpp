@@ -16,33 +16,37 @@ static HWND  HandleGL = 0	;
 #define		CNL_2	12
 #define		CNL_3	13
 #define		CNL_4	14
-#define		LVL_1	21
-#define		LVL_2	21
-#define		LVL_3	21
-#define		LVL_4	21
+#define		SHP_OGL 20
+#define		CUR_OGL 30
 //---------------------------------------------------------------------------
 BOOL 	bSetupPixelFormat(HDC hdc)     	;
 //---------------------------------------------------------------------------
-//GLvoid  DrawShapesGL(TShape_M* shp[])
-//{uint32_t lstGL				;
-//
-// for(int nCh=0;nCh<MAX_CH_NUM;nCh++){
-//   lstGL = LVL_1+nCh				;
-//   if(glIsList(lstGL)) glDeleteLists(lstGL,1)	;
-//
-//   glNewList(lstGL,GL_COMPILE);{
-////     glLineWidth(2)				;
-////     glBegin(GL_LINE_LOOP) 			;{
-////       glColorT(shp[nCh].Color)			;
-////       glVertex2f(shp[nCh].dLft,shp[nCh].dTop)	;
-////       glVertex2f(shp[nCh].dRgt,shp[nCh].dTop)	;
-////       glVertex2f(shp[nCh].dRgt,shp[nCh].dBot)	;
-////       glVertex2f(shp[nCh].dLft,shp[nCh].dBot)	;
-////     } glEnd()	;
-//     shp[nCh]->DrawGL()	;
-//   }glEndList()	;
-// }
-//}
+GLvoid DrawCursorsGL(TDsoCursor* Cur[],int CntCur)
+{uint32_t lstGL = CUR_OGL	;
+
+ if(TDsoCursor::flChng){ TDsoCursor::flChng = false	;
+   if(glIsList(lstGL)) glDeleteLists(lstGL,1)	;
+
+   glNewList(lstGL,GL_COMPILE)	;{
+     glLineStipple(4,0xAAAA)	;//1,0x3F07)	;
+     glEnable(GL_LINE_STIPPLE)	;
+     for(int is=0;is<CntCur;is++) Cur[is]->DrawGL()	;
+     glDisable(GL_LINE_STIPPLE)	;
+   }glEndList()			;
+ }
+}
+//---------------------------------------------------------------------------
+GLvoid  DrawShapesGL(TShapeGL* shp[],int CntShp)
+{uint32_t lstGL = SHP_OGL	;
+
+ if(TShapeGL::flChng){ TShapeGL::flChng = false	;
+   if(glIsList(lstGL)) glDeleteLists(lstGL,1)	;
+
+   glNewList(lstGL,GL_COMPILE)	;{
+     for(int is=0;is<CntShp;is++) shp[is]->DrawGL()	;
+   }glEndList()			;
+ }
+}
 //---------------------------------------------------------------------------
 GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
 {
@@ -71,7 +75,7 @@ GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
  }glEndList()	;
 }
 //---------------------------------------------------------------------------
-GLvoid	DrawSceneGL(GLsizei width, GLsizei height,TShapeGL* shp[])
+GLvoid	DrawSceneGL(GLsizei width, GLsizei height)
 {if(!ghDC || !ghRC) return	;
 
  glViewport( 0, 0,width,height)	;// устанавливаем область вывода
@@ -89,19 +93,12 @@ GLvoid	DrawSceneGL(GLsizei width, GLsizei height,TShapeGL* shp[])
  glPushMatrix()			;
  //-------
 
-
- for(int nCh=0;nCh<4;nCh++){
-   if(glIsList(CNL_1+nCh))
-     glCallList(CNL_1+nCh)	;
- }
- for(int nShp=0;nShp<CNT_SHP;nShp++){
-//   if(glIsList(LVL_1+nCh))
-//     glCallList(LVL_1+nCh)	;
-   shp[nShp]->DrawGL()		;
- }
- //-------
- if(glIsList(GRID))
-   glCallList(GRID)		;
+ for(int nCh=0;nCh<4;nCh++)
+   if(glIsList(CNL_1+nCh)) glCallList(CNL_1+nCh);
+  //-------
+ if(glIsList(SHP_OGL)) glCallList(SHP_OGL)     	;
+ if(glIsList(CUR_OGL)) glCallList(CUR_OGL)     	;
+ if(glIsList(GRID   )) glCallList(GRID)		;
 
 // glDisable(GL_ALPHA_TEST)	;
 

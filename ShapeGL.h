@@ -29,10 +29,10 @@ int	iMap(double dmin,double dmax,double dpos,int imin,int imax){
 				     Max(Min(dpos,dmin),dmax) 		;
 	    return imin + (imax-imin)*(dpos-dmin)/(dmax-dmin)+0.5	;}
 //---------------------------------------------------------------------------
-double	dMap(int dmin,int dmax,int dpos,double imin,double imax){
-		   dpos = dmin<dmax? Min(Max(dpos,dmin),dmax):
-				     Max(Min(dpos,dmin),dmax) 		;
-	    return imin + (imax-imin)*(dpos-dmin)/(dmax-dmin)		;}
+double	dMap(int imin,int imax,int ipos,double dmin,double dmax){
+		   ipos = imin<imax? Min(Max(ipos,imin),imax):
+				     Max(Min(ipos,imin),imax) 		;
+	    return dmin + (dmax-dmin)*(ipos-imin)/(imax-imin)		;}
 //---------------------------------------------------------------------------
 
 struct TLvlPosition{
@@ -101,6 +101,8 @@ struct TLvlPosition{
 class TShapeGL : public TShape
 {
  public:
+ static bool 	flChng	;
+ 
  int		NCh	;
  AnsiString	Caption	;
  TLvlPosition	Pos	;

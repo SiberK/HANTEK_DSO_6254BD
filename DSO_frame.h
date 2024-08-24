@@ -6,16 +6,15 @@
 #include <Controls.hpp>
 #include <StdCtrls.hpp>
 #include <Forms.hpp>
-#include "rxPlacemnt.hpp"
-
-#include "ShapeGL.h"
-
+#include <rxPlacemnt.hpp>
 #include <ExtCtrls.hpp>
 #include <Buttons.hpp>
 
 #include "Hard.h"
-#include <Menus.hpp>			// ›“Œ ƒŒÀ∆ÕŒ ¡€“‹ Õ»∆≈ ¬—≈’ rx*.h !!!!!
+#include "ShapeGL.h"
 
+#include <Menus.hpp>			// ›“Œ ƒŒÀ∆ÕŒ ¡€“‹ Õ»∆≈ ¬—≈’ rx*.h !!!!!
+#include "DSO_cursor.h"
 #define		CNT_SHP		6       // 4 shapes chnl + 2 shapes triggers
 //---------------------------------------------------------------------------
 typedef void __fastcall (__closure *TcbSendChnlParams)(TChnlParams*)	;
@@ -82,15 +81,17 @@ __published:	// IDE-managed Components
 	TMenuItem *miRising;
 	TMenuItem *miFalling;
 	void __fastcall FMouseMove(TObject *Sender,TShiftState Shift,int X,int Y);
-	void __fastcall pViewResize(TObject *Sender);
+	void __fastcall FResize(TObject *Sender);
 	void __fastcall PanResize(TObject *Sender);
 	void __fastcall BtnClick(TObject *Sender);
 	void __fastcall FrameMouseWheel(TObject *Sender, TShiftState Shift,
           int WheelDelta, TPoint &MousePos, bool &Handled);
-	void __fastcall FrameMouseDown(TObject *Sender, TMouseButton Button,
+	void __fastcall FMouseDown(TObject *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
 	void __fastcall FDblClick(TObject *Sender);
 	void __fastcall popTrgClick(TObject *Sender);
+	void __fastcall FMouseUp(TObject *Sender, TMouseButton Button,
+          TShiftState Shift, int X, int Y);
 private:	// User declarations
 //	uint32_t        LvlsPos		;
 	CHard		m_Hard		;
@@ -102,6 +103,7 @@ private:	// User declarations
 
 	TShapeGL* 	shpLvl[CNT_SHP]		;// shapes chnl + shapes triggers
 	TLabel*		lblCh[4]		;
+	TDsoCursor*	VCursor[4]		;
 
  void __fastcall CalcDrawWaves(void)		;
  void __fastcall DrawWaves   (void)    		;

@@ -6,7 +6,6 @@
 #pragma hdrstop
 #include	<GL\glu.h>
 #include	"DSO_frame.h"
-
 //---------------------------------------------------------------------------
 struct TParamsDrawWave{
  HDC 	hDC		;// handle to dc
@@ -34,10 +33,11 @@ struct TParamsDrawWave{
 //---------------------------------------------------------------------------
 extern GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)	;
 //extern GLvoid	DrawPxlArrayGL(GLsizei width, GLsizei height,TPxlArrayGL* PxlArr)			;
-extern GLvoid DrawShapesGL(TShapeGL* shp[])				;
+extern GLvoid DrawCursorsGL(TDsoCursor* Cur[],int CntCur)		;
+extern GLvoid DrawShapesGL (TShapeGL*   shp[],int CntShp) 	       	;
 extern GLvoid DrawWaveGL(USHORT nCh,TParamsDrawWave* params)		;
 extern GLvoid DrawGridGL(USHORT cntGrid_H,USHORT cntGrid_V,USHORT nBright,USHORT IsGrid);
-extern GLvoid DrawSceneGL(GLsizei width, GLsizei height,TShapeGL* shp[])	;
+extern GLvoid DrawSceneGL(GLsizei width, GLsizei height)		;
 extern GLvoid DestroyGL ()						;
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
