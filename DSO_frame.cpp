@@ -18,11 +18,12 @@
 #include	<IO.h>
 //#include	<JPEG.hpp>
 //---------------------------------------------------------------------------
-
 TFrmDSO *FrmDSO = 0	;
 //TShape_M* spmLvl[4] = {0,0,0,0}	;
 //extern double OffsetVaweGL		;
 static 	TParamsDrawWave PrmsDW		;
+static char* strHint1="Колёсиком мыши\n выбрать чувствительность\n канала по Y"	;
+static char* strHint2="Колёсиком мыши\n выбрать развертку"	;
 //---------------------------------------------------------------------------
 __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Owner)
 {String		nam			;
@@ -51,13 +52,14 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
    shpLvl[ch]->cbSetHardLvl = SetHardLvlChnl		;
    shpLvl[ch]->OnMouseDown  = FrameMouseDown		;
    shpLvl[ch]->OnDblClick   = FDblClick			;
+   shpLvl[ch]->Hint = strHint1		;
 
    nam.printf("LblCh%ld",ch+1)		;
    lblCh[ch] = new TLabel(this)		; lblCh[ch]->Name  = nam  	;
    lblCh[ch]->Parent = pBottom		; lblCh[ch]->Tag   = ch+1	;
    lblCh[ch]->Align  = alRight		; lblCh[ch]->Align = alLeft	;
    lblCh[ch]->AutoSize  = false		; lblCh[ch]->Width = 64		;
-   lblCh[ch]->Alignment = taCenter 	; 
+   lblCh[ch]->Alignment = taCenter 	; lblCh[ch]->Hint  = strHint1	;
  }
  shpLvl[TRG_T] = new TShapeGL(this,pTop,"TrgT",clYellow,soHrz,0);//pLeft->Width)	;
  shpLvl[TRG_T]->OnMouseMove  = FMouseMove	;
@@ -68,6 +70,7 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
  shpLvl[TRG_V]->cbSetHardLvl = SetHardLvlChnl	;
  shpLvl[TRG_V]->OnMouseDown  = FrameMouseDown	;
  lblTrgT->Caption = ""				;
+ lblTimDiv->Hint  = strHint2			;
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::Destroy(TObject* Sender){ DestroyGL()	;}
