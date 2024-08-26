@@ -31,7 +31,7 @@ struct TParamsDrawWave{
  double dPercentX	;
 };
 //---------------------------------------------------------------------------
-extern GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)	;
+extern GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height,TColor _color)	;
 //extern GLvoid	DrawPxlArrayGL(GLsizei width, GLsizei height,TPxlArrayGL* PxlArr)			;
 extern GLvoid DrawCursorsGL(TDsoCursor* Cur[],int CntCur)		;
 extern GLvoid DrawShapesGL (TShapeGL*   shp[],int CntShp) 	       	;

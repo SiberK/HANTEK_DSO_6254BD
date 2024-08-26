@@ -12,7 +12,7 @@ const char* strVoltDiv1  = "2mV ,5mV  ,10mV ,20mV ,50mV ,0.1V ,"
 const char* strVoltDiv10 = "20mV,50mV ,0.1V ,0.2V ,0.5V ,1V   ,"
 			   "2V  ,5V   ,10V  ,20V  ,50V  ,100V  ";
 enum	{vd20mV,vd50mV,vd100mV,vd200mV,vd500mV,vd1V,
-		    vd2V  ,vd5V  ,vd10V  ,vd20V  ,vd50V  ,vd100V}	;
+	   vd2V,  vd5V,  vd10V,  vd20V,  vd50V,vd100V}	;
 enum	{adDC,adGnd,adAC}		;
 //---------------------------------------------------------------------------
 __fastcall TFrmChnl::TFrmChnl(TComponent* Owner,TWinControl* parent,

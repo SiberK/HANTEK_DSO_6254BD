@@ -32,6 +32,8 @@ public:
   USHORT       	m_nLeverPos[MAX_CH_NUM]	;
   COLORREF 	m_clrRGB[MAX_CH_NUM]	;
 //WORD		pAmpLevel[AMPCALI_Len]	;
+  double	TimStrth		;// растяжка
+  double	MultY[MAX_CH_NUM] 	;
 
   int		m_nReadOK		;// Верны ли данные, прочитанные в этот раз, 0, неправильные, не 0, неправильные;
   BOOL 		m_bStartNew		;// Стоит ли начинать новую коллекцию
@@ -43,6 +45,10 @@ public:
   void		SetTrgT(int nCh,USHORT lvl)		;
   void		SetTrgV(int nCh,USHORT lvl)		;
   double   	SetTimeDiv(TTimeParams* timPrms)	;// вернёт SmplPerDiv
+  void 		SetStrth(double val){ TimStrth = val	;}
+  double	GetTimStrth(void){ return TimStrth	;}
+  double	GetTimDiv(void)				;
+  double	GetVltDiv(void)				;
 
   void 		SetTriggerMode (uint16_t val)		;
   void 		SetTriggerSweep(uint16_t val)		;
@@ -61,6 +67,8 @@ public:
   void 	 	SourceToDisplay(USHORT* pData,ULONG nDataLen,USHORT nCH,int nOffset=0);
 };
 //---------------------------------------------------------------------------
+extern const double   tblTimDiv[]	;
+extern const uint16_t SIZE_TBL_TIM_DIV	;
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 #endif

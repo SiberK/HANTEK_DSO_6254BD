@@ -11,11 +11,9 @@ object FrmDSO: TFrmDSO
   Font.Style = [fsBold]
   ParentCtl3D = False
   ParentFont = False
-  ParentShowHint = False
-  ShowHint = True
   TabOrder = 0
   OnMouseDown = FMouseDown
-  OnMouseWheel = FrameMouseWheel
+  OnMouseWheel = FMouseWheel
   object Label2: TLabel
     Left = 277
     Top = 101
@@ -49,7 +47,7 @@ object FrmDSO: TFrmDSO
     object Label1: TLabel
       Left = 180
       Top = 143
-      Width = 32
+      Width = 26
       Height = 14
       Caption = 'Label1'
       Color = clGradientActiveCaption
@@ -57,7 +55,7 @@ object FrmDSO: TFrmDSO
       Font.Color = clWindowText
       Font.Height = -13
       Font.Name = 'GOST type A'
-      Font.Style = [fsBold]
+      Font.Style = []
       ParentColor = False
       ParentFont = False
       Transparent = False
@@ -70,8 +68,8 @@ object FrmDSO: TFrmDSO
     Height = 303
     Align = alLeft
     BevelOuter = bvNone
-    Color = clMoneyGreen
     ParentBackground = False
+    ParentColor = True
     TabOrder = 1
   end
   object pRight: TPanel
@@ -81,8 +79,8 @@ object FrmDSO: TFrmDSO
     Height = 303
     Align = alRight
     BevelOuter = bvNone
-    Color = clMoneyGreen
     ParentBackground = False
+    ParentColor = True
     TabOrder = 2
   end
   object pTop2: TPanel
@@ -92,10 +90,9 @@ object FrmDSO: TFrmDSO
     Height = 16
     Align = alTop
     BevelOuter = bvNone
-    Color = clMoneyGreen
     ParentBackground = False
+    ParentColor = True
     TabOrder = 3
-    OnResize = PanResize
     object bStretch: TSpeedButton
       Tag = 12
       Left = 409
@@ -158,10 +155,9 @@ object FrmDSO: TFrmDSO
     Height = 16
     Align = alBottom
     BevelOuter = bvNone
-    Color = clMoneyGreen
     ParentBackground = False
+    ParentColor = True
     TabOrder = 4
-    OnResize = PanResize
     object btn3: TSpeedButton
       Tag = 13
       Left = 409
@@ -191,6 +187,7 @@ object FrmDSO: TFrmDSO
       Align = alLeft
       AllowAllUp = True
       GroupIndex = 14
+      OnClick = BtnClick
     end
     object pBottom: TPanel
       Left = 16

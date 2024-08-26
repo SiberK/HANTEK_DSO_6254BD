@@ -28,11 +28,13 @@ GLvoid DrawCursorsGL(TDsoCursor* Cur[],int CntCur)
    if(glIsList(lstGL)) glDeleteLists(lstGL,1)	;
 
    glNewList(lstGL,GL_COMPILE)	;{
+//     glLineWidth(2)		;
      glLineStipple(4,0xAAAA)	;//1,0x3F07)	;
      glEnable(GL_LINE_STIPPLE)	;
      for(int is=0;is<CntCur;is++) Cur[is]->DrawGL()	;
      glDisable(GL_LINE_STIPPLE)	;
-   }glEndList()			;
+//     glLineWidth(1)		;
+   } glEndList()  		;
  }
 }
 //---------------------------------------------------------------------------
@@ -109,7 +111,7 @@ GLvoid	DrawSceneGL(GLsizei width, GLsizei height)
  SwapBuffers(ghDC)		; // выводим всё на экран
 }
 //---------------------------------------------------------------------------
-GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)
+GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height,TColor _color)
 {
   GLfloat     maxObjectSize, aspect;
   GLdouble    near_plane;
@@ -146,7 +148,7 @@ GLvoid InitializeGL(HWND handle,GLsizei width, GLsizei height)
   GLfloat position   [] = { 2.0, 2.0, 2.0, 0.0 };
   GLfloat position1  [] = { -1.0, 1.0, 1.0, 0.0 };
 
-  Trgb rgb(clMoneyGreen)			;
+  Trgb rgb(_color)			;
   glClearColor(rgb.rf(),rgb.gf(),rgb.bf(),1)	;// Set the clear color
 //  glClearColor(0.7, 0.7, 0.7, 0.0);
 
@@ -198,6 +200,9 @@ GLvoid  DrawGridGL(USHORT cntGrid_H,USHORT cntGrid_V,USHORT nBright,USHORT IsGri
  float lenT1 = 1.0f, lenT2 = 0.015f	;
  glNewList(GRID,GL_COMPILE)	;{
    glLineWidth(1)		;
+   glLineStipple(1,0xAAAA)	;//1,0x3F07)	;
+   glEnable(GL_LINE_STIPPLE)	;
+
    glBegin(GL_LINES)		;{
      glColorT(clGray)		;//	glColor3ub(50,90,40)	;
      glVertex2f(-1.0f, 0.0f)	;
@@ -219,6 +224,7 @@ GLvoid  DrawGridGL(USHORT cntGrid_H,USHORT cntGrid_V,USHORT nBright,USHORT IsGri
        glVertex2f(-lenT2, ix)	; glVertex2f( lenT2, ix) ;}
 
    } glEnd()	;
+   glDisable(GL_LINE_STIPPLE)	;
  }glEndList()	;
 }
 //---------------------------------------------------------------------------

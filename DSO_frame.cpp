@@ -25,6 +25,7 @@ static char* strHint1="Колёсиком мыши\n выбрать чувств
 static char* strHint2="Колёсиком мыши\n выбрать развертку"	;
 
 const TColor COLOR_V_CURSOR = clBlue	;
+const double TIME_STRETH = 0.1		;// растяжка!!!
 //---------------------------------------------------------------------------
 __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Owner)
 {String		nam			;
@@ -62,7 +63,7 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
    lblCh[ch]->AutoSize  = false		; lblCh[ch]->Width = 64		;
    lblCh[ch]->Alignment = taCenter 	; lblCh[ch]->Hint  = strHint1	;
  }
- shpLvl[TRG_T] = new TShapeGL(this,pTop,"TrgT",clYellow,soHrz,0);//pLeft->Width)	;
+ shpLvl[TRG_T] = new TShapeGL(this,pTop,"TrgT",clMaroon,soHrz,0);//pLeft->Width)	;
  shpLvl[TRG_T]->OnMouseMove  = FMouseMove	;
  shpLvl[TRG_T]->cbSetHardLvl = SetHardLvlChnl	;
 
@@ -73,11 +74,21 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
  lblTrgT->Caption = ""				;
  lblTimDiv->Hint  = strHint2			;
 
- double _pos[4] = {-0.8,-0.4,0.4,0.8}		;
- for(int ix=0;ix<4;ix++){
-   nam.printf("V_Cursor%ld",ix+1)		;
+ for(int ch=0;ch<4;ch++){
+    nam.printf("LblDbg%ld",ch+1)		;
+   lblDbg[ch] = new TLabel(this)	; lblDbg[ch]->Name  = nam  	;
+   lblDbg[ch]->Parent = pBottom		; lblDbg[ch]->Caption = ""	;
+   lblDbg[ch]->Align  = alRight		; lblDbg[ch]->Align = alLeft	;
+   lblDbg[ch]->Alignment = taCenter 	; lblDbg[ch]->Hint  = strHint1	;
+   lblDbg[ch]->Font->Size = 8		;
+//   lblDbg[ch]->Font->Style >> fsBold	;
+ }
+
+ double _pos[] = {-0.8,-0.4,0.4,0.8,-0.5,0.5}	;
+ for(int ix=0;ix<CNT_CUR;ix++){
+   nam.printf("CursorDSO%ld",ix+1)		;
    _color = COLOR_V_CURSOR			;
-   VCursor[ix] = new TDsoCursor(this,nam,_pos[ix],_color);
+   CursorDSO[ix] = new TDsoCursor(this,nam,_pos[ix],ix<4 ? coVrt : coHrz,_color);
  }
 }
 //---------------------------------------------------------------------------
@@ -102,7 +113,7 @@ void __fastcall TFrmDSO::Init(TObject* Sender,uint32_t _lvlsPos)
  shpLvl[TRG_T]->Init(TRG_T,"T",pTop  ->Tag)  	;
  shpLvl[TRG_V]->Init(TRG_V,"T",pRight->Tag) 	;
 
- InitializeGL(pView->Handle,pView->Width,pView->Height)	;
+ InitializeGL(pView->Handle,pView->Width,pView->Height,Color)	;
  }DEF_CATCH
 
  try{
@@ -133,8 +144,8 @@ void __fastcall TFrmDSO::SetChnlParams(TChnlParams* params)
  if(ch<4){
    sprintf(str,"%d %c %s",ch+1,cpl,sns.c_str())	;
    lblCh[ch]->Caption = str	;
-
  }
+ CalcDrawWaves()		;
 }
 //---------------------------------------------------------------------------
 USHORT __fastcall TFrmDSO::CollectData(void)
@@ -182,7 +193,8 @@ void __fastcall TFrmDSO::CalcDrawWaves(void)
  PrmsDW.nSrcDataLen   = m_Hard.m_stControl.nBufferLen	;// the source data length
 // PrmsDW.nDisDataLen   = m_Hard.m_stControl.nBufferLen	;// the display data length for drawing
  PrmsDW.nCenterData   = PrmsDW.nSrcDataLen / 2 		;// half of the source data
- PrmsDW.dbHorizontal  = bStretch->Down ? 10.0 : 1.0 	;// the horizontal factor of zoom out/in
+ PrmsDW.dbHorizontal  = bStretch->Down ?
+				1.0 / TIME_STRETH : 1.0	;// the horizontal factor of zoom out/in
  PrmsDW.dbVertical    = 1.0				;// the vertical factor of zoom out/in
  PrmsDW.nYTFormat     = 0				;// Fomat: Normal or Scan
  PrmsDW.nScanLen      = PrmsDW.nSrcDataLen		;// the scan data length, only invalidate in scan mode
@@ -216,7 +228,9 @@ void __fastcall TFrmDSO::CalcDrawWaves(void)
    sprintf(str,"ipos=%ld,ofst=%6.3lf,tpos=%6.3lf",iPos,PrmsDW.Offset_H,dPos);
    pTop->Hint = str	;
  }
-
+ double timDiv = m_Hard.GetTimDiv()	;
+ double vltDiv = m_Hard.GetVltDiv()	;
+ TDsoCursor::CalcScale(CntGrid_H,CntGrid_V,timDiv,vltDiv)	;
  ShowShpView(bFixTrgT->Down) 		;
 }
 //---------------------------------------------------------------------------
@@ -252,7 +266,7 @@ void __fastcall TFrmDSO::OnDraw(TObject *Sender)
    if(m_Hard.m_nDeviceIndex != 0xFF){
      DrawWaves()	 			;}
 
-   DrawCursorsGL(VCursor,4)		;
+   DrawCursorsGL(CursorDSO,CNT_CUR)	;
    DrawShapesGL (shpLvl ,CNT_SHP)	;
    DrawSceneGL  (CliWdt ,CliHgt )	;
  }DEF_CATCH
@@ -283,9 +297,11 @@ void __fastcall TFrmDSO::FMouseDown(TObject *Sender, TMouseButton Button,
    }
  }
  else if(box){
-     double    _posX = dMap(0,box->Width,X,-1.0,1.0)	;
-     for(int ic=0;ic<4;ic++){
-       if(VCursor[ic]->OnSelect(_posX)) break		;
+     double    _posX = dMap(0,box->Width ,X,-1.0, 1.0)	;
+     double    _posY = dMap(0,box->Height,Y, 1.0,-1.0)	;
+
+     for(int ic=0;ic<CNT_CUR;ic++){
+       if(CursorDSO[ic]->OnSelect(_posX,_posY)) break	;
      }
  }
 }
@@ -295,16 +311,16 @@ void __fastcall TFrmDSO::FMouseUp(TObject *Sender, TMouseButton Button,
 {
  TScrollBox* box = dynamic_cast<TScrollBox*>(Sender)	;
  if(box){
-     double    _posX = -8.0	;//dMap(0,box->Width,X,-1.0,1.0)	;
-     for(int ic=0;ic<4;ic++){
-       if(VCursor[ic]->OnSelect(_posX)) break		;
+     for(int ic=0;ic<CNT_CUR;ic++){
+       if(CursorDSO[ic]->OnSelect(-8,-8)) break		;
      }
  }
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
 			 TShiftState Shift, int X, int Y)
-{TShapeGL* shpGL= dynamic_cast<TShapeGL*>(Sender)	;
+{int ic = 0	;
+ TShapeGL* shpGL= dynamic_cast<TShapeGL*>(Sender)	;
  TShape*   shp  = shpGL ? 0 : dynamic_cast<TShape*>(Sender) 	;
  TScrollBox* box = dynamic_cast<TScrollBox*>(Sender)	;
 
@@ -325,38 +341,18 @@ void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
    }
    else if(box){
      double    _posX = dMap(0,box->Width,X,-1.0,1.0)	;
-     for(int ic=0;ic<4;ic++){
-       if(VCursor[ic]->OnMove(_posX)) break		;
-     }
+     double    _posY = dMap(0,box->Height,Y, 1.0,-1.0)	;
+
+     for(ic=0;ic<CNT_CUR;ic++){
+       if(CursorDSO[ic]->OnMove(_posX,_posY)) break  	;}
+       
+     if(ic<CNT_CUR && lblDbg[0])
+       lblDbg[0]->Caption = TDsoCursor::GetInfoT()	;
    }
  }
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmDSO::PanResize(TObject *Sender)
-{
-// if(spmLvl[0]){
-//   spmLvl[0]->Width = spmLvl[0]->Parent->Width	;
-//   spmLvl[0]->Height= 20		;
-// }
-}
-//---------------------------------------------------------------------------
-void __fastcall TFrmDSO::BtnClick(TObject *Sender)
-{TSpeedButton* btn = dynamic_cast<TSpeedButton*>(Sender)	;
- int tag = btn ? btn->Tag : 0	;
- pTop->Hint = ""		;
-
- switch(tag){
-   case 13: if(!DdsDialog) DdsDialog = new TDdsDialog(this)	;
-	    if( DdsDialog) DdsDialog->Visible = btn->Down	;
-   break	;
-
-   case 12:		// растяжка!!!
-	    CalcDrawWaves()	;
-   break	;
- }
-}
-//---------------------------------------------------------------------------
-void __fastcall TFrmDSO::FrameMouseWheel(TObject *Sender, TShiftState Shift,
+void __fastcall TFrmDSO::FMouseWheel(TObject *Sender, TShiftState Shift,
       int WheelDelta, TPoint &MousePos, bool &Handled)
 {TChnlParams	params		;
  int		iix		;
@@ -397,10 +393,25 @@ void __fastcall TFrmDSO::FrameMouseWheel(TObject *Sender, TShiftState Shift,
  }
 }
 //---------------------------------------------------------------------------
+void __fastcall TFrmDSO::BtnClick(TObject *Sender)
+{TSpeedButton* btn = dynamic_cast<TSpeedButton*>(Sender)	;
+ int tag = btn ? btn->Tag : 0	;
+ pTop->Hint = ""		;
 
-//     sprintf(str,"Y=%ld, pos=%6.2lf, lvl255=%ld",
-//		Y, shpGL->Pos.dPos,shpGL->Pos.Lvl255)	;
-//     OutputDebugString(str)			;
+ switch(tag){
+   case 14: TDsoCursor::GetInfoT()	;
+   break	;
+
+   case 13: if(!DdsDialog) DdsDialog = new TDdsDialog(this)	;
+	    if( DdsDialog) DdsDialog->Visible = btn->Down	;
+   break	;
+
+   case 12:		// растяжка!!!
+	    m_Hard.SetStrth(bStretch->Down ? TIME_STRETH : 1.0)	;
+	    CalcDrawWaves()	;
+   break	;
+ }
+}
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::FDblClick(TObject *Sender)
 {TChnlParams	params	;
@@ -430,13 +441,19 @@ void __fastcall TFrmDSO::popTrgClick(TObject *Sender)
 
    case srcCH1 : case srcCH2 : case srcCH3 : case srcCH4 :
 	miSource->Tag = tag - srcCH1		;
-	m_Hard.SetTriggerSrc(miSource->Tag)	; break	;
+	m_Hard.SetTriggerSrc(miSource->Tag)	;
+	CalcDrawWaves()				;
+	break	;
 
    case slRising : case slFalling :
 	miSlope->Tag = tag - slRising		;
 	m_Hard.SetTriggerSlope(miSlope->Tag )	; break	;
  }
 }
+//---------------------------------------------------------------------------
+//     sprintf(str,"Y=%ld, pos=%6.2lf, lvl255=%ld",
+//		Y, shpGL->Pos.dPos,shpGL->Pos.Lvl255)	;
+//     OutputDebugString(str)			;
 //---------------------------------------------------------------------------
 
 

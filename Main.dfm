@@ -27,7 +27,7 @@ object Form1: TForm1
     Panels = <
       item
         Bevel = pbNone
-        Width = 300
+        Width = 260
       end
       item
         Width = 120
@@ -45,7 +45,7 @@ object Form1: TForm1
     Width = 462
     Height = 359
     Align = alClient
-    Color = clMoneyGreen
+    Color = 14413534
     ParentBackground = False
     TabOrder = 1
   end
@@ -89,7 +89,7 @@ object Form1: TForm1
         Width = 60
         Height = 23
         Hint = 'Sec/Div'
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 0
         OnChange = TimeDivChange
       end
@@ -100,7 +100,7 @@ object Form1: TForm1
         Width = 60
         Height = 23
         Hint = 'Smpl/Div'
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 1
         OnChange = TimeDivChange
       end
@@ -128,7 +128,7 @@ object Form1: TForm1
         Top = 16
         Width = 60
         Height = 23
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 0
         OnChange = TimeDivChange
         Items.Strings = (
@@ -142,7 +142,7 @@ object Form1: TForm1
         Width = 60
         Height = 23
         Hint = 'Sec/Div'
-        ItemHeight = 0
+        ItemHeight = 15
         TabOrder = 1
         OnChange = TimeDivChange
         Items.Strings = (

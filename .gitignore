@@ -5,6 +5,7 @@ Debug
 trash
 DLL*
 DOC
+Setup
 *.exe
 *.log
 *.map

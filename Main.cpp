@@ -22,10 +22,6 @@ static const char strTimeDiv[] = "2nS,5nS,10nS,20nS,50nS,100nS,200nS,500nS,1uS,"
 				 "2mS,5mS,10mS,20mS,50mS,100mS,200mS,500mS,1S,"
 				 "2S ,5S ,10S ,20S ,50S ,100S ,200S ,500S ,1000S";
 
-static const double tblTimeDiv[] = {2e-9,5e-9,10e-9,20e-9,50e-9,100e-9,200e-9,500e-9,1e-6,
-				    2e-6,5e-6,10e-6,20e-6,50e-6,100e-6,200e-6,500e-6,1e-3,
-				    2e-3,5e-3,10e-3,20e-3,50e-3,100e-3,200e-3,500e-3,1   ,
-				    2   ,5   ,10   ,20   ,50   ,100   ,200   ,500   ,1000};
 static const char strSmplDiv[] = "50 ,100,200";
 static const char strSmplRat[] = "1G/sec   ,0.5G/sec,250M/sec ,"
 				 "125M/sec ,50M/sec ,25M/sec  ,"
@@ -115,13 +111,12 @@ void __fastcall TForm1::TimeDivChange(TObject *Sender)
  if(!tag || !FrmDSO) return	;
 
  uint16_t ixTB  = cbTimeDiv->ItemIndex 			;
- uint16_t maxTB = sizeof(tblTimeDiv)/sizeof(*tblTimeDiv);
-	  if(ixTB >= maxTB) ixTB = 17			;
+	  if(ixTB >= SIZE_TBL_TIM_DIV) ixTB = 17	;
 
  TTimeParams	timPrms	;
  timPrms.nTrigSource = cbSrcTrg->ItemIndex		;
  timPrms.nTimeDIV    = ixTB				;
- timPrms.TimeBase    = tblTimeDiv[ixTB]			;
+ timPrms.TimeBase    = tblTimDiv[ixTB]			;
  timPrms.nHTriggerPos	;
  timPrms.nHTriggerPos	;
  timPrms.nVTriggerPos	;
@@ -145,12 +140,11 @@ double __fastcall TForm1::DisplaySampleRate()
 {
  String	  Str						;
  uint16_t ixTB  = cbTimeDiv->ItemIndex 			;
- uint16_t maxTB = sizeof(tblTimeDiv)/sizeof(*tblTimeDiv);
-	  if(ixTB >= maxTB) ixTB = 0			;
+	  if(ixTB >= SIZE_TBL_TIM_DIV) ixTB = 0		;
 
  int	cntSmpls   = FrmDSO->CountSamples()		;
  double	smplRate   = FrmDSO->SamplingRate()		;
- double timeBase   = tblTimeDiv[ixTB]			;
+ double timeBase   = tblTimDiv[ixTB]			;
  double timCollect = smplRate != 0 ? cntSmpls * 1e3 / smplRate : 0	;
  double	smplPerDiv = smplRate * timeBase		;// отсчётов на 1 деление
  double	srm = smplRate/(smplRate > 250.0e6 ? 1.0e9 :
@@ -215,7 +209,7 @@ void __fastcall TForm1::GetChnlParams(uint8_t ch,TChnlParams* params)
 void __fastcall TForm1::FormMouseWheel(TObject *Sender, TShiftState Shift,
       int WheelDelta, TPoint &MousePos, bool &Handled)
 {//if(Shift.Contains(ssCtrl))
-   FrmDSO->FrameMouseWheel(Sender,Shift,WheelDelta,MousePos,Handled)	;
+   FrmDSO->FMouseWheel(Sender,Shift,WheelDelta,MousePos,Handled)	;
 }
 //---------------------------------------------------------------------------
 

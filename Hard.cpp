@@ -15,7 +15,14 @@
 //////////////////////////////////////////////////////////////////////
 static int BUF_LEN     = 0x1000	;//  4K
 static int MAX_BUF_LEN = 0x4000	;// 16K
-
+//---------------------------------------------------------------------------
+const double tblVltDiv[] = {2e-3,5e-3,10e-3,20e-3,50e-3,100e-3,200e-3,500e-3,1.0,2.0,5.0,100.0};
+const double tblTimDiv[] = {2e-9,5e-9,10e-9,20e-9,50e-9,100e-9,200e-9,500e-9,1e-6,
+			    2e-6,5e-6,10e-6,20e-6,50e-6,100e-6,200e-6,500e-6,1e-3,
+			    2e-3,5e-3,10e-3,20e-3,50e-3,100e-3,200e-3,500e-3,1   ,
+			    2   ,5   ,10   ,20   ,50   ,100   ,200   ,500   ,1000};
+const uint16_t SIZE_TBL_TIM_DIV = sizeof(tblTimDiv)/sizeof(*tblTimDiv)	;
+//---------------------------------------------------------------------------
 CHard::CHard()
 {
   m_nLeverPos[CH1] = 127;//192;
@@ -32,11 +39,12 @@ CHard::CHard()
 //  m_clrRGB[CH2] = RGB(  0, 255, 255)	;
 //  m_clrRGB[CH3] = RGB(255,   0, 255)	;
 //  m_clrRGB[CH4] = RGB(  0, 255,   0)	;
-  m_clrRGB[CH1] = clBlue;//RGB(  0,  0, 255)	;
-  m_clrRGB[CH2] = clRed;//RGB(255,  0,   0)	;
-  m_clrRGB[CH3] = clGreen;//RGB(  0, 80,   0)	;
-  m_clrRGB[CH4] = clPurple;//RGB(127,  0, 127)	;
-  m_nTimeDIV    = 12			;//24;
+  m_clrRGB[CH1] = clBlue	;//RGB(  0,  0, 255)	;
+  m_clrRGB[CH2] = clRed		;//RGB(255,  0,   0)	;
+  m_clrRGB[CH3] = clGreen	;//RGB(  0, 80,   0)	;
+  m_clrRGB[CH4] = clPurple	;//RGB(127,  0, 127)	;
+  m_nTimeDIV    = 12	   	;//24;
+  TimStrth	= 1.0		;// растяжка
 
   m_stControl.nCHSet 		= 0x0F		;//Все каналы открыты
   m_stControl.nTimeDIV 		= m_nTimeDIV	;//Factory Setup
@@ -69,6 +77,14 @@ CHard::CHard()
  m_bCollect 	= TRUE	;
  m_nReadOK 	= 0	;
 }
+//---------------------------------------------------------------------------
+double CHard::GetTimDiv(void)
+{return tblTimDiv[m_nTimeDIV] * TimStrth ;}
+//---------------------------------------------------------------------------
+double CHard::GetVltDiv(void)
+{WORD Ch = m_stControl.nTriggerSource	;
+
+ return  tblVltDiv[RelayControl.nCHVoltDIV[Ch]] * MultY[Ch]	;}
 //---------------------------------------------------------------------------
 void CHard::SetTriggerMode (uint16_t val){ m_nTriggerMode  = val	;}
 //---------------------------------------------------------------------------
@@ -116,10 +132,9 @@ void CHard::SetTrgV(int nCh,USHORT lvl)
 double CHard::SetTimeDiv(TTimeParams* timPrms)
 {
  if(timPrms->nTimeDIV != -1)
-   m_nTimeDIV = timPrms->nTimeDIV	;
- m_nYTFormat = m_nTimeDIV > 23 ? YT_SCAN : YT_NORMAL;
-
- m_stControl.nTimeDIV = m_nTimeDIV	;//Factory Setup
+   m_nTimeDIV = timPrms->nTimeDIV			;
+ m_nYTFormat  = m_nTimeDIV > 23 ? YT_SCAN : YT_NORMAL	;
+ m_stControl.nTimeDIV = m_nTimeDIV			;//Factory Setup
 
  double smplPerDiv = SamplingRate() * timPrms->TimeBase	;
 
@@ -150,6 +165,7 @@ void CHard::SetChnlParams(TChnlParams* params)
    RelayControl.nCHVoltDIV [nCh] = params->IxVoltDiv	;
  if(params->IxAcDc != -1)
    RelayControl.nCHCoupling[nCh] = params->IxAcDc  	;
+ MultY[nCh] = params->XX10 ? 10.0 : 1.0			;
 
  if(m_nDeviceIndex == 0xFF) return	;
  

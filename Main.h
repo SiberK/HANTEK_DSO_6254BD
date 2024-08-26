@@ -9,13 +9,13 @@
 #include <Buttons.hpp>
 #include <ExtCtrls.hpp>
 #include <ComCtrls.hpp>
+#include <Mask.hpp>
 
 #include "rxPlacemnt.hpp"
 #include <Menus.hpp>
 #include "rxCurrEdit.hpp"
 #include "rxToolEdit.hpp"
 #include "Chnl_frame.h"
-#include <Mask.hpp>
 //---------------------------------------------------------------------------
 class TForm1 : public TForm
 {

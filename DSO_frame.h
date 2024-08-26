@@ -16,6 +16,7 @@
 #include <Menus.hpp>			// ›“Œ ƒŒÀ∆ÕŒ ¡€“‹ Õ»∆≈ ¬—≈’ rx*.h !!!!!
 #include "DSO_cursor.h"
 #define		CNT_SHP		6       // 4 shapes chnl + 2 shapes triggers
+#define		CNT_CUR		6
 //---------------------------------------------------------------------------
 typedef void __fastcall (__closure *TcbSendChnlParams)(TChnlParams*)	;
 typedef void __fastcall (__closure *TcbGetChnlParams )(uint8_t,TChnlParams*)	;
@@ -82,9 +83,8 @@ __published:	// IDE-managed Components
 	TMenuItem *miFalling;
 	void __fastcall FMouseMove(TObject *Sender,TShiftState Shift,int X,int Y);
 	void __fastcall FResize(TObject *Sender);
-	void __fastcall PanResize(TObject *Sender);
 	void __fastcall BtnClick(TObject *Sender);
-	void __fastcall FrameMouseWheel(TObject *Sender, TShiftState Shift,
+	void __fastcall FMouseWheel(TObject *Sender, TShiftState Shift,
           int WheelDelta, TPoint &MousePos, bool &Handled);
 	void __fastcall FMouseDown(TObject *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
@@ -103,7 +103,8 @@ private:	// User declarations
 
 	TShapeGL* 	shpLvl[CNT_SHP]		;// shapes chnl + shapes triggers
 	TLabel*		lblCh[4]		;
-	TDsoCursor*	VCursor[4]		;
+	TLabel*		lblDbg[4]		;
+	TDsoCursor*	CursorDSO[CNT_CUR]	;
 
  void __fastcall CalcDrawWaves(void)		;
  void __fastcall DrawWaves   (void)    		;
