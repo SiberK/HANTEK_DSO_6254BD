@@ -112,6 +112,7 @@ private:	// User declarations
  void __fastcall DrawWaveInYT(USHORT nCH)	;
  void __fastcall SetHardLvlChnl(UCHAR ch,int lvl);
  void __fastcall ShowShpView(bool Fix_TrgT=false) 	;
+ void __fastcall GetCursorInfo(void)		;
 
 
 public:		// User declarations
@@ -129,8 +130,10 @@ public:		// User declarations
  void   __fastcall SetChnlParams(TChnlParams* params)	;
  void   __fastcall SetTimeDiv(TTimeParams* timPrms, String StrTimDiv)	;
  
- double __fastcall  SamplingRate()
-			{ return m_Hard.SamplingRate()	;}
+ String __fastcall GetSmplRate  (void)			;
+ String __fastcall GetTimDiv    (void)			;
+ String __fastcall GetSmplPerDiv(void)			;
+ String __fastcall GetTimClct   (void)			;
  size_t __fastcall CountSamples(){ return m_Hard.BufferLen()	;}
 
  void   __fastcall Destroy(TObject* Sender)		;
@@ -138,7 +141,7 @@ public:		// User declarations
  void   __fastcall OnDraw(TObject *Sender)		;
 
  uint16_t __fastcall GetDevIx(){ return m_Hard.m_nDeviceIndex	;}
- TColor __fastcall GetChColor(uint8_t ch){return ch<4 ? TColor(m_Hard.m_clrRGB[ch]) : clGray	;}
+ TColor   __fastcall GetChColor(uint8_t ch){return ch<4 ? TColor(m_Hard.m_clrRGB[ch]) : clGray	;}
 
 // uint8_t  __fastcall LoadLvl255(uint8_t nCh)
 // { UCHAR* lvl = (UCHAR*)&(pLeft->Tag) ; return nCh < 4 ? lvl[nCh] : 127	;}

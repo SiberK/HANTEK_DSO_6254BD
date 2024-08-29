@@ -44,10 +44,14 @@ static bool	flChng	;
  static double __fastcall GetScaleX(void){ return ScaleX	;}
  static double __fastcall GetScaleY(void){ return ScaleY	;}
  static String __fastcall GetInfoT(void)	;
+ static String __fastcall GetInfoV(void)	;
  __published:
 
 };
 //---------------------------------------------------------------------------
+extern String IntervalToStr(double val)		;
+extern String IntervalToStr2(double val)	;
+extern String VoltToStr(double val)		;
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 

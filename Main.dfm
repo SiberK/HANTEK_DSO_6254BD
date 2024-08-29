@@ -26,14 +26,13 @@ object Form1: TForm1
     Height = 19
     Panels = <
       item
-        Bevel = pbNone
-        Width = 260
+        Width = 310
       end
       item
-        Width = 120
+        Width = 50
       end
       item
-        Width = 120
+        Width = 200
       end
       item
         Width = 100

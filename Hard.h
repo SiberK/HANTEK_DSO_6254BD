@@ -21,7 +21,7 @@ public:
 //USHORT 	m_nComType		;//0:USB; 1:LAN
   short*       	m_pSrcData[MAX_CH_NUM]	;//Считанные данные минус положение нулевого уровня (-255 ~ 255)
 //USHORT 	m_nCalLevel[CAL_LEVEL_LEN];//Cal Level
-  USHORT       	m_nTimeDIV		;
+  size_t       	m_nTimeDiv		;
   USHORT       	m_nYTFormat		;
   BOOL 		m_bCollect		;
   CONTROLDATA 	m_stControl		;
@@ -44,8 +44,8 @@ public:
   void		SetLvl (int nCh,USHORT lvl)		;
   void		SetTrgT(int nCh,USHORT lvl)		;
   void		SetTrgV(int nCh,USHORT lvl)		;
-  double   	SetTimeDiv(TTimeParams* timPrms)	;// вернёт SmplPerDiv
-  void 		SetStrth(double val){ TimStrth = val	;}
+  bool   	SetTimeDiv(TTimeParams* timPrms)	;// вернёт "уст. растяжка"
+  bool 		SetStrth(bool val)			;//{ TimStrth = val	;}
   double	GetTimStrth(void){ return TimStrth	;}
   double	GetTimDiv(void)				;
   double	GetVltDiv(void)				;
@@ -59,6 +59,7 @@ public:
   ULONG		BufferLen() { return m_stControl.nBufferLen	;}
 
   double        SamplingRate()		;
+  double 	SmplPerDiv(void)	;
 
   USHORT 	CollectData()		;// возвращаю m_nDeviceIndex (0xFF - устройство не обнаружено)
   bool 	 	FindeDev()		;
@@ -67,8 +68,10 @@ public:
   void 	 	SourceToDisplay(USHORT* pData,ULONG nDataLen,USHORT nCH,int nOffset=0);
 };
 //---------------------------------------------------------------------------
+const double TIME_STRETH = 0.1		;// растяжка!!!
+
 extern const double   tblTimDiv[]	;
-extern const uint16_t SIZE_TBL_TIM_DIV	;
+extern const size_t   SIZE_TBL_TIM_DIV	;
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 #endif

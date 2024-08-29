@@ -106,17 +106,17 @@ void __fastcall TForm1::TimeDivChange(TObject *Sender)
 {TComboBox* cmbox = dynamic_cast<TComboBox*>(Sender)	;
  TCheckBox* chbox = dynamic_cast<TCheckBox*>(Sender)	;
  int	tag = cmbox ? cmbox->Tag : chbox ? chbox->Tag : 0	;
- String	Str, strPp	;
+ String	Str, strPp			;
 
- if(!tag || !FrmDSO) return	;
+ if(!tag || !FrmDSO) return		;
 
- uint16_t ixTB  = cbTimeDiv->ItemIndex 			;
-	  if(ixTB >= SIZE_TBL_TIM_DIV) ixTB = 17	;
+ size_t ixTB  = cbTimeDiv->ItemIndex 	;
+ if(ixTB >= SIZE_TBL_TIM_DIV) ixTB = 17	;
 
  TTimeParams	timPrms	;
  timPrms.nTrigSource = cbSrcTrg->ItemIndex		;
- timPrms.nTimeDIV    = ixTB				;
- timPrms.TimeBase    = tblTimDiv[ixTB]			;
+ timPrms.nTimeDiv    = ixTB				;
+// timPrms.TimeBase    = tblTimDiv[ixTB]			;
  timPrms.nHTriggerPos	;
  timPrms.nHTriggerPos	;
  timPrms.nVTriggerPos	;
@@ -136,27 +136,30 @@ void __fastcall TForm1::TimeDivChange(TObject *Sender)
  }
 }
 //---------------------------------------------------------------------------
-double __fastcall TForm1::DisplaySampleRate()
+void __fastcall TForm1::DisplaySampleRate()
 {
- String	  Str						;
- uint16_t ixTB  = cbTimeDiv->ItemIndex 			;
-	  if(ixTB >= SIZE_TBL_TIM_DIV) ixTB = 0		;
-
- int	cntSmpls   = FrmDSO->CountSamples()		;
- double	smplRate   = FrmDSO->SamplingRate()		;
- double timeBase   = tblTimDiv[ixTB]			;
- double timCollect = smplRate != 0 ? cntSmpls * 1e3 / smplRate : 0	;
- double	smplPerDiv = smplRate * timeBase		;// отсчётов на 1 деление
- double	srm = smplRate/(smplRate > 250.0e6 ? 1.0e9 :
-			smplRate > 250.0e3 ? 1.0e6 :
-			smplRate > 250.0   ? 1.0e3 : 1.0);
- String strPp = smplRate > 250.0e6 ? "GSa" :
-		smplRate > 250.0e3 ? "MSa" :
-		smplRate > 250.0   ? "KSa" : "Sa"	;
- Str.printf("%6.1lf %s (%6.1lf Sa/Div ) %ldsmpl (%6.2lfmSec)",
- 		srm,strPp.c_str(),smplPerDiv,cntSmpls,timCollect)	;
- StatMsg[0] = Str	;
- return smplPerDiv	;
+ String	Str						;
+ String	smplRate = FrmDSO->GetSmplRate()		;
+ String timDiv   = FrmDSO->GetTimDiv()			;
+ String timClct  = FrmDSO->GetTimClct()			;
+ String smplPerDiv=FrmDSO->GetSmplPerDiv()		;
+ size_t cntSmpls = FrmDSO->CountSamples()		;
+// smplRate != 0 ? cntSmpls / smplRate : 0	;
+// String	smplPerDiv = smplRate * timeBase		;// отсчётов на 1 деление
+// double	srm = smplRate/(smplRate > 250.0e6 ? 1.0e9 :
+//			smplRate > 250.0e3 ? 1.0e6 :
+//			smplRate > 250.0   ? 1.0e3 : 1.0);
+// String strPp = smplRate > 250.0e6 ? "GSa" :
+//		smplRate > 250.0e3 ? "MSa" :
+//		smplRate > 250.0   ? "KSa" : "Sa"	;
+// String strSrm = FormatFloat("0.##",srm)		;
+//
+// Str.printf("%s %s (%3.0lf Sa/Div) %ld (%s)",
+//		strSrm,strPp.c_str(), smplPerDiv,
+//		cntSmpls, IntervalToStr(timCollect))	;
+ Str.printf("%s (%s) %ld (%s)",
+	    smplRate,smplPerDiv, cntSmpls, timClct)	;
+ StatMsg[2] = Str	;
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::ChnlOnChange(TObject *Sender)

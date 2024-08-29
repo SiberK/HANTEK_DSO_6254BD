@@ -6,6 +6,10 @@
 #ifndef _BV
 #define	_BV(X)	(1<<(X))
 #endif
+
+#ifndef	SIZE_ARR
+#define SIZE_ARR(arr) (sizeof(arr)/sizeof(*arr))
+#endif
 //---------------------------------------------------------------------------
 bool	CheckFloat(void* Val){ return ((*(uint32_t*)Val)&0x7F800000) != 0x7F800000	;}
 //---------------------------------------------------------------------------

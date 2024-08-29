@@ -13,7 +13,7 @@ typedef struct _HT_CONTROL_DATA
 			   // the 1 bit: 0 CH2 is disable, 1 CH2 is enable
 			   // the 2 bit: 0 CH3 is disable, 1 CH3 is enable
 			   // the 3 bit: 0 CH4 is disable, 1 CH4 is enable
- WORD  nTimeDIV		;// the index of time base
+ WORD  nTimeDiv		;// the index of time base
  WORD  nTriggerSource	;// the index of the trigger source
  WORD  nHTriggerPos	;// the horizontal trigger pos (Value:0~100)
  WORD  nVTriggerPos	;// the vertical trigger pos

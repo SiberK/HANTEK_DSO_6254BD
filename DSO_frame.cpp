@@ -2,8 +2,9 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include "DrawOGL.h"
 #include <RxStrUtils.hpp>
+#include "Main.h"
+#include "DrawOGL.h"
 #include "ComWorL.h"
 #include "DSO_frame.h"
 #include "DdsDlg.h"
@@ -25,7 +26,6 @@ static char* strHint1="Колёсиком мыши\n выбрать чувств
 static char* strHint2="Колёсиком мыши\n выбрать развертку"	;
 
 const TColor COLOR_V_CURSOR = clBlue	;
-const double TIME_STRETH = 0.1		;// растяжка!!!
 //---------------------------------------------------------------------------
 __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Owner)
 {String		nam			;
@@ -146,6 +146,7 @@ void __fastcall TFrmDSO::SetChnlParams(TChnlParams* params)
    lblCh[ch]->Caption = str	;
  }
  CalcDrawWaves()		;
+ GetCursorInfo()		;
 }
 //---------------------------------------------------------------------------
 USHORT __fastcall TFrmDSO::CollectData(void)
@@ -188,6 +189,7 @@ void __fastcall TFrmDSO::SetHardLvlChnl(UCHAR ch,int lvl)
 void __fastcall TFrmDSO::CalcDrawWaves(void)
 {char	str[80]	;
  double	Tprc = shpLvl[TRG_T]->Pos.Lvl100/100.0		;// 0.0 ... 1.0  % положение T относительно полной длины последовательности
+ SmplPerDiv  = m_Hard.SmplPerDiv()			;
 
  PrmsDW.nDisType      = 0				;// display type: Line or Dot
  PrmsDW.nSrcDataLen   = m_Hard.m_stControl.nBufferLen	;// the source data length
@@ -201,7 +203,7 @@ void __fastcall TFrmDSO::CalcDrawWaves(void)
 
  PrmsDW.CntGrid_H     = CntGrid_H			;
  PrmsDW.CntGrid_V     = CntGrid_V			;
- PrmsDW.SmplPerDiv    = SmplPerDiv / PrmsDW.dbHorizontal;// отсчётов на деление  с учётом растяжки(масштаба)
+ PrmsDW.SmplPerDiv    = SmplPerDiv			;// отсчётов на деление  с учётом растяжки(масштаба)
  // the display data length for drawing
  PrmsDW.nDisDataLen   = PrmsDW.SmplPerDiv * CntGrid_H 	;// сколько отсчётов войдёт на экран? с учётом растяжки(масштаба)
  PrmsDW.StpOGL	      = 2.0/PrmsDW.nDisDataLen		;// шаг отображения отсчётов в OGL (-1.0 .. 1.0)
@@ -245,11 +247,20 @@ void __fastcall TFrmDSO::ShowShpView(bool Fix_TrgT)	// показать обла
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::DrawWaves(void)
-{
+{int wch = 0	;
  for(int ch=0;ch<MAX_CH_NUM;ch++){    //CH1/CH2/CH3/CH4
-   PrmsDW.clrRGB        = m_Hard.m_clrRGB[ch]		;// the color of the line
-   PrmsDW.pSrcData      = m_Hard.RelayControl.bCHEnable[ch] ?
-			  m_Hard.m_pSrcData[ch] : 0	;// the source data for drawing
+   PrmsDW.clrRGB   = m_Hard.m_clrRGB[ch]		;// the color of the line
+   PrmsDW.pSrcData = 0					;
+   
+   if(m_Hard.RelayControl.bCHEnable[ch]){
+// в режиме nTimeDiv < 8 ( SamplingRate > 0.5GSa), когда работ. каналов = 2
+// выборки в pSrcData 0 и 2 !!!!  ХЗ почему?????
+     if(m_Hard.m_nTimeDiv<8 && m_Hard.CntChnlW()==2){
+       PrmsDW.pSrcData = m_Hard.m_pSrcData[wch]		;// the source data for drawing
+       wch += 2						;}
+
+     else PrmsDW.pSrcData= m_Hard.m_pSrcData[ch]	;// the source data for drawing
+   }
    PrmsDW.nDisLeverPos  = m_Hard.m_nLeverPos[ch]	;// the display position(Zero Level)
    DrawWaveGL(ch,&PrmsDW)				;//
  }
@@ -279,9 +290,12 @@ void __fastcall TFrmDSO::FResize(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::SetTimeDiv(TTimeParams* timPrms, String StrTimDiv)
-{SmplPerDiv = m_Hard.SetTimeDiv(timPrms)	;
- CalcDrawWaves()	;
- lblTimDiv->Caption = StrTimDiv			;}
+{bool chk = m_Hard.SetTimeDiv(timPrms)			;
+ if(bStretch->Down && !chk) bStretch->Down = false	;
+ 
+ CalcDrawWaves()		;
+ GetCursorInfo()      		;
+ lblTimDiv->Caption = StrTimDiv	;}
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::FMouseDown(TObject *Sender, TMouseButton Button,
       TShiftState Shift, int X, int Y)
@@ -345,10 +359,16 @@ void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
 
      for(ic=0;ic<CNT_CUR;ic++){
        if(CursorDSO[ic]->OnMove(_posX,_posY)) break  	;}
-       
-     if(ic<CNT_CUR && lblDbg[0])
-       lblDbg[0]->Caption = TDsoCursor::GetInfoT()	;
+     if(ic<CNT_CUR) GetCursorInfo()		;
    }
+ }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::GetCursorInfo(void)
+{
+ if(Form1){
+   Form1->StatMsg[0] = TDsoCursor::GetInfoT()	;
+   Form1->StatMsg[1] = TDsoCursor::GetInfoV()	;
  }
 }
 //---------------------------------------------------------------------------
@@ -397,9 +417,10 @@ void __fastcall TFrmDSO::BtnClick(TObject *Sender)
 {TSpeedButton* btn = dynamic_cast<TSpeedButton*>(Sender)	;
  int tag = btn ? btn->Tag : 0	;
  pTop->Hint = ""		;
+ bool	rzlt = false		;
 
  switch(tag){
-   case 14: TDsoCursor::GetInfoT()	;
+   case 14:
    break	;
 
    case 13: if(!DdsDialog) DdsDialog = new TDdsDialog(this)	;
@@ -407,8 +428,10 @@ void __fastcall TFrmDSO::BtnClick(TObject *Sender)
    break	;
 
    case 12:		// растяжка!!!
-	    m_Hard.SetStrth(bStretch->Down ? TIME_STRETH : 1.0)	;
+	    rzlt = m_Hard.SetStrth(bStretch->Down)		;
+	    if(!rzlt && bStretch->Down) bStretch->Down = false	;
 	    CalcDrawWaves()	;
+	    if(Form1) Form1->DisplaySampleRate()	;
    break	;
  }
 }
@@ -443,7 +466,7 @@ void __fastcall TFrmDSO::popTrgClick(TObject *Sender)
 	miSource->Tag = tag - srcCH1		;
 	m_Hard.SetTriggerSrc(miSource->Tag)	;
 	CalcDrawWaves()				;
-	break	;
+	GetCursorInfo()				; break	;
 
    case slRising : case slFalling :
 	miSlope->Tag = tag - slRising		;
@@ -451,9 +474,39 @@ void __fastcall TFrmDSO::popTrgClick(TObject *Sender)
  }
 }
 //---------------------------------------------------------------------------
+String __fastcall TFrmDSO::GetSmplPerDiv(void)
+{return FormatFloat("0.## Sa/Div",m_Hard.SmplPerDiv())	;}
+//---------------------------------------------------------------------------
+String __fastcall TFrmDSO::GetTimClct   (void)
+{double val = CountSamples()/m_Hard.SamplingRate()	;
+ return IntervalToStr(val)				;}
+//---------------------------------------------------------------------------
+String __fastcall TFrmDSO::GetTimDiv(void)
+{double val = m_Hard.GetTimDiv()		;
+ String str = val<1e-6 ? FormatFloat("#nS",val*1e9) :
+	      val<1e-3 ? FormatFloat("#uS",val*1e6) :
+	      val<1    ? FormatFloat("#mS",val*1e3) :
+			 FormatFloat("#S" ,val) 	;
+ return str	;}
+//---------------------------------------------------------------------------
+String __fastcall TFrmDSO::GetSmplRate(void)
+{double val = m_Hard.SamplingRate()		;
+ String str = val > 250e6 ? FormatFloat("0.# GSa",val/1e9) :
+	      val > 250e3 ? FormatFloat("0.# MSa",val/1e6) :
+	      val > 250   ? FormatFloat("0.# kSa",val/1e3) :
+			    FormatFloat("0.# Sa" ,val)		;
+ return str	;}
+//---------------------------------------------------------------------------
 //     sprintf(str,"Y=%ld, pos=%6.2lf, lvl255=%ld",
 //		Y, shpGL->Pos.dPos,shpGL->Pos.Lvl255)	;
 //     OutputDebugString(str)			;
 //---------------------------------------------------------------------------
 
+// double	srm = smplRate/(smplRate > 250.0e6 ? 1.0e9 :
+//			smplRate > 250.0e3 ? 1.0e6 :
+//			smplRate > 250.0   ? 1.0e3 : 1.0);
+// String strPp = smplRate > 250.0e6 ? "GSa" :
+//		smplRate > 250.0e3 ? "MSa" :
+//		smplRate > 250.0   ? "KSa" : "Sa"	;
+// String strSrm = FormatFloat("0.##",srm)		;
 

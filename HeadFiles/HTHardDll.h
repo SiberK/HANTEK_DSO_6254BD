@@ -41,7 +41,7 @@ struct TTimeParams{
  BOOL 	bTrigFilt  	;
  WORD	nALT	   	;
 
- short 	nTimeDIV   	;
+ short 	nTimeDiv   	;
  WORD  	nHTriggerPos	;
  WORD  	nVTriggerPos	;
  WORD  	nTriggerSlope	;
@@ -50,7 +50,7 @@ struct TTimeParams{
  ULONG 	nAlreadyReadLen	;// Запишите длину данных, которые были прочитаны в этот раз.
 			   // Она действительна в режиме сканирования/прокрутки
 			   // и недействительна в НОРМАЛЬНОМ режиме.
- double TimeBase	;
+// double TimeBase	;
 };
 //---------------------------------------------------------------------------
 

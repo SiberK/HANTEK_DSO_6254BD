@@ -55,8 +55,7 @@ private:	// User declarations
    { if(i<StatBar1->Panels->Count)StatBar1->Panels->Items[i]->Text = val	;}
  String	__fastcall rdStatBar(int i)
    { return (i<StatBar1->Panels->Count)? StatBar1->Panels->Items[i]->Text : String("")	;}
- void   __fastcall ChnlOnChange(TObject *Sender)	;
- double __fastcall DisplaySampleRate()			;// вернёт кол-во отсчётов на 1 деление 
+ void __fastcall ChnlOnChange(TObject *Sender)		;
 
  void __fastcall SendChnlParams(TChnlParams* params)	;
  void __fastcall GetChnlParams(uint8_t ch,TChnlParams* params)	;
@@ -65,6 +64,7 @@ private:	// User declarations
  public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
 
+ void __fastcall DisplaySampleRate()			;
  __property String  StatMsg[int i] = {read=rdStatBar,write=wrStatBar	};
 };
 //---------------------------------------------------------------------------

@@ -13,27 +13,34 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-static int BUF_LEN     = 0x1000	;//  4K
-static int MAX_BUF_LEN = 0x4000	;// 16K
+static uint32_t BUF_LEN     = 0x1000	;//  4K
+//static uint32_t BUF_LEN     = 0x4000	;// 16K
+static uint32_t MAX_BUF_LEN = 0x4000	;// 16K
 //---------------------------------------------------------------------------
-const double tblVltDiv[] = {2e-3,5e-3,10e-3,20e-3,50e-3,100e-3,200e-3,500e-3,1.0,2.0,5.0,100.0};
-const double tblTimDiv[] = {2e-9,5e-9,10e-9,20e-9,50e-9,100e-9,200e-9,500e-9,1e-6,
-			    2e-6,5e-6,10e-6,20e-6,50e-6,100e-6,200e-6,500e-6,1e-3,
-			    2e-3,5e-3,10e-3,20e-3,50e-3,100e-3,200e-3,500e-3,1   ,
-			    2   ,5   ,10   ,20   ,50   ,100   ,200   ,500   ,1000};
-const uint16_t SIZE_TBL_TIM_DIV = sizeof(tblTimDiv)/sizeof(*tblTimDiv)	;
+const double tblTimDiv[]   =  {2e-9,5e-9 ,10e-9,20e-9 ,50e-9,100e-9,200e-9,500e-9,1e-6,
+			       2e-6,5e-6 ,10e-6,20e-6 ,50e-6,100e-6,200e-6,500e-6,1e-3,
+			       2e-3,5e-3 ,10e-3,20e-3 ,50e-3,100e-3,200e-3,500e-3,1   ,
+			       2   ,5    ,10   ,20    ,50   ,100   ,200   ,500   ,1000};
+const double tblSmplRate[] = {1.0e9,1.0e9,1.0e9,1.0e9 ,1.0e9, 1.0e9, 1.0e9,0.5e9 ,250e6,
+			      125e6, 50e6, 25e6,12.5e6,  5e6, 2.5e6,1.25e6,500e3 ,250e3,
+			      125e3, 50e3, 25e3,12.5e3,  5e3, 2.5e3,1.25e3,500.0 ,250.0,
+			      125.0, 50.0, 25.0,12.5  ,  5.0, 2.5  ,1.25  ,0.5   ,0.25};
+const double tblVltDiv[]   =  {2e-3,5e-3 ,10e-3,20e-3 ,50e-3,100e-3,200e-3,500e-3,1.0,2.0,5.0,100.0};
+const size_t SIZE_TBL_TIM_DIV = SIZE_ARR(tblTimDiv)	;
 //---------------------------------------------------------------------------
 CHard::CHard()
 {
+  ULONG nCh = 0, ix=0	;
+
   m_nLeverPos[CH1] = 127;//192;
   m_nLeverPos[CH2] = 127;//160;
   m_nLeverPos[CH3] = 127;//96;
   m_nLeverPos[CH4] = 127;//64;
-  ULONG nCh = 0;
   m_nDeviceIndex = 0xFF;
   m_nDeviceNum = 0;
   for (nCh = 0; nCh < MAX_CH_NUM; nCh++){
     m_pSrcData[nCh] = new short[MAX_BUF_LEN]	;
+    for(ix=0;ix<MAX_BUF_LEN;ix++) m_pSrcData[nCh][ix] = m_nLeverPos[nCh]	;
   }
 //  m_clrRGB[CH1] = RGB(255, 255,   0)	;
 //  m_clrRGB[CH2] = RGB(  0, 255, 255)	;
@@ -43,11 +50,11 @@ CHard::CHard()
   m_clrRGB[CH2] = clRed		;//RGB(255,  0,   0)	;
   m_clrRGB[CH3] = clGreen	;//RGB(  0, 80,   0)	;
   m_clrRGB[CH4] = clPurple	;//RGB(127,  0, 127)	;
-  m_nTimeDIV    = 12	   	;//24;
+  m_nTimeDiv    = 12	   	;//24;
   TimStrth	= 1.0		;// растяжка
 
   m_stControl.nCHSet 		= 0x0F		;//Все каналы открыты
-  m_stControl.nTimeDIV 		= m_nTimeDIV	;//Factory Setup
+  m_stControl.nTimeDiv 		= m_nTimeDiv	;//Factory Setup
   m_stControl.nTriggerSource 	= CH1		;//Канал 1 является триггерным каналом.
 
   m_stControl.nVTriggerPos	= m_nLeverPos[CH1];//Вертикальное положение триггера такое же, как у канала 1.
@@ -58,7 +65,7 @@ CHard::CHard()
   m_stControl.nAlreadyReadLen 	= 0		;//Он действителен только при сканировании и прокрутке и используется для записи прочитанной длины.
   m_stControl.nALT 		= 0		;//Factory Setup
 
-  m_nYTFormat = m_nTimeDIV > 23 ? YT_SCAN : YT_NORMAL;
+  m_nYTFormat = m_nTimeDiv > 23 ? YT_SCAN : YT_NORMAL;
   m_stControl.nHTriggerPos = m_nYTFormat == YT_SCAN ? 0 : 25;//Горизонтальное положение триггера (0-100)
  for (nCh = 0; nCh < MAX_CH_NUM; nCh++){
    RelayControl.bCHEnable  [nCh] = 1	;
@@ -79,12 +86,21 @@ CHard::CHard()
 }
 //---------------------------------------------------------------------------
 double CHard::GetTimDiv(void)
-{return tblTimDiv[m_nTimeDIV] * TimStrth ;}
+{return tblTimDiv[m_nTimeDiv] * TimStrth ;}
 //---------------------------------------------------------------------------
 double CHard::GetVltDiv(void)
 {WORD Ch = m_stControl.nTriggerSource	;
 
  return  tblVltDiv[RelayControl.nCHVoltDIV[Ch]] * MultY[Ch]	;}
+//---------------------------------------------------------------------------
+bool CHard::SetStrth(bool val)
+{bool rzlt = true	;
+ TimStrth = 1.0		;
+
+ if(val && m_nTimeDiv > 4) TimStrth = TIME_STRETH	;
+ else rzlt = false	;
+ 
+ return rzlt		;}
 //---------------------------------------------------------------------------
 void CHard::SetTriggerMode (uint16_t val){ m_nTriggerMode  = val	;}
 //---------------------------------------------------------------------------
@@ -101,15 +117,29 @@ void CHard::SetTriggerSrc  (uint16_t val){
  RelayControl.nTrigSource = val	; m_stControl.nTriggerSource = val	;
  if(m_nDeviceIndex == 0xFF) return	;
 
+ WORD	TrgSrc = m_stControl.nTriggerSource	;
+ if(m_nTimeDiv<8 && CntChnlW()==2){
+   WORD wch=0	;
+   for(WORD ch=0;ch<MAX_CH_NUM;ch++){
+     if(RelayControl.bCHEnable[ch]){
+       if(TrgSrc == ch) TrgSrc = wch	;// в этом режиме работают только канала 0-й и 2-й!!!
+       else wch += 2			;
+     }
+   }
+ }
+
 //Установить источник триггера
- dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDIV,
+ dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDiv,
 					     m_stControl.nCHSet  ,
-					     m_stControl.nTriggerSource, 0)	;
+					     TrgSrc, 0)	;
  }
 //---------------------------------------------------------------------------
 void CHard::SetLvl(int nCh,USHORT lvl)
 {
- m_nLeverPos[nCh] = lvl		;
+ m_nLeverPos[nCh] = lvl			;
+ for(size_t ix=0;ix<MAX_BUF_LEN;ix++)
+   m_pSrcData[nCh][ix] = lvl		;
+
  if(m_nDeviceIndex == 0xFF) return	;
  dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh], nCh, 4);
 }
@@ -117,45 +147,43 @@ void CHard::SetLvl(int nCh,USHORT lvl)
 void CHard::SetTrgT(int nCh,USHORT lvl)
 {m_stControl.nHTriggerPos = lvl		;
  if(m_nDeviceIndex != 0xFF){
-   dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4)	;
- }
+   dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4)	;}
 }
 //---------------------------------------------------------------------------
 void CHard::SetTrgV(int nCh,USHORT lvl)
 {m_stControl.nVTriggerPos = lvl		;
 
  if(m_nDeviceIndex != 0xFF){
-   dsoHTSetVTriggerLevel(m_nDeviceIndex,m_stControl.nVTriggerPos, 4);
- }
+   dsoHTSetVTriggerLevel(m_nDeviceIndex,m_stControl.nVTriggerPos, 4);}
 }
 //---------------------------------------------------------------------------
-double CHard::SetTimeDiv(TTimeParams* timPrms)
+bool CHard::SetTimeDiv(TTimeParams* timPrms)
 {
- if(timPrms->nTimeDIV != -1)
-   m_nTimeDIV = timPrms->nTimeDIV			;
- m_nYTFormat  = m_nTimeDIV > 23 ? YT_SCAN : YT_NORMAL	;
- m_stControl.nTimeDIV = m_nTimeDIV			;//Factory Setup
+ if(timPrms->nTimeDiv != -1)
+   m_nTimeDiv = timPrms->nTimeDiv			;
+ m_nYTFormat  = m_nTimeDiv > 23 ? YT_SCAN : YT_NORMAL	;
+ m_stControl.nTimeDiv = m_nTimeDiv			;//Factory Setup
 
- double smplPerDiv = SamplingRate() * timPrms->TimeBase	;
+ bool 	chkTimStrth = m_nTimeDiv > 4			;// в высоких SmplRate
+ if(!chkTimStrth) TimStrth = 1.0			;// растяжку отключать!!!
 
  if(m_nDeviceIndex != 0xFF){
 // Установить частоту дискретизации
    dsoHTSetSampleRate(m_nDeviceIndex, m_nYTFormat, &RelayControl, &m_stControl)	;
 //Установить источник триггера
-   dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDIV,
+   dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDiv,
 					       m_stControl.nCHSet  ,
 					       m_stControl.nTriggerSource, 0)	;
    for (int nCh = 0; nCh < MAX_CH_NUM; nCh++)
      dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
 //Установите переключатель каналов и уровень напряжения
-   dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
+   dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDiv)	;
 // Установите коррекцию амплитуды, вызванную режимом канала
    dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
 
-   dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDIV,RelayControl.nCHVoltDIV,m_nLeverPos);
+   dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDiv,RelayControl.nCHVoltDIV,m_nLeverPos);
  }
-
- return smplPerDiv	;}
+ return chkTimStrth	;}
 //---------------------------------------------------------------------------
 void CHard::SetChnlParams(TChnlParams* params)
 {int nCh = params->IX	;
@@ -171,12 +199,12 @@ void CHard::SetChnlParams(TChnlParams* params)
  
  dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
 //Установите переключатель каналов и уровень напряжения
- dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
+ dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDiv)	;
 
 // Установите коррекцию амплитуды, вызванную режимом канала
  dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
 
- dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDIV,RelayControl.nCHVoltDIV,m_nLeverPos);
+ dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDiv,RelayControl.nCHVoltDIV,m_nLeverPos);
 }
 //---------------------------------------------------------------------------
 void CHard::Init()
@@ -188,9 +216,9 @@ void CHard::Init()
 // Установить частоту дискретизации
  dsoHTSetSampleRate(m_nDeviceIndex, m_nYTFormat, &RelayControl, &m_stControl)	;
 //Установите переключатель каналов и уровень напряжения
- dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDIV)	;
+ dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDiv)	;
 //Установить источник триггера
- dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDIV,
+ dsoHTSetRamAndTrigerControl(m_nDeviceIndex, m_stControl.nTimeDiv,
 					     m_stControl.nCHSet  ,
 					     m_stControl.nTriggerSource, 0)	;
  for (int nCh = 0; nCh < MAX_CH_NUM; nCh++){
@@ -378,18 +406,21 @@ void CHard::SourceToDisplay(USHORT* pData, ULONG nDataLen, USHORT nCH, int nOffs
 
 //---------------------------------------------------------------------------
 double CHard::SamplingRate()
-{static double tblSmplRate[] = {1.0e9,1.0e9,1.0e9,1.0e9 ,1.0e9, 1.0e9, 1.0e9,0.5e9,250e6,
-				125e6, 50e6, 25e6,12.5e6,  5e6, 2.5e6,1.25e6,500e3,250e3,
-				125e3, 50e3, 25e3,12.5e3,  5e3, 2.5e3,1.25e3,500.0,250.0,
-				125.0, 50.0, 25.0,12.5  ,  5.0, 2.5  ,1.25  ,0.5  ,0.25};
+{ size_t SizeTbl = SIZE_ARR(tblSmplRate)	;
  USHORT cntChn = CntChnlW()	;
- double rate   = m_nTimeDIV < sizeof(tblSmplRate) ? tblSmplRate[m_nTimeDIV] : 0.0	;
+ double rate   = m_nTimeDiv < SizeTbl ? tblSmplRate[m_nTimeDiv] : 0.0	;
+
 // на высоких частотах SampleRate меньше задаваемого !!!! (зависит от кол-ва вкл. каналов)
- if(m_nTimeDIV < 7) rate = cntChn > 2 ? rate/4 : cntChn > 1 ? rate/2 : rate	;
- if(m_nTimeDIV== 7) rate = cntChn > 2 ? rate/2 : rate	;
+ if(m_nTimeDiv < 7) rate = cntChn > 2 ? rate/4 : cntChn > 1 ? rate/2 : rate	;
+ if(m_nTimeDiv== 7) rate = cntChn > 2 ? rate/2 : rate	;
 
  return rate	;
 }
+//---------------------------------------------------------------------------
+double CHard::SmplPerDiv(void)
+{double timDiv = tblTimDiv[m_nTimeDiv]		;
+ double val    = SamplingRate() * timDiv * TimStrth	;
+ return val	;}
 //---------------------------------------------------------------------------
 int CHard::CntChnlW()	// кол-во включенных каналов
 {int cnt = 0	;
