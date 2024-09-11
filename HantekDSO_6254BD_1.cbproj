@@ -19,10 +19,10 @@
     <CfgParent>Base</CfgParent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Base)'!=''">
-    <BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
     <OutputExt>exe</OutputExt>
-    <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
+    <BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
     <Defines>NO_STRICT</Defines>
+    <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
     <DynamicRTL>true</DynamicRTL>
     <ILINK_ObjectSearchPath>B:\forIPH\AZUR\user;L:\RAD\PacketFrms;B:\HANTEK_DSO_6254BD</ILINK_ObjectSearchPath>
     <ProjectType>CppVCLApplication</ProjectType>
@@ -34,24 +34,28 @@
     <Multithreaded>true</Multithreaded>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_1)'!=''">
-    <BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
     <DCC_Optimize>false</DCC_Optimize>
-    <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+    <BCC_OptimizeForSpeed>false</BCC_OptimizeForSpeed>
     <Defines>_DEBUG;$(Defines)</Defines>
-    <DynamicRTL>false</DynamicRTL>
+    <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+    <BCC_MonitorThis>true</BCC_MonitorThis>
     <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+    <DynamicRTL>false</DynamicRTL>
     <BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
     <ILINK_DisableIncrementalLinking>true</ILINK_DisableIncrementalLinking>
     <BCC_UseRegisterVariables>None</BCC_UseRegisterVariables>
     <DCC_Define>DEBUG</DCC_Define>
     <BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+    <BCC_MonitorGlobalAndStackData>true</BCC_MonitorGlobalAndStackData>
     <FinalOutputDir>.</FinalOutputDir>
     <IntermediateOutputDir>Debug</IntermediateOutputDir>
+    <BCC_AllCodeguardOptions>true</BCC_AllCodeguardOptions>
     <TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
-    <BCC_StackFrames>true</BCC_StackFrames>
     <BCC_waus>false</BCC_waus>
-    <BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+    <BCC_StackFrames>true</BCC_StackFrames>
     <ILINK_LibraryPath>$(BDS)\lib\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+    <BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+    <BCC_MonitorInlinePtrAccess>true</BCC_MonitorInlinePtrAccess>
     <TASM_Debugging>Full</TASM_Debugging>
     <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
   </PropertyGroup>
@@ -70,7 +74,11 @@
       <Excluded_Packages Name="$(BDS)\bin\bcbofficexp100.bpl">CodeGear C++Builder Office XP Servers Package</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-    </Excluded_Packages><Linker><Linker Name="LibPrefix"></Linker><Linker Name="LibSuffix"></Linker><Linker Name="LibVersion"></Linker></Linker><ProjectProperties><ProjectProperties Name="AutoShowDeps">False</ProjectProperties><ProjectProperties Name="ManagePaths">True</ProjectProperties><ProjectProperties Name="VerifyPackages">True</ProjectProperties></ProjectProperties></CPlusPlusBuilder.Personality></BorlandProject></BorlandProject>
+    </Excluded_Packages><Linker><Linker Name="LibPrefix"></Linker><Linker Name="LibSuffix"></Linker><Linker Name="LibVersion"></Linker></Linker><ProjectProperties><ProjectProperties Name="AutoShowDeps">False</ProjectProperties><ProjectProperties Name="ManagePaths">True</ProjectProperties><ProjectProperties Name="VerifyPackages">True</ProjectProperties></ProjectProperties>  <HistoryLists_hlBCC_MaxIdentifierLength>
+      <HistoryLists_hlBCC_MaxIdentifierLength Name="Count">1</HistoryLists_hlBCC_MaxIdentifierLength>
+      <HistoryLists_hlBCC_MaxIdentifierLength Name="Item0">250</HistoryLists_hlBCC_MaxIdentifierLength>
+    </HistoryLists_hlBCC_MaxIdentifierLength>
+  </CPlusPlusBuilder.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Import Project="$(MSBuildBinPath)\Borland.Cpp.Targets" />
   <ItemGroup>

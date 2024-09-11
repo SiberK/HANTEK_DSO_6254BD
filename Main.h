@@ -35,6 +35,12 @@ __published:	// IDE-managed Components
 	TCurrencyEdit *eTimRef;
 	TPanel *panSwtch;
 	TPanel *pTool;
+	TPanel *Panel1;
+	TSpeedButton *bPause;
+	TSpeedButton *bDbg1;
+	TSpeedButton *SpeedButton1;
+	TSpeedButton *SpeedButton2;
+	TSpeedButton *SpeedButton3;
 	void __fastcall timRefTimer(TObject *Sender);
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall FormDestroy(TObject *Sender);
@@ -45,6 +51,7 @@ __published:	// IDE-managed Components
 	void __fastcall PanDblClick(TObject *Sender);
 	void __fastcall FormMouseWheel(TObject *Sender, TShiftState Shift,
           int WheelDelta, TPoint &MousePos, bool &Handled);
+	void __fastcall FBtnClick(TObject *Sender);
 
 private:	// User declarations
 	String		StrVersion	;

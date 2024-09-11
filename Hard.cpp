@@ -1,5 +1,6 @@
 ﻿//---------------------------------------------------------------------------
 #pragma hdrstop
+#include	<stdIO.h>
 #include "Hard.h"
 #include "ComWorL.h"
 //---------------------------------------------------------------------------
@@ -13,9 +14,13 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-static uint32_t BUF_LEN     = 0x1000	;//  4K
+//static uint32_t BUF_LEN     = 0x1000	;//  4K
+static uint32_t BUF_LEN     = 0x2000	;//  8K
 //static uint32_t BUF_LEN     = 0x4000	;// 16K
 static uint32_t MAX_BUF_LEN = 0x4000	;// 16K
+static void SaveDump(WORD* dmp,int len,char* name)	;
+//---------------------------------------------------------------------------
+#define		CH_MODE	       m_nCHMod  //4//	
 //---------------------------------------------------------------------------
 const double tblTimDiv[]   =  {2e-9,5e-9 ,10e-9,20e-9 ,50e-9,100e-9,200e-9,500e-9,1e-6,
 			       2e-6,5e-6 ,10e-6,20e-6 ,50e-6,100e-6,200e-6,500e-6,1e-3,
@@ -25,12 +30,14 @@ const double tblSmplRate[] = {1.0e9,1.0e9,1.0e9,1.0e9 ,1.0e9, 1.0e9, 1.0e9,0.5e9
 			      125e6, 50e6, 25e6,12.5e6,  5e6, 2.5e6,1.25e6,500e3 ,250e3,
 			      125e3, 50e3, 25e3,12.5e3,  5e3, 2.5e3,1.25e3,500.0 ,250.0,
 			      125.0, 50.0, 25.0,12.5  ,  5.0, 2.5  ,1.25  ,0.5   ,0.25};
-const double tblVltDiv[]   =  {2e-3,5e-3 ,10e-3,20e-3 ,50e-3,100e-3,200e-3,500e-3,1.0,2.0,5.0,100.0};
+const double tblVltDiv[]   =  {2e-3,5e-3 ,10e-3,20e-3 ,50e-3,0.1   ,
+			       0.2 ,0.5  ,1.0  ,2.0   ,5.0  ,10.0};
 const size_t SIZE_TBL_TIM_DIV = SIZE_ARR(tblTimDiv)	;
 //---------------------------------------------------------------------------
 CHard::CHard()
 {
   ULONG nCh = 0, ix=0	;
+  flDbg1 = flDbg2 = flDbg3 = flDbg4 = 0	;
 
   m_nLeverPos[CH1] = 127;//192;
   m_nLeverPos[CH2] = 127;//160;
@@ -53,7 +60,7 @@ CHard::CHard()
   m_nTimeDiv    = 12	   	;//24;
   TimStrth	= 1.0		;// растяжка
 
-  m_stControl.nCHSet 		= 0x0F		;//Все каналы открыты
+  m_stControl.nCHSet = m_nCHSet = 0x0F		;//Все каналы открыты
   m_stControl.nTimeDiv 		= m_nTimeDiv	;//Factory Setup
   m_stControl.nTriggerSource 	= CH1		;//Канал 1 является триггерным каналом.
 
@@ -83,6 +90,12 @@ CHard::CHard()
 
  m_bCollect 	= TRUE	;
  m_nReadOK 	= 0	;
+}
+//---------------------------------------------------------------------------
+CHard::~CHard()
+{
+for(ULONG nCh = 0; nCh < MAX_CH_NUM; nCh++)
+  if(m_pSrcData[nCh]) delete[] m_pSrcData[nCh]	;
 }
 //---------------------------------------------------------------------------
 double CHard::GetTimDiv(void)
@@ -140,30 +153,35 @@ void CHard::SetLvl(int nCh,USHORT lvl)
  for(size_t ix=0;ix<MAX_BUF_LEN;ix++)
    m_pSrcData[nCh][ix] = lvl		;
 
+ WORD CHMod = CH_MODE	;
  if(m_nDeviceIndex == 0xFF) return	;
- dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh], nCh, 4);
+ dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh], nCh, CHMod);
 }
 //---------------------------------------------------------------------------
 void CHard::SetTrgT(int nCh,USHORT lvl)
 {m_stControl.nHTriggerPos = lvl		;
+ WORD CHMod = CH_MODE	;
  if(m_nDeviceIndex != 0xFF){
-   dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4)	;}
+   dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4/*CHMod*/)	;}
 }
 //---------------------------------------------------------------------------
 void CHard::SetTrgV(int nCh,USHORT lvl)
 {m_stControl.nVTriggerPos = lvl		;
+ WORD CHMod = CH_MODE	;
 
  if(m_nDeviceIndex != 0xFF){
-   dsoHTSetVTriggerLevel(m_nDeviceIndex,m_stControl.nVTriggerPos, 4);}
+   dsoHTSetVTriggerLevel(m_nDeviceIndex,m_stControl.nVTriggerPos,4);}
 }
 //---------------------------------------------------------------------------
 bool CHard::SetTimeDiv(TTimeParams* timPrms)
-{
- if(timPrms->nTimeDiv != -1)
+{if(timPrms->nTimeDiv != -1)
    m_nTimeDiv = timPrms->nTimeDiv			;
  m_nYTFormat  = m_nTimeDiv > 23 ? YT_SCAN : YT_NORMAL	;
  m_stControl.nTimeDiv = m_nTimeDiv			;//Factory Setup
 
+ CalcCHMode()			;
+ WORD 	CHMod = CH_MODE		;
+ 
  bool 	chkTimStrth = m_nTimeDiv > 4			;// в высоких SmplRate
  if(!chkTimStrth) TimStrth = 1.0			;// растяжку отключать!!!
 
@@ -175,45 +193,76 @@ bool CHard::SetTimeDiv(TTimeParams* timPrms)
 					       m_stControl.nCHSet  ,
 					       m_stControl.nTriggerSource, 0)	;
    for (int nCh = 0; nCh < MAX_CH_NUM; nCh++)
-     dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
+     dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh,CHMod);
 //Установите переключатель каналов и уровень напряжения
    dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDiv)	;
 // Установите коррекцию амплитуды, вызванную режимом канала
-   dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
+   dsoHTADCCHModGain(m_nDeviceIndex, CHMod)			;
 
-   dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDiv,RelayControl.nCHVoltDIV,m_nLeverPos);
+   dsoHTSetAmpCalibrate(m_nDeviceIndex,m_nCHSet,m_nTimeDiv,RelayControl.nCHVoltDIV,m_nLeverPos);
  }
  return chkTimStrth	;}
 //---------------------------------------------------------------------------
 void CHard::SetChnlParams(TChnlParams* params)
 {int nCh = params->IX	;
 
- RelayControl.bCHEnable  [nCh] = params->OnOff		;
+ RelayControl.bCHEnable[nCh] = params->OnOff		;
  if(params->IxVoltDiv != -1)
    RelayControl.nCHVoltDIV [nCh] = params->IxVoltDiv	;
  if(params->IxAcDc != -1)
    RelayControl.nCHCoupling[nCh] = params->IxAcDc  	;
  MultY[nCh] = params->XX10 ? 10.0 : 1.0			;
 
- if(m_nDeviceIndex == 0xFF) return	;
+ CalcCHMode()				;
+ WORD 	CHMod = CH_MODE			;
  
- dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh, 4);
+ if(m_nDeviceIndex == 0xFF) return	;
+
+ dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh],nCh,CHMod);
 //Установите переключатель каналов и уровень напряжения
  dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDiv)	;
 
 // Установите коррекцию амплитуды, вызванную режимом канала
- dsoHTADCCHModGain(m_nDeviceIndex, 4)			;
+ dsoHTADCCHModGain(m_nDeviceIndex, CHMod)			;
 
- dsoHTSetAmpCalibrate(m_nDeviceIndex,0x0F,m_nTimeDiv,RelayControl.nCHVoltDIV,m_nLeverPos);
+ dsoHTSetAmpCalibrate(m_nDeviceIndex,m_nCHSet,m_nTimeDiv,RelayControl.nCHVoltDIV,m_nLeverPos);
 }
+//---------------------------------------------------------------------------
+WORD CHard::CalcCHMode(void)
+{int cntChnlW = CntChnlW()				;// кол-во работающих каналов
+ m_nCHMod = m_nTimeDiv == 7 && cntChnlW <= 2 ? 2 :
+	    m_nTimeDiv <  7 && cntChnlW == 1 ? 1 :
+	    m_nTimeDiv <  7 && cntChnlW == 2 ? 2 : 4	;
+
+ return m_nCHMod	;}
+//---------------------------------------------------------------------------
+int CHard::CntChnlW(void)	// кол-во включенных каналов
+{int cnt = 0			;
+
+ m_nCHSet = 0x0F		;
+ for(int nCh=0;nCh<4;nCh++){
+   if(RelayControl.bCHEnable[nCh]) cnt++	;
+   else if(flDbg4) m_nCHSet &= ~_BV(nCh)	;
+ }
+ m_stControl.nCHSet = m_nCHSet	;
+ return cnt	;}
 //---------------------------------------------------------------------------
 void CHard::Init()
 {
- try{
- dsoInitHard(m_nDeviceIndex)		;//Инициализация оборудования
- dsoHTADCCHModGain(m_nDeviceIndex, 4)	;// Установите коррекцию амплитуды, вызванную режимом канала
+ const int  SzCHLvl = 288	;
+ WORD  CHLevel[600]		; memset(CHLevel,0,sizeof(CHLevel))	;
 
-// Установить частоту дискретизации
+ try{
+ dsoInitHard(m_nDeviceIndex)	;//Инициализация оборудования
+ CalcCHMode()			;
+ WORD 	CHMod = CH_MODE		;
+
+ dsoHTADCCHModGain(m_nDeviceIndex, CHMod)	;// Установите коррекцию амплитуды, вызванную режимом канала
+
+ dsoHTReadCalibrationData(m_nDeviceIndex,CHLevel,28)	;//(WORD nDeviceIndex,WORD* pLevel,WORD nLen);
+ SaveDump(CHLevel,600,"ChLevel.dmp")			;
+
+ // Установить частоту дискретизации
  dsoHTSetSampleRate(m_nDeviceIndex, m_nYTFormat, &RelayControl, &m_stControl)	;
 //Установите переключатель каналов и уровень напряжения
  dsoHTSetCHAndTrigger(m_nDeviceIndex, &RelayControl, m_stControl.nTimeDiv)	;
@@ -222,7 +271,7 @@ void CHard::Init()
 					     m_stControl.nCHSet  ,
 					     m_stControl.nTriggerSource, 0)	;
  for (int nCh = 0; nCh < MAX_CH_NUM; nCh++){
-   dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh], nCh, 4);
+   dsoHTSetCHPos(m_nDeviceIndex, RelayControl.nCHVoltDIV[nCh], m_nLeverPos[nCh], nCh, CHMod);
  }
  dsoHTSetVTriggerLevel(m_nDeviceIndex, m_nLeverPos[CH1], 4);
 
@@ -254,10 +303,11 @@ void CHard::Init()
 //---------------------------------------------------------------------------
 USHORT CHard::CollectData()
 {
+ WORD 	CHMod = CH_MODE	;
  if(m_nDeviceIndex == 0xFF){
    if(FindeDev()){
-     dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4)	;//
-     dsoHTSetVTriggerLevel (m_nDeviceIndex, m_stControl.nVTriggerPos, 4);//
+     dsoHTSetHTriggerLength(m_nDeviceIndex,&m_stControl,4/*CHMod*/)	;//
+     dsoHTSetVTriggerLevel (m_nDeviceIndex, m_stControl.nVTriggerPos,4);//
    }
    else{
      Application->MessageBox("No suitble device was found!","!!!",MB_OK);
@@ -422,9 +472,17 @@ double CHard::SmplPerDiv(void)
  double val    = SamplingRate() * timDiv * TimStrth	;
  return val	;}
 //---------------------------------------------------------------------------
-int CHard::CntChnlW()	// кол-во включенных каналов
-{int cnt = 0	;
- for(int nCh=0;nCh<4;nCh++) if(RelayControl.bCHEnable[nCh]) cnt++	;
- return cnt	;}
 //---------------------------------------------------------------------------
+void SaveDump(WORD* dmp,int len,char* name)
+{char	str[1000] = {0} , srr[8]	;
+ FILE* fll = fopen(name,"wt")		;
+ if(fll){
+   for(int ix=0;ix<len;ix++){
+     fprintf(fll,"%04X ",dmp[ix])	;
+     if(ix && !((ix+1) % 18)){
+       fprintf(fll,"\n")		;}
+   }
+   fclose(fll)	; fll = 0		;}
+}
 //---------------------------------------------------------------------------
+

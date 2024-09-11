@@ -13,7 +13,7 @@ class CHard
 {
 public:
 	CHard();
-       ~CHard(){}
+       ~CHard();//{}
 //Attributes
 public:
   USHORT       	m_nDeviceIndex		;
@@ -23,7 +23,7 @@ public:
 //USHORT 	m_nCalLevel[CAL_LEVEL_LEN];//Cal Level
   size_t       	m_nTimeDiv		;
   USHORT       	m_nYTFormat		;
-  BOOL 		m_bCollect		;
+  bool 		m_bCollect		;
   CONTROLDATA 	m_stControl		;
   RELAYCONTROL 	RelayControl		;
   USHORT       	m_nTriggerMode		;
@@ -31,12 +31,15 @@ public:
   USHORT       	m_nTriggerSlope		;
   USHORT       	m_nLeverPos[MAX_CH_NUM]	;
   COLORREF 	m_clrRGB[MAX_CH_NUM]	;
+  WORD		m_nCHSet		;
+  bool		flDbg1,flDbg2,flDbg3,flDbg4	;
 //WORD		pAmpLevel[AMPCALI_Len]	;
   double	TimStrth		;// растяжка
   double	MultY[MAX_CH_NUM] 	;
 
   int		m_nReadOK		;// Верны ли данные, прочитанные в этот раз, 0, неправильные, не 0, неправильные;
   BOOL 		m_bStartNew		;// Стоит ли начинать новую коллекцию
+  WORD		m_nCHMod		;// 1,2,4	??????????????
 //Operations
 public:
   void 	 	Init()			;
@@ -49,14 +52,15 @@ public:
   double	GetTimStrth(void){ return TimStrth	;}
   double	GetTimDiv(void)				;
   double	GetVltDiv(void)				;
+  WORD		CalcCHMode(void)			;
 
   void 		SetTriggerMode (uint16_t val)		;
   void 		SetTriggerSweep(uint16_t val)		;
   void 		SetTriggerSlope(uint16_t val)		;
   void 		SetTriggerSrc  (uint16_t val)		;
 
-  int 		CntChnlW()		;// кол-во включенных каналов
-  ULONG		BufferLen() { return m_stControl.nBufferLen	;}
+  int 		CntChnlW(void)		;// кол-во включенных каналов
+  ULONG		BufferLen(void) { return m_stControl.nBufferLen	;}
 
   double        SamplingRate()		;
   double 	SmplPerDiv(void)	;

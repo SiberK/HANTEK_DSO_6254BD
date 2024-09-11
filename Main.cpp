@@ -144,6 +144,8 @@ void __fastcall TForm1::DisplaySampleRate()
  String timClct  = FrmDSO->GetTimClct()			;
  String smplPerDiv=FrmDSO->GetSmplPerDiv()		;
  size_t cntSmpls = FrmDSO->CountSamples()		;
+ char	chCHMode = FrmDSO->GetCHMode()			;
+	chCHMode = chCHMode == 4 ? 'Q' : chCHMode == 2 ? 'D' : 'S'	;
 // smplRate != 0 ? cntSmpls / smplRate : 0	;
 // String	smplPerDiv = smplRate * timeBase		;// отсчётов на 1 деление
 // double	srm = smplRate/(smplRate > 250.0e6 ? 1.0e9 :
@@ -157,8 +159,8 @@ void __fastcall TForm1::DisplaySampleRate()
 // Str.printf("%s %s (%3.0lf Sa/Div) %ld (%s)",
 //		strSrm,strPp.c_str(), smplPerDiv,
 //		cntSmpls, IntervalToStr(timCollect))	;
- Str.printf("%s (%s) %ld (%s)",
-	    smplRate,smplPerDiv, cntSmpls, timClct)	;
+ Str.printf("%s (%s) %ld (%s)%c",
+	    smplRate,smplPerDiv, cntSmpls, timClct,chCHMode)	;
  StatMsg[2] = Str	;
 }
 //---------------------------------------------------------------------------
@@ -176,10 +178,13 @@ void __fastcall TForm1::ChnlOnChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::timRefTimer(TObject *Sender)
-{timRef->Enabled = false	;
+{uint8_t 	rzlt = 0 	;
+ timRef->Enabled = false	;
  if(!FrmDSO) return		;
 
- if(0xFF == FrmDSO->CollectData()){
+ if(!bPause->Down) rzlt = FrmDSO->CollectData()	;
+
+ if(rzlt == 0xFF){
    Application->MessageBox("No suitble device was found!","!!!",MB_OK);
  }
  else{
@@ -213,6 +218,21 @@ void __fastcall TForm1::FormMouseWheel(TObject *Sender, TShiftState Shift,
       int WheelDelta, TPoint &MousePos, bool &Handled)
 {//if(Shift.Contains(ssCtrl))
    FrmDSO->FMouseWheel(Sender,Shift,WheelDelta,MousePos,Handled)	;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::FBtnClick(TObject *Sender)
+{
+ TSpeedButton* btn = dynamic_cast<TSpeedButton*>(Sender)	;
+ int tag = btn ? btn->Tag : 0	;
+
+ switch(tag){
+   case 101 : timRefTimer(this)	; break	;// bPause
+   case 102 : if(FrmDSO) FrmDSO->flDbg1 = btn->Down	; break	;// bDbg1
+   case 103 : if(FrmDSO) FrmDSO->flDbg2 = btn->Down	; break	;// bDbg2
+   case 104 : if(FrmDSO) FrmDSO->flDbg3 = btn->Down	; break	;// bDbg3
+   case 105 : if(FrmDSO) FrmDSO->flDbg4 = btn->Down	; break	;// bDbg4   
+ }
 }
 //---------------------------------------------------------------------------
 

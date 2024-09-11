@@ -50,18 +50,93 @@ GLvoid  DrawShapesGL(TShapeGL* shp[],int CntShp)
  }
 }
 //---------------------------------------------------------------------------
-GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
+GLvoid  DrawWaveGL_M(TParamsDrawWave* prms)
 {
- uint32_t lst = CNL_1+nCh	;
- if(glIsList(lst)) glDeleteLists(lst,1)	;
+ uint32_t ix, lstGL = CNL_1 + prms->nCh 	;
+// if(glIsList(lst)) glDeleteLists(lst,1)	;
 
 // кол-во отсчётов в ViewOGL
- double	nDisDataLen = prms->nDisDataLen	;
  double stpX = prms->StpOGL		;// шаг по горизонтали
- double stpY = 2.0 / 255		;// Шаг по вертикали
+ double stpY = 2.0 / 256.0		;// Шаг по вертикали
  double ofst = prms->Offset_H		;
- short* pSrcData = prms->pSrcData	;
- 
+ ULONG  ixArr  = prms->IxArr		;
+// int	cntArr = prms->CntArr		;
+// short* pSrcData = prms->pSrcData	;
+
+ if(!prms->pSrcData || !prms->ChEnbl) return 	;
+
+ glNewList(lstGL,GL_COMPILE)	;{
+   glLineWidth(1)		;
+   glBegin(GL_LINE_STRIP) 	;{
+     glColorT(prms->clrRGB)	;
+     if(prms->CHMode == 4)			// Q: four channel mode
+       for(ix=0;ix<prms->nSrcDataLen;ix++){
+	 glVertex2f((ix * stpX + ofst),prms->pSrcData[ixArr][ix] * stpY-1.0)	;
+       }
+     else if(prms->CHMode == 2)                 // D: dual channel mode
+       for(ix=0;ix<prms->nSrcDataLen;ix++){
+	 if(!prms->flDbg2){
+	   glVertex2f(( 2*ix    * stpX + ofst),prms->pSrcData[ixArr+0][ix] * stpY-1.0)	;
+	   glVertex2f(((2*ix+1) * stpX + ofst),prms->pSrcData[ixArr+1][ix] * stpY-1.0)	;}
+	 else{
+	   glVertex2f(( 2*ix    * stpX + ofst),prms->pSrcData[ixArr+1][ix] * stpY-1.0)	;
+	   glVertex2f(((2*ix+1) * stpX + ofst),prms->pSrcData[ixArr+0][ix] * stpY-1.0)	;}
+       }
+
+     else if(prms->CHMode == 1)                 // S: single channel mode
+       for(ix=0;ix<prms->nSrcDataLen;ix++){
+	 glVertex2f(( 4*ix    * stpX + ofst),prms->pSrcData[ixArr  ][ix] * stpY-1.0)	;
+	 glVertex2f(((4*ix+1) * stpX + ofst),prms->pSrcData[ixArr+1][ix] * stpY-1.0)	;
+	 glVertex2f(((4*ix+2) * stpX + ofst),prms->pSrcData[ixArr+2][ix] * stpY-1.0)	;
+	 glVertex2f(((4*ix+3) * stpX + ofst),prms->pSrcData[ixArr+3][ix] * stpY-1.0)	;
+       }
+
+   } glEnd()	;
+ }glEndList()	;
+}
+//---------------------------------------------------------------------------
+GLvoid  DrawWaveGL_D(TParamsDrawWave* prms)
+{
+ uint32_t ix, lstGL = CNL_1 + prms->nCh 	;
+// if(glIsList(lst)) glDeleteLists(lst,1)	;
+ TColor clr[4] = {clBlue,clRed,clGreen,clPurple};
+// кол-во отсчётов в ViewOGL
+ double XX, stpX = prms->StpOGL		;// шаг по горизонтали
+ double YY, stpY = 2.0 / 256.0		;// Шаг по вертикали
+ double ofst = prms->Offset_H		;
+ ULONG  ixArr  = prms->IxArr		;
+// int	cntArr = prms->CntArr		;
+// short* pSrcData = prms->pSrcData	;
+
+ if(!prms->pSrcData || !prms->ChEnbl) return 	;
+ int ch, cntCh = prms->CHMode == 1 ? 4 : prms->CHMode == 2 ? 2 : 1	;
+
+ glNewList(lstGL,GL_COMPILE)	;{
+   glLineWidth(1)		;
+   for(ch=0;ch<cntCh;ch++){
+     glColorT(clr[ch])		;
+     glBegin(GL_LINE_STRIP) 	;{
+       for(ix=0;ix<prms->nSrcDataLen;ix++){
+	 XX = (ix*cntCh+ch) * stpX		;
+	 YY = prms->pSrcData[ixArr+ch][ix]*stpY	;
+	 glVertex2f(XX + ofst,YY - 1.0)		;
+       }
+     } glEnd()	;
+   }
+ }glEndList()	;
+}
+//---------------------------------------------------------------------------
+GLvoid  DrawWaveGL(TParamsDrawWave* prms)
+{
+ uint32_t lst = CNL_1 + prms->nCh	;
+// if(glIsList(lst)) glDeleteLists(lst,1)	;
+
+// кол-во отсчётов в ViewOGL
+ double stpX = prms->StpOGL		;// шаг по горизонтали
+ double stpY = 2.0 / 256.0		;// Шаг по вертикали
+ double ofst = prms->Offset_H		;
+ short* pSrcData = prms->pSrcData[prms->nCh]	;
+
  if(!pSrcData) return		;
 
  glNewList(lst,GL_COMPILE)	;{
@@ -76,7 +151,7 @@ GLvoid  DrawWaveGL(USHORT nCh,TParamsDrawWave* prms)
  }glEndList()	;
 }
 //---------------------------------------------------------------------------
-GLvoid	DrawSceneGL(GLsizei width, GLsizei height)
+GLvoid	DrawSceneGL(GLsizei width, GLsizei height,bool dbg)
 {if(!ghDC || !ghRC) return	;
 
  glViewport( 0, 0,width,height)	;// устанавливаем область вывода
@@ -95,7 +170,7 @@ GLvoid	DrawSceneGL(GLsizei width, GLsizei height)
  //-------
 
  for(int nCh=0;nCh<4;nCh++)
-   if(glIsList(CNL_1+nCh)) glCallList(CNL_1+nCh);
+   if(glIsList(CNL_1+nCh)){ glCallList(CNL_1+nCh); glDeleteLists(CNL_1+nCh,1)	;}
   //-------
  if(glIsList(SHP_OGL)) glCallList(SHP_OGL)     	;
  if(glIsList(CUR_OGL)) glCallList(CUR_OGL)     	;

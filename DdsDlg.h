@@ -11,19 +11,37 @@
 #include "rxCurrEdit.hpp"
 #include "rxPlacemnt.hpp"
 #include "rxToolEdit.hpp"
+#include <ExtCtrls.hpp>
 //---------------------------------------------------------------------------
 class TDdsDialog : public TForm
 {
 __published:	// IDE-managed Components
-	TLabel *Label1;
-	TLabel *Label2;
-	TLabel *Label3;
 	TComboBox *cbDdsMode;
 	TCurrencyEdit *eFrq;
 	TComboBox *cbFrq;
 	TCurrencyEdit *eAmpl;
 	TCurrencyEdit *eOffset;
 	TFormStorage *FormStorage1;
+	TPanel *pFrq;
+	TPanel *Panel1;
+	TPanel *pAmpl;
+	TPanel *pOfst;
+	TPanel *pPhase;
+	TPanel *pAMFM;
+	TPanel *pRise;
+	TCurrencyEdit *ePhase;
+	TCurrencyEdit *eDuty;
+	TCurrencyEdit *eRise;
+	TCurrencyEdit *eHigh;
+	TCurrencyEdit *eFall;
+	TCurrencyEdit *eCWFrq;
+	TComboBox *cbCWFrq;
+	TCurrencyEdit *eAMDepth;
+	TLabel *Label1;
+	TCheckBox *cbFM;
+	TCurrencyEdit *eFMDev;
+	TLabel *Label2;
+	TLabel *Label3;
 	void __fastcall DdsChange(TObject *Sender);
 	void __fastcall FormMouseWheel(TObject *Sender, TShiftState Shift,
           int WheelDelta, TPoint &MousePos, bool &Handled);

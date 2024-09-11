@@ -17,9 +17,9 @@
 #include <math.hpp>
 //#include <windef.h>
 #include "HeadFiles_UTF8/DefMacro.h"
-#include "HeadFiles/HTSoftDll.h"
-//#include "HeadFiles/HTDisplayDll.h"
-#include "HeadFiles/HTHardDll.h"
+#include "HeadFiles_UTF8/HTSoftDll.h"
+//#include "HeadFiles_UTF8/HTDisplayDll.h"
+#include "HeadFiles_UTF8/HTHardDll.h"
 
 
 //µº»Îª≠ÕºDLL

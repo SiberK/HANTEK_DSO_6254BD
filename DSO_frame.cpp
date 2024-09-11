@@ -3,6 +3,7 @@
 #pragma hdrstop
 
 #include <RxStrUtils.hpp>
+#include	<Math.hpp>
 #include "Main.h"
 #include "DrawOGL.h"
 #include "ComWorL.h"
@@ -35,6 +36,7 @@ __fastcall TFrmDSO::TFrmDSO(TComponent* Owner,TNotifyEvent _onChnge): TFrame(Own
  cbGetChnlParams  = 0			;
  cbSendTimParams  = 0			;
  cbGetTimParams   = 0			;
+ flDbg1 = flDbg2 = flDbg3 = flDbg4 = 0	;
 
  SmplPerDiv = 250			;
  CntGrid_H  = 10	; CntGrid_V = 8	;
@@ -190,10 +192,12 @@ void __fastcall TFrmDSO::CalcDrawWaves(void)
 {char	str[80]	;
  double	Tprc = shpLvl[TRG_T]->Pos.Lvl100/100.0		;// 0.0 ... 1.0  % положение T относительно полной длины последовательности
  SmplPerDiv  = m_Hard.SmplPerDiv()			;
+ int IX_LEN  = m_Hard.m_nCHMod == 1 ? 4 : m_Hard.m_nCHMod == 2 ? 2 : 1	;
 
  PrmsDW.nDisType      = 0				;// display type: Line or Dot
  PrmsDW.nSrcDataLen   = m_Hard.m_stControl.nBufferLen	;// the source data length
-// PrmsDW.nDisDataLen   = m_Hard.m_stControl.nBufferLen	;// the display data length for drawing
+
+ // PrmsDW.nDisDataLen   = m_Hard.m_stControl.nBufferLen	;// the display data length for drawing
  PrmsDW.nCenterData   = PrmsDW.nSrcDataLen / 2 		;// half of the source data
  PrmsDW.dbHorizontal  = bStretch->Down ?
 				1.0 / TIME_STRETH : 1.0	;// the horizontal factor of zoom out/in
@@ -209,17 +213,21 @@ void __fastcall TFrmDSO::CalcDrawWaves(void)
  PrmsDW.StpOGL	      = 2.0/PrmsDW.nDisDataLen		;// шаг отображения отсчётов в OGL (-1.0 .. 1.0)
 
 // длительность набираемой последовательности отсчётов (мСек)
- PrmsDW.dLenWave      = PrmsDW.nSrcDataLen * PrmsDW.StpOGL		;
+ PrmsDW.dLenWave      = PrmsDW.nSrcDataLen * PrmsDW.StpOGL*IX_LEN		;
+// кол-во массивов в которых размазаны данные выборки одного канала
+ PrmsDW.CHMode = m_Hard.m_nCHMod			;// в одноканальном режиме - в 4-х массивах!!!
+							 // в двухканальном - в двух массивах,
 
 // !!! (SC_OGL) - система координат контекста OGL !!! (причём видимая часть контекста -1.0 ... 1.0)!!!
  if(!bFixTrgT->Down){
-   PrmsDW.Offset_H = Tprc*(2.0-PrmsDW.StpOGL*PrmsDW.nSrcDataLen) -1.0	;}
+   PrmsDW.Offset_H = Tprc*(2.0-PrmsDW.StpOGL*PrmsDW.nSrcDataLen*IX_LEN) -1.0	;}
  else{
    int    iMin = 0, iMax = pTop->Width - shpView->Width		;
    int    iPos = shpView->Left					;
-   double dMin = -1.0, dMax = 1.0 - PrmsDW.dLenWave,dPos	;
+   double dMin = -1.0,dPos, dMax = 1.0 - PrmsDW.dLenWave	;
 
-   dPos = dMap(iMin,iMax,iPos,dMin,dMax)			;
+   dPos = flDbg3 ? dMapDbg(iMin,iMax,iPos,dMin,dMax) :
+		   dMapDbg(iMin,iMax,iPos,dMin,dMax)		;
    PrmsDW.Offset_H = dPos					;
 // рассчёт положения отметки TrgT
    dPos = PrmsDW.Offset_H + Tprc * PrmsDW.dLenWave		;
@@ -237,8 +245,10 @@ void __fastcall TFrmDSO::CalcDrawWaves(void)
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::ShowShpView(bool Fix_TrgT)	// показать область видимости
-{if(PrmsDW.dLenWave > 1.0 && PrmsDW.nSrcDataLen > 0){
-   double scale1 = double(PrmsDW.nDisDataLen) / PrmsDW.nSrcDataLen	;
+{
+ int IX_LEN  = m_Hard.m_nCHMod == 1 ? 4 : m_Hard.m_nCHMod == 2 ? 2 : 1	;
+ if(PrmsDW.dLenWave > 1.0 && PrmsDW.nSrcDataLen > 0){
+   double scale1 = double(PrmsDW.nDisDataLen) / (PrmsDW.nSrcDataLen * IX_LEN)	;
    double scale2 = (-1.0 - PrmsDW.Offset_H)/2.0	;
    shpView->Width = pTop->Width * scale1+0.5	;
    if(!Fix_TrgT)
@@ -247,22 +257,42 @@ void __fastcall TFrmDSO::ShowShpView(bool Fix_TrgT)	// показать обла
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::DrawWaves(void)
-{int wch = 0	;
- for(int ch=0;ch<MAX_CH_NUM;ch++){    //CH1/CH2/CH3/CH4
-   PrmsDW.clrRGB   = m_Hard.m_clrRGB[ch]		;// the color of the line
-   PrmsDW.pSrcData = 0					;
-   
-   if(m_Hard.RelayControl.bCHEnable[ch]){
-// в режиме nTimeDiv < 8 ( SamplingRate > 0.5GSa), когда работ. каналов = 2
-// выборки в pSrcData 0 и 2 !!!!  ХЗ почему?????
-     if(m_Hard.m_nTimeDiv<8 && m_Hard.CntChnlW()==2){
-       PrmsDW.pSrcData = m_Hard.m_pSrcData[wch]		;// the source data for drawing
-       wch += 2						;}
+{bool	ChEnbl			;
+ int 	wch = 0, cntCh = 1	;
+ PrmsDW.pSrcData[0] = m_Hard.m_pSrcData[0] 		;
+ PrmsDW.pSrcData[1] = m_Hard.m_pSrcData[1] 		;
+ PrmsDW.pSrcData[2] = m_Hard.m_pSrcData[2] 		;
+ PrmsDW.pSrcData[3] = m_Hard.m_pSrcData[3] 		;
+ PrmsDW.flDbg1      = m_Hard.flDbg1 = flDbg1   		;
+ PrmsDW.flDbg2      = m_Hard.flDbg2 = flDbg2   		;
+ PrmsDW.flDbg3      = m_Hard.flDbg3 = flDbg3   		;
+ PrmsDW.flDbg4      = m_Hard.flDbg4 = flDbg4   		;
 
-     else PrmsDW.pSrcData= m_Hard.m_pSrcData[ch]	;// the source data for drawing
-   }
+// кол-во массивов в которых размазаны данные выборки одного канала
+ PrmsDW.CHMode = m_Hard.m_nCHMod			;// в одноканальном режиме - в 4-х массивах!!!
+							 // в двухканальном - в двух массивах,
+
+ for(int ch=0;ch<MAX_CH_NUM && wch<MAX_CH_NUM;ch++){    //CH1/CH2/CH3/CH4
+   PrmsDW.ChEnbl = m_Hard.RelayControl.bCHEnable[ch]   	;
+   PrmsDW.nCh           = ch				;
    PrmsDW.nDisLeverPos  = m_Hard.m_nLeverPos[ch]	;// the display position(Zero Level)
-   DrawWaveGL(ch,&PrmsDW)				;//
+   PrmsDW.clrRGB        = m_Hard.m_clrRGB[ch]		;// the color of the line
+   if(!PrmsDW.ChEnbl) continue				;
+
+// в режиме nTimeDiv < 8 ( SamplingRate > 0.5GSa), когда работ. каналов = 2
+// выборки в pSrcData 0 и 2 !!!!
+//   if(PrmsDW.CntArr == 4)     { PrmsDW.IxArr = 0 	;// 1 канал 1GHz
+//				wch = 4			;}// это чтоб вышли из цикла for
+//   else if(PrmsDW.CntArr == 2){ PrmsDW.IxArr = wch	; // 2 канала 0.5GHz
+//				wch+=2			;}
+//   else{                        PrmsDW.IxArr = ch	;}// обычный режим
+//
+   if(PrmsDW.CHMode == 1){ PrmsDW.IxArr = 0	; wch = 0	;}
+   if(PrmsDW.CHMode == 2){ PrmsDW.IxArr = wch	; wch += 2	;}
+   if(PrmsDW.CHMode == 4){ PrmsDW.IxArr = ch	; wch = ch	;}
+//   DrawWaveGL(&PrmsDW)
+   if(PrmsDW.CHMode <= 2 && flDbg1) DrawWaveGL_D(&PrmsDW)	;
+   else DrawWaveGL_M(&PrmsDW)	;//
  }
 }
 //---------------------------------------------------------------------------
@@ -279,7 +309,7 @@ void __fastcall TFrmDSO::OnDraw(TObject *Sender)
 
    DrawCursorsGL(CursorDSO,CNT_CUR)	;
    DrawShapesGL (shpLvl ,CNT_SHP)	;
-   DrawSceneGL  (CliWdt ,CliHgt )	;
+   DrawSceneGL  (CliWdt ,CliHgt, btn4->Down )	;
  }DEF_CATCH
 }
 //---------------------------------------------------------------------------
@@ -347,7 +377,8 @@ void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
    }
    else if(shp == shpView && bFixTrgT->Down){
      X += shp->Left				;
-     X = Min(Max(X,shp->Width/2 ),shp->Parent->Width-shp->Width/2 )	;
+     if(!flDbg3)
+       X = Min(Max(X,shp->Width/2 ),shp->Parent->Width-shp->Width/2 )	;
      shp->Left = X - shp->Width/2 	 	;
      CalcDrawWaves()	;
      sprintf(str,"%ld  %ld", X, shp->Left)	;
@@ -365,51 +396,58 @@ void __fastcall TFrmDSO::FMouseMove(TObject *Sender,
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::GetCursorInfo(void)
-{
+{WORD	nCHState = m_Hard.m_nCHMod		;
  if(Form1){
+
    Form1->StatMsg[0] = TDsoCursor::GetInfoT()	;
    Form1->StatMsg[1] = TDsoCursor::GetInfoV()	;
+   double 	insNum = dsoSFGetInsertNum(m_Hard.m_nTimeDiv,0,m_Hard.m_nCHMod)	;
+   uint32_t	smplRate = dsoSFGetSampleRate(m_Hard.m_nTimeDiv,0,nCHState,1)		;
+   Form1->StatMsg[3] = FormatFloat("0.0##",insNum) + FormatFloat(":::0.##",smplRate)	;
  }
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmDSO::FMouseWheel(TObject *Sender, TShiftState Shift,
       int WheelDelta, TPoint &MousePos, bool &Handled)
 {TChnlParams	params		;
- int		iix		;
- static double 	WhlPos = 0	;
- const  double  WhlSns = 1/4.0	;
+ int		iix,flUpDn=0		;
+// static double 	WhlPos = 0	;
+// const  double  WhlSns = 1/4.0	;
  bool 		bCtrl = Shift.Contains(ssCtrl) 	;// ??????
  bool 		bShft = Shift.Contains(ssShift)	;// ??????
  uint8_t	nCh = 0xFF	;
 
- WhlPos += WheelDelta > 0 ? -WhlSns: WhlSns	;
- int iWhl = WhlPos	; if(iWhl) WhlPos = 0	;
-
- if(lblTimDiv->ClientRect.Contains(lblTimDiv->ScreenToClient(MousePos))){
-   if(cbChngTimDiv && iWhl!=0) cbChngTimDiv(iWhl > 0 ? 1:-1)	;
-   nCh = 9 	;
-   CalcDrawWaves()	;
+ WheelAccumulator += WheelDelta	;
+ if(abs(WheelAccumulator) > WHEEL_DELTA*4){
+   flUpDn = (WheelAccumulator > 0) ? 1 : -1	;
+   WheelAccumulator = 0			   	;
  }
-
- for(int ch=0;ch<CNT_SHP && iWhl && nCh > 10;ch++){
-   if(shpLvl[ch]->ClientRect.Contains(shpLvl[ch]->ScreenToClient(MousePos)))
-     nCh = shpLvl[ch]->Tag-1			;
-   else if(ch<4 && lblCh[ch]->ClientRect.Contains(lblCh[ch]->ScreenToClient(MousePos)))
-     nCh = lblCh[ch]->Tag-1			;
- }
-
- if(nCh < 4){
-   if(cbGetChnlParams && cbSendChnlParams && nCh<4){
-     cbGetChnlParams(nCh,&params)		;
-     if(bCtrl){
-     }
-     else{
-       iix = params.IxVoltDiv + iWhl		;
-       iix = Min(Max(iix,0),11)			;
-       params.IxVoltDiv = iix			;
-     }
-     cbSendChnlParams(&params)			;
+ if(flUpDn){
+   if(lblTimDiv->ClientRect.Contains(lblTimDiv->ScreenToClient(MousePos))){
+     if(cbChngTimDiv) cbChngTimDiv(flUpDn)	;
+     nCh = 9 		;
+     CalcDrawWaves()	;
    }
+
+   for(int ch=0;ch<CNT_SHP && nCh > 10;ch++){
+     if(shpLvl[ch]->ClientRect.Contains(shpLvl[ch]->ScreenToClient(MousePos)))
+       nCh = shpLvl[ch]->Tag-1			;
+     else if(ch<4 && lblCh[ch]->ClientRect.Contains(lblCh[ch]->ScreenToClient(MousePos)))
+       nCh = lblCh[ch]->Tag-1			;
+   }
+
+   if(nCh < 4){
+     if(cbGetChnlParams && cbSendChnlParams && nCh<4){
+       cbGetChnlParams(nCh,&params)		;
+       if(!bCtrl){
+	 iix = params.IxVoltDiv + flUpDn   	;
+	 iix = Min(Max(iix,0),11)	   	;
+	 params.IxVoltDiv = iix			;
+       }
+       cbSendChnlParams(&params)	   	;
+     }
+   }
+   Application->ProcessMessages()		;
  }
 }
 //---------------------------------------------------------------------------
@@ -477,6 +515,10 @@ void __fastcall TFrmDSO::popTrgClick(TObject *Sender)
 String __fastcall TFrmDSO::GetSmplPerDiv(void)
 {return FormatFloat("0.## Sa/Div",m_Hard.SmplPerDiv())	;}
 //---------------------------------------------------------------------------
+size_t __fastcall TFrmDSO::CountSamples (void)
+{int IX_LEN  = m_Hard.m_nCHMod == 1 ? 4 : m_Hard.m_nCHMod == 2 ? 2 : 1	;
+ return m_Hard.BufferLen() * IX_LEN	;}
+//---------------------------------------------------------------------------
 String __fastcall TFrmDSO::GetTimClct   (void)
 {double val = CountSamples()/m_Hard.SamplingRate()	;
  return IntervalToStr(val)				;}
@@ -496,6 +538,13 @@ String __fastcall TFrmDSO::GetSmplRate(void)
 	      val > 250   ? FormatFloat("0.# kSa",val/1e3) :
 			    FormatFloat("0.# Sa" ,val)		;
  return str	;}
+//---------------------------------------------------------------------------
+void __fastcall TFrmDSO::Dbg1(void)
+{
+ double insNum = dsoSFGetInsertNum(m_Hard.m_nTimeDiv,0,m_Hard.m_nCHMod)	;
+ ShowMessage(FormatFloat("0.00E+00",insNum))	;
+
+}
 //---------------------------------------------------------------------------
 //     sprintf(str,"Y=%ld, pos=%6.2lf, lvl255=%ld",
 //		Y, shpGL->Pos.dPos,shpGL->Pos.Lvl255)	;

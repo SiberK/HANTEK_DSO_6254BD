@@ -34,6 +34,11 @@ double	dMap(int imin,int imax,int ipos,double dmin,double dmax){
 				     Max(Min(ipos,imin),imax) 		;
 	    return dmin + (dmax-dmin)*(ipos-imin)/(imax-imin)		;}
 //---------------------------------------------------------------------------
+double	dMapDbg(int imin,int imax,int ipos,double dmin,double dmax){
+//		   ipos = imin<imax? Min(Max(ipos,imin),imax):
+//				     Max(Min(ipos,imin),imax) 		;
+	    return dmin + (dmax-dmin)*(ipos-imin)/(imax-imin)		;}
+//---------------------------------------------------------------------------
 
 struct TLvlPosition{
   short		HgtGL, WdtGL	 	;

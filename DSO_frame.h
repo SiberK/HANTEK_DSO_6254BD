@@ -117,6 +117,8 @@ private:	// User declarations
 
 public:		// User declarations
 
+ bool	flDbg1, flDbg2, flDbg3, flDbg4		;
+
  TcbSendChnlParams cbSendChnlParams		;
  TcbGetChnlParams  cbGetChnlParams		;
  TcbSendTimParams  cbSendTimParams		;
@@ -129,12 +131,13 @@ public:		// User declarations
 
  void   __fastcall SetChnlParams(TChnlParams* params)	;
  void   __fastcall SetTimeDiv(TTimeParams* timPrms, String StrTimDiv)	;
+ void   __fastcall Dbg1(void)				;
  
  String __fastcall GetSmplRate  (void)			;
  String __fastcall GetTimDiv    (void)			;
  String __fastcall GetSmplPerDiv(void)			;
  String __fastcall GetTimClct   (void)			;
- size_t __fastcall CountSamples(){ return m_Hard.BufferLen()	;}
+ size_t __fastcall CountSamples (void) 			;//{ return m_Hard.BufferLen()	;}
 
  void   __fastcall Destroy(TObject* Sender)		;
  USHORT __fastcall CollectData (void)			;
@@ -142,7 +145,7 @@ public:		// User declarations
 
  uint16_t __fastcall GetDevIx(){ return m_Hard.m_nDeviceIndex	;}
  TColor   __fastcall GetChColor(uint8_t ch){return ch<4 ? TColor(m_Hard.m_clrRGB[ch]) : clGray	;}
-
+ char     __fastcall GetCHMode(){return m_Hard.m_nCHMod	;} 
 // uint8_t  __fastcall LoadLvl255(uint8_t nCh)
 // { UCHAR* lvl = (UCHAR*)&(pLeft->Tag) ; return nCh < 4 ? lvl[nCh] : 127	;}
 // void     __fastcall SaveLvl255(UCHAR nCh,UCHAR val)
